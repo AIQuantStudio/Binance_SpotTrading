@@ -10,6 +10,7 @@ from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineUrlScheme
 # from core.bbin_ws_scheme_handler import BBINWebsocketSchemeHandler
 # from views.adminWebEngine import AdminWebEngine
 from config import Config_Data
+from select_model_dialog import CustomDialog
 
 
 css_loading_model_on = """
@@ -122,13 +123,23 @@ class MainWindow(QMainWindow):
         vbox_layout = QVBoxLayout()
 
         # 载入模型按钮
-        self.loading_model_btn = QPushButton("加载模型")
+        self.loading_model_btn = QPushButton("模型")
         self.loading_model_btn.setFixedHeight(30)
         self.loading_model_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.loading_model_btn.setStyleSheet(css_loading_model_on)
         self.loading_model_btn.setFixedWidth(100)
         # self.loading_model_btn.setDisabled(True)
         vbox_layout.addWidget(self.loading_model_btn)
+        
+        
+        # 加载参数按钮
+        self.loading_parameters_btn = QPushButton("加载参数")
+        self.loading_parameters_btn.setFixedHeight(30)
+        self.loading_parameters_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.loading_parameters_btn.setStyleSheet(css_loading_model_on)
+        self.loading_parameters_btn.setFixedWidth(100)
+        # self.loading_model_btn.setDisabled(True)
+        vbox_layout.addWidget(self.loading_parameters_btn)
 
         # 开始按钮
         self.btn_switch = QPushButton("开始监控")
@@ -217,15 +228,32 @@ class MainWindow(QMainWindow):
 
     def bind_event(self):
         # self.btn_switch.clicked.connect(self.onClickWatchButton)
-        self.button_sid.clicked.connect(self.on_click)
+        self.loading_model_btn.clicked.connect(self.on_click)
+        self.loading_parameters_btn.clicked.connect(self.on_click_loading_parameters)
         self.btn_refresh.clicked.connect(self.on_refresh)
 
         # self.tab_widget_browser.tabBar().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         # self.tab_widget_browser.tabBar().customContextMenuRequested.connect(self.on_showContextMenu)
 
+    def on_click_loading_parameters(self):
+        filename, _ = QFileDialog.getOpenFileName(self, "Open File", r".", "参数文件(*.py)")
+        print(filename)
+        # self.ledit_filepath.setText(filename + ";" + filetypelist)
+
+
     def on_click(self):
-        sid = self.webview_bbin.get_sid()
-        print(sid)
+        msg = CustomDialog()
+        
+        btn_clicked = msg.exec()
+        print(btn_clicked)
+        print(QMessageBox.ButtonRole.AcceptRole)
+        print(QMessageBox.ButtonRole.RejectRole)
+        if btn_clicked == QMessageBox.ButtonRole.AcceptRole:
+            print("操作一被点击")
+        elif btn_clicked == QMessageBox.ButtonRole.RejectRole:
+            print("操作二或取消被点击")
+        # sid = self.webview_bbin.get_sid()
+        # print(sid)
 
     def on_refresh(self):
         url = self.lineedit_url.text()
