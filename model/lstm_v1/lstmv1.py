@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-
+from model.lstm_v1.model_config import ModelConfig
 
 class LstmV1:
 
@@ -58,8 +58,11 @@ class LstmV1:
 
         self.current_model_id = "|".join(map(str, current_model_id))
         
-    def load(self):
-        pass
+    def load_data(self, filename_data):
+        checkpoint = torch.load(filename_data)
+        self.config = ModelConfig(**checkpoint["model_config"])
+        self.model.load_state_dict(checkpoint["model_state_dict"])
+        self.scaler = checkpoint["model_scaler"]
 
     def predict(self):
         self.model.eval()

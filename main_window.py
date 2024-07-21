@@ -123,24 +123,52 @@ class MainWindow(QMainWindow):
     def setup_left_area_ui(self, widget: QWidget):
         vbox_layout = QVBoxLayout()
 
+        first_hbox_layout = QHBoxLayout()
         # 载入模型按钮
-        self.loading_model_btn = QPushButton("模型")
+        self.loading_model_btn = QPushButton("选择模型")
         self.loading_model_btn.setFixedHeight(30)
         self.loading_model_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.loading_model_btn.setStyleSheet(css_loading_model_on)
+        self.loading_model_btn.setStyleSheet("QPushButton:hover { color: #333; }")
+        # self.loading_model_btn.setStyleSheet(css_loading_model_on)
         self.loading_model_btn.setFixedWidth(100)
-        # self.loading_model_btn.setDisabled(True)
-        vbox_layout.addWidget(self.loading_model_btn)
+        first_hbox_layout.addWidget(self.loading_model_btn)
+        # 模型名称标签
+        self.model_name_label = QLabel("")
+        first_hbox_layout.addWidget(self.model_name_label)
+        vbox_layout.addLayout(first_hbox_layout)
         
-        
+    
         # 加载参数按钮
         self.loading_parameters_btn = QPushButton("加载参数")
         self.loading_parameters_btn.setFixedHeight(30)
         self.loading_parameters_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.loading_parameters_btn.setStyleSheet(css_loading_model_on)
+        # self.loading_parameters_btn.setStyleSheet(css_loading_model_on)
         self.loading_parameters_btn.setFixedWidth(100)
-        # self.loading_model_btn.setDisabled(True)
+        self.loading_parameters_btn.setDisabled(True)
         vbox_layout.addWidget(self.loading_parameters_btn)
+        
+        
+        second_hbox_layout = QHBoxLayout()
+        second_left_widget = QWidget()
+        second_hbox_layout.addWidget(second_left_widget, stretch=8)
+        second_right_widget = QWidget()
+        second_hbox_layout.addWidget(second_right_widget, stretch=3)
+        
+        second_left_hbox_layout = QHBoxLayout()
+        pair_name_label = QLabel("交易对: ")
+        second_left_hbox_layout.addWidget(pair_name_label)
+        self.pair_name_LineEdit = QLineEdit()
+        self.pair_name_LineEdit.setEnabled(False)
+        second_left_hbox_layout.addWidget(self.pair_name_LineEdit)
+        second_left_widget.setLayout(second_left_hbox_layout)
+        
+        second_right_hbox_layout = QHBoxLayout()
+        self.is_gpu_checkbox = QCheckBox("GPU")
+        self.is_gpu_checkbox.setDisabled(True)
+        second_right_hbox_layout.addWidget(self.is_gpu_checkbox)
+        second_right_widget.setLayout(second_right_hbox_layout)
+        
+        vbox_layout.addLayout(second_hbox_layout)
 
         # 开始按钮
         self.btn_switch = QPushButton("开始监控")
@@ -228,7 +256,6 @@ class MainWindow(QMainWindow):
         widget.setLayout(v_layout)
 
     def bind_event(self):
-        # self.btn_switch.clicked.connect(self.onClickWatchButton)
         self.loading_model_btn.clicked.connect(self.on_click_loading_model)
         self.loading_parameters_btn.clicked.connect(self.on_click_loading_parameters)
         self.btn_refresh.clicked.connect(self.on_refresh)
@@ -236,19 +263,28 @@ class MainWindow(QMainWindow):
         # self.tab_widget_browser.tabBar().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         # self.tab_widget_browser.tabBar().customContextMenuRequested.connect(self.on_showContextMenu)
 
-    def on_click_loading_parameters(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "Open File", r".", "参数文件(*.py)")
-        print(filename)
-        # self.ledit_filepath.setText(filename + ";" + filetypelist)
+    
 
 
     def on_click_loading_model(self):
-        msg = CustomDialog()
-        
-        selected_idx = msg.exec()
+        dlg = CustomDialog()
+        selected_idx = dlg.exec()
         if selected_idx >= 0:
-            print(list(ModelConfig.Models.values())[selected_idx]["class"])
-            ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
+            # ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
+            # print(list(ModelConfig.Models.values())[selected_idx]["class"])
+            self.model_name_label.setText(list(ModelConfig.Models.values())[selected_idx]["class"])
+            self.loading_parameters_btn.setDisabled(False)
+            
+    def on_click_loading_parameters(self):
+        filename, _ = QFileDialog.getOpenFileName(self, "选择参数文件", r".", "参数文件(*.py)")
+        if filename is not None and len(filename) > 0: 
+            print(filename)
+            ModelFactory.load_parameters(filename)
+            
+            
+        # self.ledit_filepath.setText(filename + ";" + filetypelist)
+            
+            
 
         # elif btn_clicked == QMessageBox.ButtonRole.RejectRole:
         #     print("操作二或取消被点击")

@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QDialog, QVBoxLayout, QLabel, QPushButton
+from PyQt6.QtCore import Qt
 
 from config import Config_Data, ModelConfig
 from functools import partial
@@ -17,13 +18,13 @@ class CustomDialog(QDialog):
         layout.addWidget(label)
 
         for idx, name in enumerate(ModelConfig.Models):
-            print(idx)
-            print(name)
             btn = QPushButton(name, self)
+            btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             btn.clicked.connect(partial(self.done, idx))
             layout.addWidget(btn)
 
         button_cancel = QPushButton("取消", self)
+        button_cancel.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button_cancel.clicked.connect(partial(self.done, -1))
         layout.addWidget(button_cancel)
 
