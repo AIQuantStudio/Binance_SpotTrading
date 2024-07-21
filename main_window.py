@@ -9,8 +9,9 @@ from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineUrlScheme
 # from core.bbin_webengine_page import BBINWebEnginePage
 # from core.bbin_ws_scheme_handler import BBINWebsocketSchemeHandler
 # from views.adminWebEngine import AdminWebEngine
-from config import Config_Data
+from config import Config_Data, ModelConfig
 from select_model_dialog import CustomDialog
+from model.model_factory import ModelFactory
 
 
 css_loading_model_on = """
@@ -228,7 +229,7 @@ class MainWindow(QMainWindow):
 
     def bind_event(self):
         # self.btn_switch.clicked.connect(self.onClickWatchButton)
-        self.loading_model_btn.clicked.connect(self.on_click)
+        self.loading_model_btn.clicked.connect(self.on_click_loading_model)
         self.loading_parameters_btn.clicked.connect(self.on_click_loading_parameters)
         self.btn_refresh.clicked.connect(self.on_refresh)
 
@@ -241,17 +242,16 @@ class MainWindow(QMainWindow):
         # self.ledit_filepath.setText(filename + ";" + filetypelist)
 
 
-    def on_click(self):
+    def on_click_loading_model(self):
         msg = CustomDialog()
         
-        btn_clicked = msg.exec()
-        print(btn_clicked)
-        print(QMessageBox.ButtonRole.AcceptRole)
-        print(QMessageBox.ButtonRole.RejectRole)
-        if btn_clicked == QMessageBox.ButtonRole.AcceptRole:
-            print("操作一被点击")
-        elif btn_clicked == QMessageBox.ButtonRole.RejectRole:
-            print("操作二或取消被点击")
+        selected_idx = msg.exec()
+        if selected_idx >= 0:
+            print(list(ModelConfig.Models.values())[selected_idx]["class"])
+            ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
+
+        # elif btn_clicked == QMessageBox.ButtonRole.RejectRole:
+        #     print("操作二或取消被点击")
         # sid = self.webview_bbin.get_sid()
         # print(sid)
 

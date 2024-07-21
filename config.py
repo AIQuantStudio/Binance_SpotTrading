@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+
 Config_Data = {
     "FontFamily": "Arial",
     "FontSize": 12,
@@ -11,3 +14,20 @@ Config_Data = {
 def init_cfg(data):
     for key, value in data.items():
         Config_Data[key] = value
+
+
+@dataclass
+class ModelConfig:
+    Models = {
+        "LSTM_V1": {
+            "class": "LstmV1"
+        },
+        "LSTM_V2": {
+            "class": "LstmV2"
+        }
+    }
+        
+    ModelValues =["lstmv1", "lstmv2"]
+
+    
+    
