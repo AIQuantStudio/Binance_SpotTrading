@@ -20,7 +20,10 @@ class ModelFactory:
     
     @staticmethod
     def load_data(filename):
-        print("-----")
         if ModelFactory._instance_model is not None:
-            print("******")
             ModelFactory._instance_model.load_data(filename)
+            
+    @staticmethod
+    def get_config_dict():
+        if ModelFactory._instance_model is not None:
+            return ModelFactory._instance_model.get_config()

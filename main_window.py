@@ -10,7 +10,9 @@ from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineUrlScheme
 # from core.bbin_ws_scheme_handler import BBINWebsocketSchemeHandler
 # from views.adminWebEngine import AdminWebEngine
 from config import Config_Data, ModelConfig
+from config import Accounts
 from select_model_dialog import CustomDialog
+from select_account_dialog import SelectAccountDialog
 from model.model_factory import ModelFactory
 
 
@@ -123,6 +125,29 @@ class MainWindow(QMainWindow):
     def setup_left_area_ui(self, widget: QWidget):
         vbox_layout = QVBoxLayout()
 
+        model_frame = QFrame(self)
+        model_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        binance_frame = QFrame(self)
+        binance_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        
+        model_vbox_layout = QVBoxLayout()
+        binance_vbox_layout = QVBoxLayout()
+        model_frame.setLayout(model_vbox_layout)
+        binance_frame.setLayout(binance_vbox_layout)
+        
+        
+        self.line = QFrame(self)
+        self.line.setGeometry(QRect(0, 120, 341, 20))
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
+        self.line.setLineWidth(5)
+        self.line.setFrameShape(QFrame.Shape.HLine)
+
+        splitter = QSplitter(Qt.Orientation.Vertical)
+        splitter.addWidget(model_frame)
+        splitter.addWidget(self.line)
+        splitter.addWidget(binance_frame)
+        vbox_layout.addWidget(splitter)
+        
         first_hbox_layout = QHBoxLayout()
         # 载入模型按钮
         self.loading_model_btn = QPushButton("选择模型")
@@ -135,8 +160,7 @@ class MainWindow(QMainWindow):
         # 模型名称标签
         self.model_name_label = QLabel("")
         first_hbox_layout.addWidget(self.model_name_label)
-        vbox_layout.addLayout(first_hbox_layout)
-        
+        model_vbox_layout.addLayout(first_hbox_layout)
     
         # 加载参数按钮
         self.loading_parameters_btn = QPushButton("加载参数")
@@ -145,9 +169,9 @@ class MainWindow(QMainWindow):
         # self.loading_parameters_btn.setStyleSheet(css_loading_model_on)
         self.loading_parameters_btn.setFixedWidth(100)
         self.loading_parameters_btn.setDisabled(True)
-        vbox_layout.addWidget(self.loading_parameters_btn)
+        model_vbox_layout.addWidget(self.loading_parameters_btn)
         
-        
+        # 交易对 GPU
         second_hbox_layout = QHBoxLayout()
         second_left_widget = QWidget()
         second_hbox_layout.addWidget(second_left_widget, stretch=8)
@@ -168,14 +192,40 @@ class MainWindow(QMainWindow):
         second_right_hbox_layout.addWidget(self.is_gpu_checkbox)
         second_right_widget.setLayout(second_right_hbox_layout)
         
-        vbox_layout.addLayout(second_hbox_layout)
+        model_vbox_layout.addLayout(second_hbox_layout)
+        
+        
+        # 配置信息
+        config_info_label = QLabel("配置信息：")
+        model_vbox_layout.addWidget(config_info_label)
+        self.config_info_textbrowser = QTextBrowser()
+        self.config_info_textbrowser.setFont(QFont('Courier New'))
+        model_vbox_layout.addWidget(self.config_info_textbrowser)
+        
+        ##################################################
+        
+        
+        binance_first_hbox_layout = QHBoxLayout()
+        # 选择账号
+        self.select_account_btn = QPushButton("选择账号")
+        self.select_account_btn.setFixedHeight(30)
+        self.select_account_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.select_account_btn.setStyleSheet("QPushButton:hover { color: #333; }")
+        # self.loading_model_btn.setStyleSheet(css_loading_model_on)
+        self.select_account_btn.setFixedWidth(100)
+        binance_first_hbox_layout.addWidget(self.select_account_btn)
+        # 模型名称标签
+        self.account_name_label = QLabel("")
+        binance_first_hbox_layout.addWidget(self.account_name_label)
+        binance_vbox_layout.addLayout(binance_first_hbox_layout)
+        
 
         # 开始按钮
         self.btn_switch = QPushButton("开始监控")
         self.btn_switch.setFixedHeight(30)
         self.btn_switch.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_switch.setStyleSheet(";".join(switch_on_css_list))
-        vbox_layout.addWidget(self.btn_switch)
+        binance_vbox_layout.addWidget(self.btn_switch)
 
         # 下注上限
         h_box_Layout = QHBoxLayout()
@@ -183,19 +233,13 @@ class MainWindow(QMainWindow):
         h_box_Layout.addWidget(lbl_name, 3)
         self.maxBetVal = QLineEdit("1")
         h_box_Layout.addWidget(self.maxBetVal, 9)
-        vbox_layout.addLayout(h_box_Layout)
-
-        # 信息
-        lbl_output_info = QLabel("信息：")
-        vbox_layout.addWidget(lbl_output_info)
-        self.txtbrowser_output_info = QTextBrowser()
-        vbox_layout.addWidget(self.txtbrowser_output_info)
+        binance_vbox_layout.addLayout(h_box_Layout)
 
         # 日志
         lbl_output_log = QLabel("日志：")
-        vbox_layout.addWidget(lbl_output_log)
+        binance_vbox_layout.addWidget(lbl_output_log)
         self.txtbrowser_output_log = QTextBrowser()
-        vbox_layout.addWidget(self.txtbrowser_output_log)
+        binance_vbox_layout.addWidget(self.txtbrowser_output_log)
 
         widget.setLayout(vbox_layout)
 
@@ -258,6 +302,7 @@ class MainWindow(QMainWindow):
     def bind_event(self):
         self.loading_model_btn.clicked.connect(self.on_click_loading_model)
         self.loading_parameters_btn.clicked.connect(self.on_click_loading_parameters)
+        self.select_account_btn.clicked.connect(self.on_click_select_account)
         self.btn_refresh.clicked.connect(self.on_refresh)
 
         # self.tab_widget_browser.tabBar().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -278,8 +323,18 @@ class MainWindow(QMainWindow):
     def on_click_loading_parameters(self):
         filename, _ = QFileDialog.getOpenFileName(self, "选择参数文件", r".", "参数文件(*.pth)")
         if filename is not None and len(filename) > 0: 
-            print(filename)
             ModelFactory.load_data(filename)
+            config = ModelFactory.get_config_dict()
+            if config is not None:
+                s = ""
+                max_len = 0
+                for key in config.keys():
+                    if len(key) > max_len:
+                        max_len = len(key)
+                for key, value in config.items():
+                    s = s + f"{key:<{max_len+1}}: {value}\n"
+                    
+                self.config_info_textbrowser.setText(s)
             
             
         # self.ledit_filepath.setText(filename + ";" + filetypelist)
@@ -290,6 +345,15 @@ class MainWindow(QMainWindow):
         #     print("操作二或取消被点击")
         # sid = self.webview_bbin.get_sid()
         # print(sid)
+        
+    def on_click_select_account(self):
+        dlg = SelectAccountDialog()
+        selected_idx = dlg.exec()
+        if selected_idx >= 0:
+            # ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
+            # print(list(ModelConfig.Models.values())[selected_idx]["class"])
+            self.account_name_label.setText(Accounts.data[selected_idx]["Name"])
+            # self.loading_parameters_btn.setDisabled(False)
 
     def on_refresh(self):
         url = self.lineedit_url.text()

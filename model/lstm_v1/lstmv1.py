@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from dataclasses import asdict
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from model.lstm_v1.model_config import ModelConfig
 
@@ -61,7 +62,7 @@ class LstmV1:
         # self.current_model_id = "|".join(map(str, current_model_id))
         
     def load_data(self, filename_data):
-        checkpoint = torch.load(filename_data)
+        checkpoint = torch.load(filename_data, map_location='cpu')
         self.config = ModelConfig(**checkpoint["model_config"])
         print(self.config)
         # self.model.load_state_dict(checkpoint["model_state_dict"])
@@ -71,6 +72,10 @@ class LstmV1:
         print(self.scaler.mean_)
         print(self.scaler.var_)
         print(self.scaler.scale_)
+        
+    
+    def get_config(self):
+        return asdict(self.config)
 
 
     def predict(self):

@@ -8,7 +8,21 @@ Config_Data = {
     'LowerLimit': 5,
     'UpperLimit': 1000,
     'Ratio': 1,
-    'MailAddrs':['376844229@qq.com']
+    'MailAddrs':['376844229@qq.com'],
+    "BinanceAccount":[
+        {
+            "Name": "ZhuZheng",
+            "Account": "23194749@qq.com",
+            "ApiKey": "tPMBEjZCnFiAszSuXMzk1r8ASdd20dUwlaVFsOv4LvnfVW5xEPPZYK5JqlrOTnSU",
+            "SecertKey": "R2rh9FwjRCWRxm5I8muCmErmFeSyKMsjx8ecg5kqXYcqEbPWzfEFq7VZBOb1xdnY"
+        },
+        {
+            "Name": "Test",
+            "Account": "13812665650",
+            "ApiKey": "111",
+            "SecertKey": "222"
+        },
+    ]
 }
 
 def init_cfg(data):
@@ -28,6 +42,24 @@ class ModelConfig:
     }
         
     ModelValues =["lstmv1", "lstmv2"]
+    
+@dataclass
+class Accounts:
+    data = [
+        {
+            "Name": "ZhuZheng",
+            "Account": "23194749@qq.com",
+            "ApiKey": "tPMBEjZCnFiAszSuXMzk1r8ASdd20dUwlaVFsOv4LvnfVW5xEPPZYK5JqlrOTnSU",
+            "SecertKey": "R2rh9FwjRCWRxm5I8muCmErmFeSyKMsjx8ecg5kqXYcqEbPWzfEFq7VZBOb1xdnY"
+        },
+        {
+            "Name": "Test",
+            "Account": "13812665650",
+            "ApiKey": "111",
+            "SecertKey": "222"
+        },
+    ]
+        
 
     
     
