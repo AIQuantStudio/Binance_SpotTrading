@@ -270,16 +270,16 @@ class MainWindow(QMainWindow):
         dlg = CustomDialog()
         selected_idx = dlg.exec()
         if selected_idx >= 0:
-            # ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
+            ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
             # print(list(ModelConfig.Models.values())[selected_idx]["class"])
             self.model_name_label.setText(list(ModelConfig.Models.values())[selected_idx]["class"])
             self.loading_parameters_btn.setDisabled(False)
             
     def on_click_loading_parameters(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "选择参数文件", r".", "参数文件(*.py)")
+        filename, _ = QFileDialog.getOpenFileName(self, "选择参数文件", r".", "参数文件(*.pth)")
         if filename is not None and len(filename) > 0: 
             print(filename)
-            ModelFactory.load_parameters(filename)
+            ModelFactory.load_data(filename)
             
             
         # self.ledit_filepath.setText(filename + ";" + filetypelist)

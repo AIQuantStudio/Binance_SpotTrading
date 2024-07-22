@@ -19,6 +19,8 @@ class ModelFactory:
         return ModelFactory._instance_model
     
     @staticmethod
-    def load_parameters(filename):
+    def load_data(filename):
+        print("-----")
         if ModelFactory._instance_model is not None:
-            ModelFactory._instance_model.load_parameters(filename)
+            print("******")
+            ModelFactory._instance_model.load_data(filename)

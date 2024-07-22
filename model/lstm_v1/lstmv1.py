@@ -1,68 +1,77 @@
 import torch
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from model.lstm_v1.model_config import ModelConfig
 
 class LstmV1:
 
-    def __init__(self, pair, scaler, config, device):  # data loader
-        self.device = device
-        self.pair = pair
-        self.scaler = scaler
-        self.config = config
-        self.dataloader = dataloader
-        self.dataloader_train = dataloader.dataloader_train
-        self.dataloader_val = dataloader.dataloader_val
-        self.dataloader_test = dataloader.dataloader_test
+    def __init__(self):  # data loader
+        pass
+        # self.device = device
+        # self.pair = pair
+        # self.scaler = scaler
+        # self.config = config
+        # self.dataloader = dataloader
+        # self.dataloader_train = dataloader.dataloader_train
+        # self.dataloader_val = dataloader.dataloader_val
+        # self.dataloader_test = dataloader.dataloader_test
 
-        torch.set_float32_matmul_precision("high")
-        self.model = TradeModel(config=config)
-        self.model.to(self.device)
+        # torch.set_float32_matmul_precision("high")
+        # self.model = TradeModel(config=config)
+        # self.model.to(self.device)
 
-        self.raw_model = self.model.module if self.ddp else self.model  # always contains the "raw" unwrapped model
+        # self.raw_model = self.model.module if self.ddp else self.model  # always contains the "raw" unwrapped model
 
 
-        self.all_model_stats = {}
-        self.current_model_stats = {
-            "name": self.raw_model.model.__class__.__name__,
-            "device": self.device,
-            "optimizer": self.optimizer.__class__.__name__,
-            "sample_size": self.config.sample_size,
-            "hidden_units": self.config.hidden_units,
-            "num_layers": self.config.num_layers,
-            "learning_rate": self.config.learning_rate,
-            "batch_size": self.config.batch_size,
-            "window_size": self.config.window_size,
-            "prediction_steps": self.config.prediction_steps,
-            "dropout_rate": self.config.dropout_rate,
-            "duration": 0,
-            "epochs": [],
-            "train_loss_values": [],
-            "test_loss_values": [],
-            "train_rmse_values": [],
-            "test_rmse_values": [],
-        }
+        # self.all_model_stats = {}
+        # self.current_model_stats = {
+        #     "name": self.raw_model.model.__class__.__name__,
+        #     "device": self.device,
+        #     "optimizer": self.optimizer.__class__.__name__,
+        #     "sample_size": self.config.sample_size,
+        #     "hidden_units": self.config.hidden_units,
+        #     "num_layers": self.config.num_layers,
+        #     "learning_rate": self.config.learning_rate,
+        #     "batch_size": self.config.batch_size,
+        #     "window_size": self.config.window_size,
+        #     "prediction_steps": self.config.prediction_steps,
+        #     "dropout_rate": self.config.dropout_rate,
+        #     "duration": 0,
+        #     "epochs": [],
+        #     "train_loss_values": [],
+        #     "test_loss_values": [],
+        #     "train_rmse_values": [],
+        #     "test_rmse_values": [],
+        # }
 
-        current_model_id = (
-            self.current_model_stats["name"],
-            self.current_model_stats["device"],
-            self.current_model_stats["optimizer"],
-            self.current_model_stats["sample_size"],
-            self.current_model_stats["hidden_units"],
-            self.current_model_stats["num_layers"],
-            self.current_model_stats["learning_rate"],
-            self.current_model_stats["batch_size"],
-            self.current_model_stats["window_size"],
-            self.current_model_stats["prediction_steps"],
-            self.current_model_stats["dropout_rate"],
-        )
+        # current_model_id = (
+        #     self.current_model_stats["name"],
+        #     self.current_model_stats["device"],
+        #     self.current_model_stats["optimizer"],
+        #     self.current_model_stats["sample_size"],
+        #     self.current_model_stats["hidden_units"],
+        #     self.current_model_stats["num_layers"],
+        #     self.current_model_stats["learning_rate"],
+        #     self.current_model_stats["batch_size"],
+        #     self.current_model_stats["window_size"],
+        #     self.current_model_stats["prediction_steps"],
+        #     self.current_model_stats["dropout_rate"],
+        # )
 
-        self.current_model_id = "|".join(map(str, current_model_id))
+        # self.current_model_id = "|".join(map(str, current_model_id))
         
     def load_data(self, filename_data):
         checkpoint = torch.load(filename_data)
         self.config = ModelConfig(**checkpoint["model_config"])
-        self.model.load_state_dict(checkpoint["model_state_dict"])
+        print(self.config)
+        # self.model.load_state_dict(checkpoint["model_state_dict"])
         self.scaler = checkpoint["model_scaler"]
+        print(self.scaler)
+        print(self.scaler.n_samples_seen_)
+        print(self.scaler.mean_)
+        print(self.scaler.var_)
+        print(self.scaler.scale_)
+
 
     def predict(self):
         self.model.eval()
