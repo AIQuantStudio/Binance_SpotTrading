@@ -15,9 +15,9 @@ class Worker(QObject):
         self.fn()  # Your asynchronous function here
         self.finished.emit()
  
-class AsyncQt(QThread):
-    def __init__(self, fn, *args, **kwargs):
-        QThread.__init__(self)
+class AsyncMarket(QThread):
+    def __init__(self, result_signal, fn, *args, **kwargs):
+        super(QThread, self).__init__()
         self.fn = fn
         self.args = args
         self.kwargs = kwargs

@@ -340,6 +340,8 @@ class MainWindow(QMainWindow):
                     s = s + f"{key:<{max_len+1}}: {value}\n"
                     
                 self.config_info_textbrowser.setText(s)
+                
+                
             
             
         # self.ledit_filepath.setText(filename + ";" + filetypelist)

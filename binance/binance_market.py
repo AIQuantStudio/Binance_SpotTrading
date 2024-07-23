@@ -1,4 +1,7 @@
 import asyncio
+
+from PyQt6.QtCore import QTimer
+
 from binance import Client
 from binance import AsyncClient
 
@@ -12,8 +15,13 @@ class BinanceMarket:
         
 
     def get_order_book(self, symbol):
-        result = ...
-        AsyncQt.signals.result.emit(result)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.async_get_order_book)
+        self.timer.start()
+        
+        asyn = AsyncMarket(self.async_get_asset_balance)
+        asyn.start()
+        
         
         # loop = asyncio.get_event_loop()
         # get_future = asyncio.ensure_future(self.async_get_asset_balance(asset)) # 相当于开启一个future
@@ -26,8 +34,12 @@ class BinanceMarket:
         # self.new_loop = asyncio.new_event_loop()
         # asyncio.run(self.async_get_asset_balance(asset))
         
-    
-    async def async_get_asset_balance(self, asset):
-        balance = await self.binance_client.get_asset_balance(asset=asset)
+    def async_get_order_book(self):
+        balance = self.binance_market.get_asset_balance(asset=asset)
         print(balance)
+        
+        result = ...
+        AsyncMarket.signals.result.emit(result)
+        
+    async def async_get_asset_balance(self, asset):
         
