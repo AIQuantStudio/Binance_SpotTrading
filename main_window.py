@@ -14,7 +14,7 @@ from config import Accounts
 from select_model_dialog import CustomDialog
 from select_account_dialog import SelectAccountDialog
 from model.model_factory import ModelFactory
-
+from binance_account import BinanceAccount
 
 css_loading_model_on = """
             QPushButton {
@@ -353,6 +353,8 @@ class MainWindow(QMainWindow):
             # ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
             # print(list(ModelConfig.Models.values())[selected_idx]["class"])
             self.account_name_label.setText(Accounts.data[selected_idx]["Name"])
+            self.binance = BinanceAccount(name=Accounts.data[selected_idx]["Name"], apikey=Accounts.data[selected_idx]["ApiKey"], secretkey=Accounts.data[selected_idx]["SecertKey"])
+            self.binance.getAssetBalance("USDT")
             # self.loading_parameters_btn.setDisabled(False)
 
     def on_refresh(self):
