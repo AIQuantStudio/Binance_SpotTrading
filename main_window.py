@@ -4,6 +4,7 @@ from PyQt6.QtGui import *
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineUrlScheme
 
+import asyncio
 # from views.bbin_webengine_view import BBINWebEngineView
 # from core.bbin_request_interceptor import BBINRequestInterceptor
 # from core.bbin_webengine_page import BBINWebEnginePage
@@ -60,12 +61,14 @@ class MainWindow(QMainWindow):
 
     def __init__(self, title):
         super().__init__()
-
+        
         self.webview_bbin = None
-
+        
         self.setWindowTitle(title)
         self.setup_ui()
         self.bind_event()
+        
+        self.init_default_status()
 
         # 添加组件
         self.table_widget = None
@@ -308,7 +311,9 @@ class MainWindow(QMainWindow):
         # self.tab_widget_browser.tabBar().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         # self.tab_widget_browser.tabBar().customContextMenuRequested.connect(self.on_showContextMenu)
 
-    
+    def init_default_status(self):
+        self.selected_model_idx = -1
+        self.selected_account_idx = -1
 
 
     def on_click_loading_model(self):
@@ -348,14 +353,13 @@ class MainWindow(QMainWindow):
         
     def on_click_select_account(self):
         dlg = SelectAccountDialog()
-        selected_idx = dlg.exec()
-        if selected_idx >= 0:
-            # ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
-            # print(list(ModelConfig.Models.values())[selected_idx]["class"])
-            self.account_name_label.setText(Accounts.data[selected_idx]["Name"])
-            self.binance = BinanceAccount(name=Accounts.data[selected_idx]["Name"], apikey=Accounts.data[selected_idx]["ApiKey"], secretkey=Accounts.data[selected_idx]["SecertKey"])
+        select_idx = dlg.exec()
+        if select_idx >= 0 and self.selected_account_idx != select_idx:
+            self.account_name_label.setText(Accounts.data[select_idx]["Name"])
+            self.binance = BinanceAccount(name=Accounts.data[select_idx]["Name"], apikey=Accounts.data[select_idx]["ApiKey"], secretkey=Accounts.data[select_idx]["SecertKey"])
             self.binance.getAssetBalance("USDT")
-            # self.loading_parameters_btn.setDisabled(False)
+            
+            self.selected_account_idx = select_idx
 
     def on_refresh(self):
         url = self.lineedit_url.text()

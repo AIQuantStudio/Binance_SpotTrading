@@ -1,4 +1,5 @@
 import sys
+import asyncio
 from main_application import create_application
 from main_window import MainWindow
 
