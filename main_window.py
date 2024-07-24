@@ -62,7 +62,7 @@ class MainWindow(QMainWindow):
     def __init__(self, app_title, app_engine):
         super().__init__()
         
-        # self.webview_bbin = No ne
+        self.webview_bbin = None
         self.app_engine = app_engine
         
         self.setWindowTitle(app_title)
@@ -383,3 +383,17 @@ class MainWindow(QMainWindow):
         print(1111)
         print(widget)
         self.tab_widget_browser.addTab(widget, "欧博游戏B")
+
+    def closeEvent(self, event):
+        """ 重写 QMainWindow::closeEvent """
+        reply = QMessageBox.question(self, "退出", "确认退出？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
+        if reply == QMessageBox.StandardButton.Yes:
+            # self._save_dashboard_state("custom")
+            # for app_win in self._apps_window.values():
+            #     app_win.close()
+
+            self.app_engine.close()
+            event.accept()
+            QApplication.quit()
+        else:
+            event.ignore()

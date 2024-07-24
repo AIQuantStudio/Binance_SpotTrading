@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from logging import CRITICAL
 
 Config_Data = {
     "FontFamily": "Arial",
@@ -22,7 +22,20 @@ Config_Data = {
             "ApiKey": "111",
             "SecertKey": "222"
         },
-    ]
+    ],
+    
+    "log.active": True,
+    "log.level": CRITICAL,
+    "log.console": True,
+    "log.file": True,
+    "log.formatter": "%(asctime)s  %(levelname)s: %(message)s",
+
+    "email.server": "smtp.qq.com",
+    "email.port": 465,
+    "email.username": "",
+    "email.password": "",
+    "email.sender": "",
+    "email.receiver": "",
 }
 
 def init_cfg(data):

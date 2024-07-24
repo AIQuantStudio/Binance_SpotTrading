@@ -4,9 +4,6 @@ from typing import Any, Sequence, Type, Dict, List, Optional
 from event import Event, EventEngine, EVENT_LOG
 from service import EmailService
 from service import BaseService, LogService, EmailService
-from harvester.gateway import BaseGateway
-from harvester.app import BaseApp
-from harvester.structure import LogData, Exchange
 
 
 class AppEngine:
@@ -17,9 +14,9 @@ class AppEngine:
         self._event_engine = EventEngine()
         self._event_engine.start()
 
-        self._gateways: Dict[str, BaseGateway] = {}
+        # self._gateways: Dict[str, BaseGateway] = {}
         self._services = {}
-        self._apps: Dict[str, BaseApp]  = {}
+        # self._apps: Dict[str, BaseApp]  = {}
 
         self._log_servic = None
         self._email_service = None
@@ -86,7 +83,7 @@ class AppEngine:
 
     def close(self) -> None:
         """
-        首先停止 event_engine, 然后依次关闭所有的 service 和 gateway
+        首先停止 event_engine, 然后依次关闭所有的 service
         """
         self._event_engine.stop()
 
