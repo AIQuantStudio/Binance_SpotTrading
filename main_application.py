@@ -3,23 +3,32 @@ import sys
 import os
 import traceback
 import types
+import qdarkstyle
+import platform
+import ctypes
 from pathlib import Path
-from PyQt6.QtGui import QIcon, QFont
+from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
+
 
 from config import Config_Data, init_cfg
 
 
-def create_application(app_name: str):
+def create_application(app_name):
     """"""
     create_config()
 
     sys.excepthook = excepthook
 
     app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(True)
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt6())
     app.setFont(QFont(Config_Data["FontFamily"], Config_Data["FontSize"]))
     app.setWindowIcon(QIcon(("logo.ico")))
     app.setApplicationDisplayName(app_name)
+    if "Windows" in platform.uname():
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_name)
     return app
 
 

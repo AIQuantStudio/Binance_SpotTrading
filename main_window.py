@@ -59,12 +59,13 @@ switch_disable_css_list = [
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, title):
+    def __init__(self, app_title, app_engine):
         super().__init__()
         
-        self.webview_bbin = None
+        # self.webview_bbin = No ne
+        self.app_engine = app_engine
         
-        self.setWindowTitle(title)
+        self.setWindowTitle(app_title)
         self.setup_ui()
         self.bind_event()
         
