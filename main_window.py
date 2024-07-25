@@ -12,7 +12,7 @@ import asyncio
 # from views.adminWebEngine import AdminWebEngine
 from config import Config_Data, ModelConfig
 from config import Accounts
-from select_model_dialog import CustomDialog
+from select_model_dialog import SelectModelDialog
 from select_account_dialog import SelectAccountDialog
 from model.model_factory import ModelFactory
 from binance_account import BinanceAccount
@@ -124,7 +124,7 @@ class MainWindow(QMainWindow):
         self.app_toolbar.addWidget(left_space)
         
         action = QAction(QIcon(QPixmap("./editor.ico")), '选择模型', self)
-        action.triggered.connect(self.on_click_loading_model)
+        action.triggered.connect(self.on_click_select_model)
         self.app_toolbar.addAction(action)
         self.app_toolbar.addSeparator()
         
@@ -189,7 +189,7 @@ class MainWindow(QMainWindow):
 
         # self.setCentralWidget(main_widget)
         
-        self.setCentralWidget(self.log_dock)
+        # self.setCentralWidget(self.log_dock)
 
     def setup_left_area_ui(self, widget: QWidget):
         vbox_layout = QVBoxLayout()
@@ -382,17 +382,25 @@ class MainWindow(QMainWindow):
         self.selected_account_idx = -1
 
 
-    def on_click_loading_model(self):
-        dlg = CustomDialog()
-        selected_idx = dlg.exec()
+    def on_click_select_model(self):
+        selected_idx = SelectModelDialog().exec()
         if selected_idx >= 0:
-            self.app_engine.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
+            model = self.app_engine.create_model(selected_idx)
             
-            ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
+            # ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
             # print(list(ModelConfig.Models.values())[selected_idx]["class"])
-            self.create_model_panel()
-            self.model_name_label.setText(list(ModelConfig.Models.values())[selected_idx]["class"])
-            self.loading_parameters_btn.setDisabled(False)
+            self.create_model_panel(model)
+            # self.model_name_label.setText(list(ModelConfig.Models.values())[selected_idx]["class"])
+            # self.loading_parameters_btn.setDisabled(False)
+            
+    def create_model_panel(self, model):
+        panel = MainFrame(self, self.app_engine)
+        dock_panel = QDockWidget(model.name)
+        dock_panel.setObjectName(model.id)
+        dock_panel.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable | QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
+        dock_panel.setAllowedAreas(Qt.DockWidgetArea.TopDockWidgetArea | Qt.DockWidgetArea.BottomDockWidgetArea )
+        dock_panel.setWidget(panel)
+        self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, dock_panel, Qt.Orientation.Vertical)
             
     def on_click_loading_parameters(self):
         filename, _ = QFileDialog.getOpenFileName(self, "选择参数文件", r".", "参数文件(*.pth)")
@@ -422,14 +430,7 @@ class MainWindow(QMainWindow):
         # sid = self.webview_bbin.get_sid()
         # print(sid)
         
-    def create_model_panel(self, model):
-        panel = MainFrame(self, self.app_engine)
-        dock_panel = QDockWidget(model.name)
-        dock_panel.setWidget(panel)
-        # self.log_dock.setObjectName(name)
-        dock_panel.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable | QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
-        dock_panel.setAllowedAreas(Qt.DockWidgetArea.TopDockWidgetArea | Qt.DockWidgetArea.BottomDockWidgetArea )
-        self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, dock_panel)
+    
         
     def on_click_select_account(self):
         dlg = SelectAccountDialog()

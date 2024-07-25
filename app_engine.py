@@ -1,10 +1,12 @@
 import os
+import shortuuid
 from typing import Any, Sequence, Type, Dict, List, Optional
 
 from event import Event, EventEngine, EVENT_LOG
 from service import EmailService
 from service import BaseService, LogService, EmailService
-
+from config import Config_Data, ModelConfig
+from model import ModelFactory
 
 class AppEngine:
     """"""
@@ -132,4 +134,9 @@ class AppEngine:
     #     """"""
     #     self.email_service.send(subject, content, receiver)
 
-    def create_model(self):
+    def create_model(self, model_idx):
+        cls = list(ModelConfig.Models.values())[model_idx]["class"]
+        return ModelFactory.create_model(cls)
+        
+        
+        

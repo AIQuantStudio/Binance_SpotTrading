@@ -3,11 +3,12 @@ import numpy as np
 from dataclasses import asdict
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from model.lstm_v1.model_config import ModelConfig
+from model import BaseModel
 
-class LstmV1:
+class LstmV1(BaseModel):
 
-    def __init__(self):  # data loader
-        pass
+    def __init__(self, id):
+        super().__init__("LstmV1", id)
         # self.device = device
         # self.pair = pair
         # self.scaler = scaler

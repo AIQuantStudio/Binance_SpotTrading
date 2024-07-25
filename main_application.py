@@ -22,7 +22,7 @@ def create_application(app_name):
     sys.excepthook = excepthook
 
     app = QApplication(sys.argv)
-    app.setQuitOnLastWindowClosed(True)
+    # app.setQuitOnLastWindowClosed(True)
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt6())
     app.setFont(QFont(Config_Data["FontFamily"], Config_Data["FontSize"]))
     app.setWindowIcon(QIcon(("logo.ico")))

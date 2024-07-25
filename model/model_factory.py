@@ -1,27 +1,25 @@
+import shortuuid
 from collections import defaultdict
 from model.lstm_v1.lstmv1 import LstmV1
 
 
 class ModelFactory:
     
-    _instance_model = defaultdict(list)
+    _instance_models = {}
     
     @staticmethod
-    def create_model(cls):
-        model_list = ModelFactory._instance_model[cls]
-        if cls in model_list:
-        if cls not in ModelFactory._instance_model:
-            
-            
-            ModelFactory._instance_model = eval(cls)()
-            return ModelFactory._instance_model
+    def create_model(name):
+        id = shortuuid.ShortUUID().random(length=22)
+        instance = eval(name)(id)
+        ModelFactory._instance_models[id] = instance
+        return instance
     
     @staticmethod
     def remove_model():
         ModelFactory._instance_model = None
     
     @staticmethod
-    def get_model():
+    def get_model(name, id):
         return ModelFactory._instance_model
     
     @staticmethod

@@ -5,7 +5,7 @@ from config import Config_Data, ModelConfig
 from functools import partial
 
 
-class CustomDialog(QDialog):
+class SelectModelDialog(QDialog):
     def __init__(self):
         super().__init__()
 
