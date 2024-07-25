@@ -131,3 +131,5 @@ class AppEngine:
     # def send_email(self, subject: str, content: str, receiver: str = "") -> None:
     #     """"""
     #     self.email_service.send(subject, content, receiver)
+
+    def create_model(self):

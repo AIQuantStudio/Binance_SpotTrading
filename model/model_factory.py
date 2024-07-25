@@ -1,14 +1,20 @@
+from collections import defaultdict
 from model.lstm_v1.lstmv1 import LstmV1
 
 
 class ModelFactory:
     
-    _instance_model = None
+    _instance_model = defaultdict(list)
     
     @staticmethod
-    def load_model(cls):
-        ModelFactory._instance_model = eval(cls)()
-        return ModelFactory._instance_model
+    def create_model(cls):
+        model_list = ModelFactory._instance_model[cls]
+        if cls in model_list:
+        if cls not in ModelFactory._instance_model:
+            
+            
+            ModelFactory._instance_model = eval(cls)()
+            return ModelFactory._instance_model
     
     @staticmethod
     def remove_model():

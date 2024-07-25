@@ -16,6 +16,7 @@ from select_model_dialog import CustomDialog
 from select_account_dialog import SelectAccountDialog
 from model.model_factory import ModelFactory
 from binance_account import BinanceAccount
+from main_frame import MainFrame
 
 css_loading_model_on = """
             QPushButton {
@@ -67,7 +68,7 @@ class MainWindow(QMainWindow):
         
         self.setWindowTitle(app_title)
         self.setup_ui()
-        self.bind_event()
+        # self.bind_event()
         
         self.init_default_status()
 
@@ -105,26 +106,90 @@ class MainWindow(QMainWindow):
 
     def setup_ui(self):
         self.resize(1600, 900)
-
+        
         # 窗体的位置
         fg = self.frameGeometry()
         fg.moveCenter(QApplication.primaryScreen().availableGeometry().center())
         self.move(fg.topLeft())
+        
+        self.app_toolbar = QToolBar(self)
+        self.app_toolbar.setFloatable(False)
+        self.app_toolbar.setMovable(False)
+        self.app_toolbar.setIconSize(QSize(26, 26))
+        self.app_toolbar.layout().setSpacing(4)
 
-        main_widget = QWidget()
-        main_hbox_layout = QHBoxLayout()
-        main_widget.setLayout(main_hbox_layout)
+        left_space = QWidget()
+        left_space.setFixedWidth(6)
+        left_space.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.app_toolbar.addWidget(left_space)
+        
+        action = QAction(QIcon(QPixmap("./editor.ico")), '选择模型', self)
+        action.triggered.connect(self.on_click_loading_model)
+        self.app_toolbar.addAction(action)
+        self.app_toolbar.addSeparator()
+        
+        self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.app_toolbar)
 
-        main_left_widget = QWidget()
-        main_hbox_layout.addWidget(main_left_widget, stretch=2)
+        
 
-        main_right_widget = QWidget()
-        main_hbox_layout.addWidget(main_right_widget, stretch=10)
+        
+        
+        # sep_idx = 0
+        # separator = Setting.get_global_setting("layout.main.apps", [])
+        # if not bool(separator):
+        #     separator = [len(self._apps_open_window)]
 
-        self.setup_left_area_ui(main_left_widget)
-        self.setup_right_area_ui(main_right_widget)
+        # for i in range(len(self._apps_open_window)):
+        #     if i == separator[sep_idx]:
+        #         self._app_toolbar.addSeparator()
+        #         sep_idx += 1 if sep_idx < len(separator) - 1 else 0
 
-        self.setCentralWidget(main_widget)
+        #     func = self._apps_open_window[i]
+        #     path = self._apps_icon_path[i]
+        #     name = self._apps_display_name[i]
+
+        #     icon = QtGui.QIcon()
+        #     icon.addPixmap(QtGui.QPixmap(path))
+        #     icon.addPixmap(QtGui.QPixmap(path), QtGui.QIcon.Disabled)
+        #     icon.addPixmap(QtGui.QPixmap(path), QtGui.QIcon.Active)
+
+        #     action = QtWidgets.QAction(name, self)
+        #     action.triggered.connect(func)
+        #     action.setIcon(icon)
+        #     # action.setDisabled(True)
+
+        #     self._app_toolbar.addAction(action)
+        #     self._app_toolbar.setStyleSheet(
+        #         "QToolButton:disabled {background-color:transparent}"
+        #         "QToolButton:hover {background-color:lightgray}"
+        #     )
+
+
+        self.app_statusBar=QStatusBar()
+        self.setStatusBar(self.app_statusBar)
+
+
+        
+   
+
+        
+
+        # main_widget = QWidget()
+        # main_hbox_layout = QHBoxLayout()
+        # main_widget.setLayout(main_hbox_layout)
+
+        # main_left_widget = QWidget()
+        # main_hbox_layout.addWidget(main_left_widget, stretch=2)
+
+        # main_right_widget = QWidget()
+        # main_hbox_layout.addWidget(main_right_widget, stretch=10)
+
+        # self.setup_left_area_ui(main_left_widget)
+        # self.setup_right_area_ui(main_right_widget)
+
+        # self.setCentralWidget(main_widget)
+        
+        self.setCentralWidget(self.log_dock)
 
     def setup_left_area_ui(self, widget: QWidget):
         vbox_layout = QVBoxLayout()
@@ -321,8 +386,11 @@ class MainWindow(QMainWindow):
         dlg = CustomDialog()
         selected_idx = dlg.exec()
         if selected_idx >= 0:
+            self.app_engine.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
+            
             ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
             # print(list(ModelConfig.Models.values())[selected_idx]["class"])
+            self.create_model_panel()
             self.model_name_label.setText(list(ModelConfig.Models.values())[selected_idx]["class"])
             self.loading_parameters_btn.setDisabled(False)
             
@@ -353,6 +421,15 @@ class MainWindow(QMainWindow):
         #     print("操作二或取消被点击")
         # sid = self.webview_bbin.get_sid()
         # print(sid)
+        
+    def create_model_panel(self, model):
+        panel = MainFrame(self, self.app_engine)
+        dock_panel = QDockWidget(model.name)
+        dock_panel.setWidget(panel)
+        # self.log_dock.setObjectName(name)
+        dock_panel.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable | QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
+        dock_panel.setAllowedAreas(Qt.DockWidgetArea.TopDockWidgetArea | Qt.DockWidgetArea.BottomDockWidgetArea )
+        self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, dock_panel)
         
     def on_click_select_account(self):
         dlg = SelectAccountDialog()
