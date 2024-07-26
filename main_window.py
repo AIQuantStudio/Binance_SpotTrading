@@ -364,7 +364,7 @@ class MainWindow(QMainWindow):
 
         # self.webview_bbin.load(QUrl(Config_Data.get("Url")))
 
-        v_layout.addWidget(self.webview_bbin, stretch=9)
+        # v_layout.addWidget(self.webview_bbin, stretch=9)
 
         widget.setLayout(v_layout)
 
