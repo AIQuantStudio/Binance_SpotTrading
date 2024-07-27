@@ -123,8 +123,8 @@ class MainWindow(QMainWindow):
         left_space.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.app_toolbar.addWidget(left_space)
         
-        action = QAction(QIcon(QPixmap("./editor.ico")), '选择模型', self)
-        action.triggered.connect(self.on_click_select_model)
+        action = QAction(QIcon(QPixmap("./editor.ico")), '加载模型', self)
+        action.triggered.connect(self.on_click_load_model)
         self.app_toolbar.addAction(action)
         self.app_toolbar.addSeparator()
         
@@ -165,8 +165,8 @@ class MainWindow(QMainWindow):
         #     )
 
 
-        self.app_statusBar=QStatusBar()
-        self.setStatusBar(self.app_statusBar)
+        self.app_status_bar = QStatusBar()
+        self.setStatusBar(self.app_status_bar)
 
 
         
@@ -382,41 +382,39 @@ class MainWindow(QMainWindow):
         self.selected_account_idx = -1
 
 
-    def on_click_select_model(self):
-        selected_idx = SelectModelDialog().exec()
-        if selected_idx >= 0:
-            model = self.app_engine.create_model(selected_idx)
+    def on_click_load_model(self):
+        id = SelectModelDialog(self).exec()        
+        if id == QDialog.DialogCode.Rejected:
+            return
+        else:
+            self.create_model_panel(id)
+
             
-            # ModelFactory.load_model(list(ModelConfig.Models.values())[selected_idx]["class"])
-            # print(list(ModelConfig.Models.values())[selected_idx]["class"])
-            self.create_model_panel(model)
-            # self.model_name_label.setText(list(ModelConfig.Models.values())[selected_idx]["class"])
-            # self.loading_parameters_btn.setDisabled(False)
-            
-    def create_model_panel(self, model):
+    def create_model_panel(self, model_id):
+        model = ModelFactory.get_model(model_id)
         panel = MainFrame(self, self.app_engine)
         dock_panel = QDockWidget(model.name)
-        dock_panel.setObjectName(model.id)
+        dock_panel.setObjectName(str(model.id))
         dock_panel.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable | QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
         dock_panel.setAllowedAreas(Qt.DockWidgetArea.TopDockWidgetArea | Qt.DockWidgetArea.BottomDockWidgetArea )
         dock_panel.setWidget(panel)
         self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, dock_panel, Qt.Orientation.Vertical)
             
-    def on_click_loading_parameters(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "选择参数文件", r".", "参数文件(*.pth)")
-        if filename is not None and len(filename) > 0: 
-            ModelFactory.load_data(filename)
-            config = ModelFactory.get_config_dict()
-            if config is not None:
-                s = ""
-                max_len = 0
-                for key in config.keys():
-                    if len(key) > max_len:
-                        max_len = len(key)
-                for key, value in config.items():
-                    s = s + f"{key:<{max_len+1}}: {value}\n"
+    # def on_click_loading_parameters(self):
+    #     filename, _ = QFileDialog.getOpenFileName(self, "选择参数文件", r".", "参数文件(*.pth)")
+    #     if filename is not None and len(filename) > 0: 
+    #         ModelFactory.load_data(filename)
+    #         config = ModelFactory.get_config_dict()
+    #         if config is not None:
+    #             s = ""
+    #             max_len = 0
+    #             for key in config.keys():
+    #                 if len(key) > max_len:
+    #                     max_len = len(key)
+    #             for key, value in config.items():
+    #                 s = s + f"{key:<{max_len+1}}: {value}\n"
                     
-                self.config_info_textbrowser.setText(s)
+    #             self.config_info_textbrowser.setText(s)
                 
                 
             
