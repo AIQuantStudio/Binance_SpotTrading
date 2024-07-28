@@ -1,37 +1,55 @@
 import uuid
-from collections import defaultdict
+
 from model.lstm_v1.lstmv1 import LstmV1
 
 
+def singleton(cls):
+    instances = {}
+    def wrapper(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+    return wrapper
+
+    
+@singleton
 class ModelFactory:
+    def __init__(self):
+        self._instance_models = {}
     
-    _instance_models = {}
-    
-    @staticmethod
-    def create_model(name):
+    def create_model(self, name):
         unique_id = str(uuid.uuid4().int)[:8]
         id = int(unique_id)
-        # id = uuid.ShortUUID().random(length=22)
-        instance = eval(name)(id)
-        ModelFactory._instance_models[id] = instance
+        try:
+            model_instance = eval(name)(id)
+        except:
+            return -1
+        
+        self._instance_models[id] = model_instance
         return id
     
-    @staticmethod
-    def remove_model(model_id):
-        ModelFactory._instance_models.pop(model_id)
-
-    @staticmethod
-    def get_model(model_id):
-        return ModelFactory._instance_models.get(model_id)
-    
-    @staticmethod
-    def load_data(model_id, filename):
-        model = ModelFactory._instance_models.get(model_id)
+    def load_data(self, model_id, filename):
+        model = self._instance_models.get(model_id)
         if model is not None:
             model.load_data(filename)
+            print(model.validate_config())
+            if not model.validate_config():
+                return False
             
-    @staticmethod
-    def get_config_dict(model_id):
-        model = ModelFactory._instance_models.get(model_id)
+            return True
+    
+    def remove_model(self, model_id):
+        self._instance_models.pop(model_id)
+
+    def get_model(self, model_id):
+        return self._instance_models.get(model_id)
+    
+  
+    
+            
+    def get_config_dict(self, model_id):
+        model = self._instance_models.get(model_id)
         if model is not None:
             return model.get_config()
+        
+ 

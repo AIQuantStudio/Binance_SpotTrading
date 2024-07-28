@@ -136,5 +136,5 @@ class AppEngine:
 
     def create_model(self, model_idx):
         cls = list(ModelConfig.Models.values())[model_idx]["class"]
-        return ModelFactory.create_model(cls)
+        return ModelFactory().create_model(cls)
  

@@ -9,6 +9,10 @@ class LstmV1(BaseModel):
 
     def __init__(self, id):
         super().__init__("LstmV1", id)
+        self.scaler = None 
+        self.config = None
+        self.symbol = None
+            
         # self.device = device
         # self.pair = pair
         # self.scaler = scaler
@@ -74,6 +78,10 @@ class LstmV1(BaseModel):
         print(self.scaler.var_)
         print(self.scaler.scale_)
         
+    def validate_config(self):
+        if self.scaler is None or self.config is None or self.symbol is None:
+            return False
+        return True
     
     def get_config(self):
         return asdict(self.config)

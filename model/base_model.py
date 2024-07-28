@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 class BaseModel(ABC):
 
@@ -13,6 +13,13 @@ class BaseModel(ABC):
     @property
     def name(self):
         return self._name
-
-    def close(self):
+    
+    @abstractmethod
+    def load_data(self, filename_data):
         pass
+
+    @abstractmethod
+    def validate_config(self):
+        pass
+    
+    

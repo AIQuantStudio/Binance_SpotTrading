@@ -2,7 +2,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from market.binance_canvas import BinanceFigure
+from exchange.binance_canvas import BinanceFigure
 
 
 
