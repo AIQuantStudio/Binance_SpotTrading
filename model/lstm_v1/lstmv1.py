@@ -68,15 +68,18 @@ class LstmV1(BaseModel):
         
     def load_data(self, filename_data):
         checkpoint = torch.load(filename_data, map_location='cpu')
+        # self.symbol = checkpoint["symbol"]
+        self.symbol = "ADA_USDT"
+        self._base_currency = self.symbol.split("_")[0]
+        self._quote_currency = self.symbol.split("_")[1]
         self.config = ModelConfig(**checkpoint["model_config"])
-        print(self.config)
-        # self.model.load_state_dict(checkpoint["model_state_dict"])
         self.scaler = checkpoint["model_scaler"]
         print(self.scaler)
         print(self.scaler.n_samples_seen_)
         print(self.scaler.mean_)
         print(self.scaler.var_)
         print(self.scaler.scale_)
+        # self.model.load_state_dict(checkpoint["model_state_dict"])
         
     def validate_config(self):
         if self.scaler is None or self.config is None or self.symbol is None:

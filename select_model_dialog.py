@@ -49,20 +49,6 @@ class SelectModelDialog(QDialog):
                 ModelFactory().remove_model(id)
                 QMessageBox.warning(self, "警告", f"数据加载失败,请检查！", QMessageBox.StandardButton.Ok)
                 return
-
-            # 打印模型参数
-            # config = ModelFactory().get_config_dict(id)
-            # if config is not None:
-            #     s = ""
-            #     max_len = 0
-            #     for key in config.keys():
-            #         if len(key) > max_len:
-            #             max_len = len(key)
-            #     for key, value in config.items():
-            #         s = s + f"{key:<{max_len+1}}: {value}\n"
-
-            #     print(s)
-
             self.done(id)
         else:
             ModelFactory().remove_model(id)

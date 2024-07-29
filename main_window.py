@@ -17,7 +17,7 @@ from select_model_dialog import SelectModelDialog
 from select_account_dialog import SelectAccountDialog
 from model.model_factory import ModelFactory
 from binance_account import BinanceAccount
-from main_frame import MainFrame
+from main_dock import MainDock
 
 
 class MainWindow(QMainWindow):
@@ -81,13 +81,8 @@ class MainWindow(QMainWindow):
 
     def create_model_panel(self, model_id):
         model = ModelFactory().get_model(model_id)
-        panel = MainFrame(self, self.app_engine)
-        dock_panel = QDockWidget(model.name)
-        dock_panel.setObjectName(str(model.id))
-        dock_panel.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable | QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
-        dock_panel.setAllowedAreas(Qt.DockWidgetArea.TopDockWidgetArea | Qt.DockWidgetArea.BottomDockWidgetArea)
-        dock_panel.setWidget(panel)
-        self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, dock_panel, Qt.Orientation.Vertical)
+        model_dock = MainDock(model.name, model.id, self.app_engine)
+        self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, model_dock, Qt.Orientation.Vertical)
 
     # def on_click_loading_parameters(self):
     #     filename, _ = QFileDialog.getOpenFileName(self, "选择参数文件", r".", "参数文件(*.pth)")
