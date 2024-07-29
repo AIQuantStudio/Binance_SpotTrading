@@ -22,7 +22,7 @@ class ModelPanel(QFrame):
         self.show_config_info()
         self.show_kline()
         
-        self.app_engine.event_engine.register(EVENT_TIMER, self.refresh_kline)
+        self.app_engine.event_engine.register_timer(self.refresh_kline, 5)
 
     def setup_ui(self):
         main_hbox_layout = QHBoxLayout()
@@ -92,6 +92,5 @@ class ModelPanel(QFrame):
         
     def refresh_kline(self):
         model = ModelFactory().get_model(self.top_dock.id)
-        BinanceMarket.get_klines(model.symbol)
-        
+        data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
         
