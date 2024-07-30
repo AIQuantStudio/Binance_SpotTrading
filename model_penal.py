@@ -87,10 +87,14 @@ class ModelPanel(QFrame):
     
     def show_kline(self):
         layout = QVBoxLayout()
-        layout.addWidget(BinanceFigure())
         self.binance_kline_penal.setLayout(layout)
+        
+        self.figure_canvas = BinanceFigure()
+        layout.addWidget(self.figure_canvas)
+        
+        self.figure_canvas.plot()
         
     def refresh_kline(self):
         model = ModelFactory().get_model(self.top_dock.id)
-        data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
+        # data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
         
