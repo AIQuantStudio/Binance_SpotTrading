@@ -96,5 +96,7 @@ class ModelPanel(QFrame):
         
     def refresh_kline(self):
         model = ModelFactory().get_model(self.top_dock.id)
-        # data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
+        data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
+        self.figure_canvas.plot_data(data)
+        
         

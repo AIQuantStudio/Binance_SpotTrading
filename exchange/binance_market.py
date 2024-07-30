@@ -55,7 +55,8 @@ class BinanceMarket:
 
         data = self.binance_market.get_klines(
             symbol=symbol,
-            interval=Client.KLINE_INTERVAL_15MINUTE
+            interval=Client.KLINE_INTERVAL_15MINUTE,
+            limit=50
         )
 
         return data

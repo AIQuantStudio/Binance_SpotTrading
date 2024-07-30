@@ -2,8 +2,14 @@ import mplfinance as mpf
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import matplotlib as mpl
-mpl.use("QtAgg")
+
+
+import matplotlib 
+
+
+matplotlib.use("QtAgg")
+matplotlib.rcParams['font.sans-serif'] = ['SimHei']
+matplotlib.rcParams['axes.unicode_minus'] = False
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt6.QtWidgets import *
 import sys
@@ -12,8 +18,8 @@ from matplotlib.animation import FuncAnimation
 
 # plt.rcParams['font.sans-serif'] = ['SimHei']
 # plt.rcParams['axes.unicode_minus'] = False
-plt.rcParams['font.sans-serif'] = ['SimHei']
-plt.rcParams['axes.unicode_minus'] = False
+
+
 
 class BinanceFigure(FigureCanvas):
     
@@ -28,11 +34,11 @@ class BinanceFigure(FigureCanvas):
         # self.ax1, self.ax2 = self.fig.subplots(nrows=2, ncols=1, sharex=True)
         # mpf.plot(self.df.head(50), ax=self.ax1, type="candle", volume=self.ax2, mav=[5, 10, 30], axtitle="customize plot", tight_layout=True)
         
-        
+
         
 
         mcolors = mpf.make_marketcolors(up="green", down="red", edge="in", wick="in")
-        my_style = mpf.make_mpf_style(base_mpf_style="binance", marketcolors=mcolors, facecolor="#19232D", rc={'font.family': 'SimHei'})
+        my_style = mpf.make_mpf_style(base_mpf_style="binance", marketcolors=mcolors, facecolor="#19232D")
         self.fig = mpf.figure(style=my_style, figsize=(width, height), dpi=dpi)
         super(BinanceFigure, self).__init__(self.fig)
         
@@ -84,7 +90,8 @@ class BinanceFigure(FigureCanvas):
         # # fig.show()		
 
     def plot(self):
-        data = pd.DataFrame(index=pd.date_range('2024-01-01', periods=10))
+        
+        data = pd.DataFrame(index=pd.date_range(end=pd.Timestamp.now(), periods=10, freq='h'))
         data['Open'] = 0
         data['High'] = 0
         data['Low'] = 0
@@ -92,9 +99,22 @@ class BinanceFigure(FigureCanvas):
         data['Volume'] = 0
         print(data)
         ax1 = self.fig.add_axes([0.2, 0.2 ,0.78, 0.78])
-        ax1.set_ylabel('price')
+        ax1.set_ylabel('价格')
         mpf.plot(data,
                 ax=ax1,
                 # volume=ax2,
                 type='candle')
-        # fig.show()	
+        # fig.show()
+        
+    def plot_data(self, data):
+        
+        df = pd.DataFrame(data, columns=['datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'CloseTime', 'QuoteVolume', 'NumberTrades', 'BuyBaseVolume', 'BuyQuoteVolume', 'Ignored'], dtype=float)
+        df['datetime'] = pd.to_datetime(df['datetime'] / 1000.0 , unit='s')
+        df.set_index('datetime', inplace=True)
+        ax1 = self.fig.add_axes([0.2, 0.2 ,0.78, 0.78])
+        ax1.set_ylabel('价格')
+        mpf.plot(df,
+                ax=ax1,
+                # volume=ax2,
+                type='candle')
+        self.draw()
