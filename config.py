@@ -4,11 +4,8 @@ from logging import CRITICAL
 Config_Data = {
     "FontFamily": "Arial",
     "FontSize": 12,
-    'Url':'https://www.3356g3356.com:8990/',
-    'LowerLimit': 5,
-    'UpperLimit': 1000,
-    'Ratio': 1,
-    'MailAddrs':['376844229@qq.com'],
+    "model.path": "./data",
+
     "BinanceAccount":[
         {
             "Name": "ZhuZheng",
