@@ -2,7 +2,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from exchange.binance_canvas import BinanceFigure
+from exchange.binance_canvas import BinanceCanvas
 from exchange.binance_market import BinanceMarket
 from model import ModelFactory
 from event import EVENT_TIMER
@@ -89,10 +89,10 @@ class ModelPanel(QFrame):
         layout = QVBoxLayout()
         self.binance_kline_penal.setLayout(layout)
         
-        self.figure_canvas = BinanceFigure()
+        self.figure_canvas = BinanceCanvas()
         layout.addWidget(self.figure_canvas)
         
-        self.figure_canvas.plot()
+        # self.figure_canvas.plot()
         
     def refresh_kline(self):
         model = ModelFactory().get_model(self.top_dock.id)
