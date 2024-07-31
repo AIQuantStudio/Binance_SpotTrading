@@ -17,12 +17,13 @@ class ModelPanel(QFrame):
         self.app_engine = app_engine
         
         self.setup_ui()
+        self.bind_event()
         
         self.show_symbol()
         self.show_config_info()
         self.show_kline()
         
-        self.app_engine.event_engine.register_timer(self.refresh_kline, 5)
+        self.app_engine.event_engine.register_timer(self.refresh_kline, 1)
 
     def setup_ui(self):
         main_hbox_layout = QHBoxLayout()
@@ -50,19 +51,44 @@ class ModelPanel(QFrame):
         self.config_info_textbrowser.setFont(QFont("Courier New"))
         vbox_layout.addWidget(self.config_info_textbrowser)
 
+        hbox_layout = QHBoxLayout()
+        self.start_prediction_btn = QPushButton()
+        self.start_prediction_btn.setText("启动预测")
+        hbox_layout.addWidget(self.start_prediction_btn)
+        self.stop_prediction_btn = QPushButton()
+        self.stop_prediction_btn.setText("停止预测")
+        self.stop_prediction_btn.setDisabled(True)
+        hbox_layout.addWidget(self.stop_prediction_btn)
+        vbox_layout.addLayout(hbox_layout)
+        
         left_widget.setLayout(vbox_layout)
 
     def setup_right_area_ui(self, right_widget):
         vbox_layout = QVBoxLayout()
         right_widget.setLayout(vbox_layout)
 
-        # self.binance_kline_penal = BinanceFigure()
         self.binance_kline_penal = QFrame(right_widget)
         self.binance_kline_penal.setLineWidth(1)
         self.binance_kline_penal.setMidLineWidth(1)
         self.binance_kline_penal.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Raised)
         
         vbox_layout.addWidget(self.binance_kline_penal)
+    
+    def bind_event(self):
+        self.start_prediction_btn.clicked.connect(self.start_predict)
+        self.stop_prediction_btn.clicked.connect(self.stop_predict)
+        
+    def start_predict(self):
+        self.start_prediction_btn.setDisabled(True)
+        self.stop_prediction_btn.setEnabled(True)
+
+        self.app_engine.event_engine.register(self.predict)
+        
+        
+    def stop_predict(self):
+        self.start_prediction_btn.setEnabled(True)
+        self.stop_prediction_btn.setDisabled(True)
+
         
     def show_symbol(self):
         model = ModelFactory().get_model(self.top_dock.id)
@@ -99,4 +125,9 @@ class ModelPanel(QFrame):
         data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
         self.figure_canvas.plot_data(data)
         
+    def predict(self):
+        pass
         
+    def close(self):
+        self.app_engine.event_engine.unregister_timer(self.refresh_kline)
+        return super().close()

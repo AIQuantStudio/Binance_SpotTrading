@@ -12,9 +12,17 @@ aaa = wx.App(False)
 # FontEnumerator 枚举系统上所有可用的字体
 e = wx.FontEnumerator()
 
-fontlist=e.GetFacenames()
 
-print("可用字体数：", len(fontlist))
+# fontlist=e.GetFacenames()
 
-for i in fontlist[:20]:
-    print(i)
+# print("可用字体数：", len(fontlist))
+
+# for i in fontlist:
+#     print(i)
+    
+from matplotlib.font_manager import FontManager
+fm = FontManager()
+
+print(fm.ttflist)
+for i in fm.ttflist:
+    print(i.name)

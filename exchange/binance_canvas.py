@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import *
 # plt.rcParams['font.sans-serif'] = ['SimHei']
 # plt.rcParams['axes.unicode_minus'] = False
 matplotlib.use("QtAgg")
-matplotlib.rcParams["font.sans-serif"] = ["SimHei"]
+# matplotlib.rcParams["font.sans-serif"] = ["Apple LiSung"]
 matplotlib.rcParams["axes.unicode_minus"] = False
 STYLE_DICT = {
     "xtick.color": "white", 
@@ -31,7 +31,7 @@ class BinanceCanvas(FigureCanvas):
         
         super(BinanceCanvas, self).__init__(self.fig)
 
-        self.fig.text(0.20, 0.90, 'low: ', fontdict={"color":"white","horizontalalignment":"right"})
+        self.fig.text(0.20, 0.90, '低价: ', fontdict={"color":"white","horizontalalignment":"right","fontname": "Heiti TC"})
         self.t1 = self.fig.text(0.20, 0.90, '', fontdict={"color":"white","horizontalalignment":"left"})
         self.fig.text(0.20, 0.95, 'high: ', fontdict={"color":"white","horizontalalignment":"right"})
         self.t2 = self.fig.text(0.20, 0.95, '', fontdict={"color":"white","horizontalalignment":"left"})

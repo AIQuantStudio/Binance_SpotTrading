@@ -25,6 +25,7 @@ class MainDock(QDockWidget):
         """重写 QMainWindow::closeEvent"""
         reply = QMessageBox.question(self, "关闭", "确认关闭？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
+            self.main_frame.close()
             event.accept()
         else:
             event.ignore()
