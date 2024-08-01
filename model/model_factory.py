@@ -1,5 +1,5 @@
 import uuid
-
+import pandas as pd
 from model.lstm_v1.lstmv1 import LstmV1
 
 
@@ -45,8 +45,12 @@ class ModelFactory:
         return self._instance_models.get(model_id)
   
     def create_dataloader(self, model_id, data):
+        df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "Trades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
+        df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
+        df.set_index("datetime", inplace=True)
+        
         model = self._instance_models.get(model_id)
-        return model.create_dataloader(data)
+        return model.create_dataloader(df)
             
     def get_config_dict(self, model_id):
         model = self._instance_models.get(model_id)

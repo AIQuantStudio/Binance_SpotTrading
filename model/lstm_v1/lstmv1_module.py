@@ -16,8 +16,8 @@ class ImprovedPricePredictionLSTM(nn.Module):
 
     def forward(self, x):
         # Initialize hidden states
-        h0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size).to(x.device)  # Multiply by 2 for bidirectional
-        c0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size).to(x.device)  # Multiply by 2 for bidirectional
+        h0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size)  # Multiply by 2 for bidirectional
+        c0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size)  # Multiply by 2 for bidirectional
         
         # Forward propagate LSTM
         out, _ = self.lstm(x, (h0, c0))  # out: tensor of shape (batch_size, seq_length, hidden_size * 2)

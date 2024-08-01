@@ -5,6 +5,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from torch.utils.data import TensorDataset, DataLoader
 
 from model.lstm_v1.model_config import ModelConfig
+from model.lstm_v1.lstmv1_module import LstmV1Model
 from model import BaseModel
 
 
@@ -29,7 +30,7 @@ class LstmV1(BaseModel):
         # self.dataloader_test = dataloader.dataloader_test
 
         # torch.set_float32_matmul_precision("high")
-        # self.model = TradeModel(config=config)
+        # self.model = LstmV1Model(config=self.config)
         # self.model.to(self.device)
 
         # self.raw_model = self.model.module if self.ddp else self.model  # always contains the "raw" unwrapped model
@@ -85,6 +86,8 @@ class LstmV1(BaseModel):
         print(self.scaler.mean_)
         print(self.scaler.var_)
         print(self.scaler.scale_)
+        
+        self.model = LstmV1Model(config=self.config)
         # self.model.load_state_dict(checkpoint["model_state_dict"])
         
     def validate_config(self):
@@ -96,44 +99,60 @@ class LstmV1(BaseModel):
         return asdict(self.config)
 
 
-    def predict(self):
+    def predict(self, dataloader):
         self.model.eval()
         # scaler = StandardScaler()
         # Iterate over the test DataLoader to generate predictions
-        predicted_close = np.zeros((0, 1))
+        # predicted_close = np.zeros((0, 1))
 
-        print(f"dataloader_test: {len(self.dataloader)}")
-        for batch_idx, (inputs, targets) in enumerate(self.dataloader):
-            inputs = inputs.to(self.device)
-            targets = targets.to(self.device)
+        print(f"dataloader_test: {len(dataloader)}")
+        for batch_idx, (inputs, targets) in enumerate(dataloader):
+            # inputs = inputs.to(self.device)
+            # targets = targets.to(self.device)
             # print(f'inputs: {inputs.shape}, targets: {targets.shape}')
             with torch.inference_mode():
                 output, _ = self.model(inputs=inputs, targets=targets)
-                # predicted_array = np.array(output).reshape(-1, 1)
-                # targets_array = np.array(targets).reshape(-1, 1)
-                predicted_array = output.detach().cpu().numpy().reshape(-1, 1)
-                targets_array = targets.cpu().numpy().reshape(-1, 1)
+                print("Number of dimensions:", output.ndim)
+                print("Shape of Tensor:", output.shape)
+                print("Elements number along axis 0 of Tensor:", output.shape[0])
+                print("Elements number along the last axis of Tensor:", output.shape[-1])
+                print('Number of elements in Tensor: ', output.numel())
+                print("Data Type of every element:", output.dtype)
+                print(output[0,0].item())
+                # o:torch.Tensor = output[0][0]
+                # print(o.values)
+                o = np.array([[output[0,0].item(), 0.0, 0.0]])
+                d = self.scaler.inverse_transform(o)
+    
+                
+                
+                # # predicted_array = np.array(output).reshape(-1, 1)
+                # # targets_array = np.array(targets).reshape(-1, 1)
+                # predicted_array = output.detach().cpu().numpy().reshape(-1, 1)
+                # targets_array = targets.cpu().numpy().reshape(-1, 1)
 
-                dummy_columns = np.zeros((predicted_array.shape[0], 2))  # Assuming 2 dummy columns
-                predicted_array_with_dummy = np.concatenate((predicted_array, dummy_columns), axis=1)
-                predicted_close_with_dummy = self.scaler.inverse_transform(predicted_array_with_dummy)
-                predicted_close_batch = predicted_close_with_dummy[:, :-2]  # Remove the last two columns
-                # print(f'predicted_close = {predicted_close.shape}, predicted_close_batch = {predicted_close_batch.shape}')
-                predicted_close = np.vstack([predicted_close, predicted_close_batch])
-                # actual_array_with_dummy = np.concatenate((targets_array, dummy_columns), axis=1)
-                # actual_close_with_dummy = self.scaler.inverse_transform(actual_array_with_dummy)
-                # actual_close = actual_close_with_dummy[:, :-2]  # Remove the last two columns
-                # print(predicted_close)
-                # print(f'output = {output.shape}, targets = {targets.shape}, predicted_array = {predicted_array.shape}, predicted_close = {predicted_close.shape}, actual_close = {actual_close.shape}')
-                # for idx in range(inputs.shape[0]):
-                #     print(f'Batch = {batch_idx}, Index = {idx},  predicted: {predicted_close[idx]}, actual = {actual_close[idx]}')
+                # dummy_columns = np.zeros((predicted_array.shape[0], 2))  # Assuming 2 dummy columns
+                # predicted_array_with_dummy = np.concatenate((predicted_array, dummy_columns), axis=1)
+                # predicted_close_with_dummy = self.scaler.inverse_transform(predicted_array_with_dummy)
+                # predicted_close_batch = predicted_close_with_dummy[:, :-2]  # Remove the last two columns
+                # # print(f'predicted_close = {predicted_close.shape}, predicted_close_batch = {predicted_close_batch.shape}')
+                # predicted_close = np.vstack([predicted_close, predicted_close_batch])
+                # # actual_array_with_dummy = np.concatenate((targets_array, dummy_columns), axis=1)
+                # # actual_close_with_dummy = self.scaler.inverse_transform(actual_array_with_dummy)
+                # # actual_close = actual_close_with_dummy[:, :-2]  # Remove the last two columns
+                # # print(predicted_close)
+                # # print(f'output = {output.shape}, targets = {targets.shape}, predicted_array = {predicted_array.shape}, predicted_close = {predicted_close.shape}, actual_close = {actual_close.shape}')
+                # # for idx in range(inputs.shape[0]):
+                # #     print(f'Batch = {batch_idx}, Index = {idx},  predicted: {predicted_close[idx]}, actual = {actual_close[idx]}')
+            
+            
+            
             # break
         # print(f'predicted_close = {predicted_close.shape}, predicted_close_batch = {predicted_close_batch.shape}')
-        return predicted_close
+        return d
 
-    def create_dataloader(self, data):
-        print(data)
-        self.df_sampled = data[self.features].copy()
+    def create_dataloader(self, df):
+        self.df_sampled = df[self.features].copy()
         self.df_sampled_original = self.df_sampled.copy()
         #scaler = MinMaxScaler() # MinMax would work, too, but in fact a stock price has not really "min/max values", except the 0 ;)
         # self.scaler = StandardScaler()
@@ -148,9 +167,21 @@ class LstmV1(BaseModel):
         self.df_sampled[self.features] = scaled_features
 
         # MERGING
-        X, y = self.create_sequences(self.df_sampled, self.config["window_size"], self.config["prediction_steps"])
+        print(self.config)
+        X, y = self.create_sequences(self.df_sampled, self.config.window_size, self.config.prediction_steps)
+        print(X.shape)
+        X = X[-1:]
         print(X.shape)
         print(y.shape)
+        X_tensor = torch.Tensor(X)
+        y_tensor = torch.Tensor([0])
+        dataset = TensorDataset(X_tensor, y_tensor)
+        dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
+        return dataloader
+        
+        
+        
+        
         # print(f'X = {len(X)}')
         # SPLITTING
         # X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=(1.0 - self.ratio_train), shuffle=False)
@@ -185,16 +216,16 @@ class LstmV1(BaseModel):
         # if self.master_process:
         #     print(f'dataloader_train = {len(self.dataloader_train)}, dataloader_val = {len(self.dataloader_val)}, dataloader_test = {len(self.dataloader_test)}')
             
-        return DataLoader()
+        # return DataLoader()
             
     def create_sequences(self, df, window_size, prediction_steps):
         X = []
         y = []
         for i in range(len(df) - window_size - prediction_steps + 1):
             sequence = df.iloc[i:i + window_size][self.features]
-            target = df.iloc[i + window_size + prediction_steps - 1][self.targets]
+            # target = df.iloc[i + window_size + prediction_steps - 1][self.targets]
             X.append(sequence)
-            y.append(target)
+            # y.append(target)
             # print(X)
             # print(y)
         

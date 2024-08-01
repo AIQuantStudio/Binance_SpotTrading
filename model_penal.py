@@ -129,7 +129,8 @@ class ModelPanel(QFrame):
         model = ModelFactory().get_model(self.top_dock.id)
         data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
         dataloader = ModelFactory().create_dataloader(self.top_dock.id, data)
-        # model.predict(dataloader)
+        price = model.predict(dataloader)
+        print(price)
         
     def close(self):
         self.app_engine.event_engine.unregister_timer(self.refresh_kline)
