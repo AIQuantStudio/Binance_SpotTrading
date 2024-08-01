@@ -7,6 +7,7 @@ class BaseModel(ABC):
         self._id = id
         self._base_currency = ""
         self._quote_currency = ""
+        self._dataloader = None
     
     @property
     def id(self):
@@ -15,6 +16,10 @@ class BaseModel(ABC):
     @property
     def name(self):
         return self._name
+    
+    @property
+    def dataloader(self):
+        return self._dataloader
     
     @property
     def base_currency(self):
@@ -30,6 +35,14 @@ class BaseModel(ABC):
 
     @abstractmethod
     def validate_config(self):
+        pass
+    
+    @abstractmethod
+    def create_dataloader(self, data):
+        pass
+    
+    @abstractmethod
+    def predict(self):
         pass
     
     

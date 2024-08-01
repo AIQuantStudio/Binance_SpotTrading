@@ -16,6 +16,8 @@ EVENT_MARKETMANAGER_EXCEPTION = "eMarketManagerException"
 EVENT_TRADER_STRATEGY = "evtTraderStrategy"
 EVENT_TRADER_STOPORDER = "evtTraderStopOrder"
 
+EVENT_PREDICT = "ePredict"
+
 
 class Event:
 

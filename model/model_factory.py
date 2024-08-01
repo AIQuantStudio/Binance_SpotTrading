@@ -43,9 +43,10 @@ class ModelFactory:
 
     def get_model(self, model_id):
         return self._instance_models.get(model_id)
-    
   
-    
+    def create_dataloader(self, model_id, data):
+        model = self._instance_models.get(model_id)
+        return model.create_dataloader(data)
             
     def get_config_dict(self, model_id):
         model = self._instance_models.get(model_id)

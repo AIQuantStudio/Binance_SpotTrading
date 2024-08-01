@@ -5,7 +5,7 @@ from PyQt6.QtGui import *
 from exchange.binance_canvas import BinanceCanvas
 from exchange.binance_market import BinanceMarket
 from model import ModelFactory
-from event import EVENT_TIMER
+from event import EVENT_TIMER, EVENT_PREDICT
 
 
 class ModelPanel(QFrame):
@@ -82,7 +82,7 @@ class ModelPanel(QFrame):
         self.start_prediction_btn.setDisabled(True)
         self.stop_prediction_btn.setEnabled(True)
 
-        self.app_engine.event_engine.register(self.predict)
+        self.app_engine.event_engine.register_timer(self.predict, once = True)
         
         
     def stop_predict(self):
@@ -126,7 +126,10 @@ class ModelPanel(QFrame):
         self.figure_canvas.plot_data(data)
         
     def predict(self):
-        pass
+        model = ModelFactory().get_model(self.top_dock.id)
+        data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
+        dataloader = ModelFactory().create_dataloader(self.top_dock.id, data)
+        # model.predict(dataloader)
         
     def close(self):
         self.app_engine.event_engine.unregister_timer(self.refresh_kline)

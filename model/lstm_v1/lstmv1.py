@@ -2,10 +2,16 @@ import torch
 import numpy as np
 from dataclasses import asdict
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from torch.utils.data import TensorDataset, DataLoader
+
 from model.lstm_v1.model_config import ModelConfig
 from model import BaseModel
 
+
+
 class LstmV1(BaseModel):
+
+    features = ['Close', 'Volume', 'Trades']
 
     def __init__(self, id):
         super().__init__("LstmV1", id)
@@ -96,8 +102,8 @@ class LstmV1(BaseModel):
         # Iterate over the test DataLoader to generate predictions
         predicted_close = np.zeros((0, 1))
 
-        print(f"dataloader_test: {len(self.dataloader_test)}")
-        for batch_idx, (inputs, targets) in enumerate(self.dataloader_test):
+        print(f"dataloader_test: {len(self.dataloader)}")
+        for batch_idx, (inputs, targets) in enumerate(self.dataloader):
             inputs = inputs.to(self.device)
             targets = targets.to(self.device)
             # print(f'inputs: {inputs.shape}, targets: {targets.shape}')
@@ -124,3 +130,72 @@ class LstmV1(BaseModel):
             # break
         # print(f'predicted_close = {predicted_close.shape}, predicted_close_batch = {predicted_close_batch.shape}')
         return predicted_close
+
+    def create_dataloader(self, data):
+        print(data)
+        self.df_sampled = data[self.features].copy()
+        self.df_sampled_original = self.df_sampled.copy()
+        #scaler = MinMaxScaler() # MinMax would work, too, but in fact a stock price has not really "min/max values", except the 0 ;)
+        # self.scaler = StandardScaler()
+
+        # Extract the selected features and transform them
+        selected_features = self.df_sampled[self.features].values.reshape(-1, len(self.features))
+        # print(selected_features)
+        # print(f'selected_features = {selected_features.shape}')
+        scaled_features = self.scaler.transform(selected_features)
+        # print(f'df_sampled = {type(self.df_sampled[self.features])}, scaled_features = {type(scaled_features)}')
+        # Replace the original features with the scaled features in the DataFrame
+        self.df_sampled[self.features] = scaled_features
+
+        # MERGING
+        X, y = self.create_sequences(self.df_sampled, self.config["window_size"], self.config["prediction_steps"])
+        print(X.shape)
+        print(y.shape)
+        # print(f'X = {len(X)}')
+        # SPLITTING
+        # X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=(1.0 - self.ratio_train), shuffle=False)
+        # # print(f'X_train = {len(X_train)}, X_temp = {len(X_temp)}')
+        # ratio_val_test = (1.0 - self.ratio_val) / (1.0 - self.ratio_train)
+        # X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp,  test_size=ratio_val_test, shuffle=False)
+
+        # self.df_sampled_train = self.df_sampled_original[:len(X_train)]
+        # self.df_sampled_val = self.df_sampled_original[len(X_train):(len(X_train) + len(X_val))]
+        # self.df_sampled_test = self.df_sampled_original[(len(X_train) + len(X_val)):]
+
+        # print(f'X_train = {len(X_train)}-{len(self.df_sampled_train)}, X_val = {len(X_val)}-{len(self.df_sampled_val)}, X_test = {len(X_test)}-{len(self.df_sampled_test)}')
+        # # BATCHING
+        # X_train_tensor = torch.Tensor(X_train)
+        # # print(f'X_train_tensor = {X_train_tensor.shape}')
+        # y_train_tensor = torch.Tensor(y_train)
+        # X_val_tensor = torch.Tensor(X_val)
+        # y_val_tensor = torch.Tensor(y_val)
+        # X_test_tensor = torch.Tensor(X_test)
+        # print(X_test_tensor.shape)
+        # y_test_tensor = torch.Tensor(y_test)
+        # print(y_test_tensor.shape)
+
+        # train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+        # val_dataset = TensorDataset(X_val_tensor, y_val_tensor)
+        # test_dataset = TensorDataset(X_test_tensor, y_test_tensor)
+
+        # # Shuffling is set to "True", if you want to reproduce results, it may help to set shuffle to False
+        # self.dataloader_train = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True) 
+        # self.dataloader_val = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
+        # self.dataloader_test = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
+        # if self.master_process:
+        #     print(f'dataloader_train = {len(self.dataloader_train)}, dataloader_val = {len(self.dataloader_val)}, dataloader_test = {len(self.dataloader_test)}')
+            
+        return DataLoader()
+            
+    def create_sequences(self, df, window_size, prediction_steps):
+        X = []
+        y = []
+        for i in range(len(df) - window_size - prediction_steps + 1):
+            sequence = df.iloc[i:i + window_size][self.features]
+            target = df.iloc[i + window_size + prediction_steps - 1][self.targets]
+            X.append(sequence)
+            y.append(target)
+            # print(X)
+            # print(y)
+        
+        return np.array(X), np.array(y)
