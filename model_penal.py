@@ -51,6 +51,14 @@ class ModelPanel(QFrame):
         self.config_info_textbrowser.setFont(QFont("Courier New"))
         vbox_layout.addWidget(self.config_info_textbrowser)
 
+        self.gpu_checkbox = QCheckBox()
+        self.gpu_checkbox.setText("GPU")
+        self.gpu_checkbox.setCheckState(Qt.CheckState.Checked)
+        if not ModelFactory().cuda_is_available():
+            self.gpu_checkbox.setCheckState(Qt.CheckState.Unchecked)
+            self.gpu_checkbox.setDisabled(True)
+        vbox_layout.addWidget(self.gpu_checkbox)
+        
         hbox_layout = QHBoxLayout()
         self.start_prediction_btn = QPushButton()
         self.start_prediction_btn.setText("启动预测")
@@ -75,6 +83,7 @@ class ModelPanel(QFrame):
         vbox_layout.addWidget(self.binance_kline_penal)
     
     def bind_event(self):
+        self.gpu_checkbox.stateChanged.connect(self.gpu_changed)
         self.start_prediction_btn.clicked.connect(self.start_predict)
         self.stop_prediction_btn.clicked.connect(self.stop_predict)
         
@@ -118,8 +127,9 @@ class ModelPanel(QFrame):
         self.figure_canvas = BinanceCanvas()
         layout.addWidget(self.figure_canvas)
         
-        # self.figure_canvas.plot()
-        
+    def gpu_changed(self):
+        model = ModelFactory().get_model(self.top_dock.id)
+        model
     def refresh_kline(self):
         model = ModelFactory().get_model(self.top_dock.id)
         data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")

@@ -8,6 +8,7 @@ class BaseModel(ABC):
         self._base_currency = ""
         self._quote_currency = ""
         self._dataloader = None
+        self._device = "" 
     
     @property
     def id(self):
@@ -16,6 +17,10 @@ class BaseModel(ABC):
     @property
     def name(self):
         return self._name
+    
+    @property
+    def device(self):
+        return self._device
     
     @property
     def dataloader(self):

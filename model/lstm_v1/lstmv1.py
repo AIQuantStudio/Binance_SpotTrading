@@ -88,7 +88,8 @@ class LstmV1(BaseModel):
         print(self.scaler.scale_)
         
         self.model = LstmV1Model(config=self.config)
-        # self.model.load_state_dict(checkpoint["model_state_dict"])
+        self.model.load_state_dict(checkpoint["model_state_dict"])
+        self.model.to("cuda")
         
     def validate_config(self):
         if self.scaler is None or self.config is None or self.symbol is None:
@@ -107,8 +108,8 @@ class LstmV1(BaseModel):
 
         print(f"dataloader_test: {len(dataloader)}")
         for batch_idx, (inputs, targets) in enumerate(dataloader):
-            # inputs = inputs.to(self.device)
-            # targets = targets.to(self.device)
+            inputs = inputs.to("cuda")
+            targets = targets.to("cuda")
             # print(f'inputs: {inputs.shape}, targets: {targets.shape}')
             with torch.inference_mode():
                 output, _ = self.model(inputs=inputs, targets=targets)
@@ -119,6 +120,7 @@ class LstmV1(BaseModel):
                 print('Number of elements in Tensor: ', output.numel())
                 print("Data Type of every element:", output.dtype)
                 print(output[0,0].item())
+
                 # o:torch.Tensor = output[0][0]
                 # print(o.values)
                 o = np.array([[output[0,0].item(), 0.0, 0.0]])
