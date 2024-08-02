@@ -8,7 +8,7 @@ class BaseModel(ABC):
         self._base_currency = ""
         self._quote_currency = ""
         self._dataloader = None
-        self._device = "" 
+        self._device = "cpu"
     
     @property
     def id(self):
@@ -21,6 +21,9 @@ class BaseModel(ABC):
     @property
     def device(self):
         return self._device
+    
+    def set_device(self, device):
+        self._device = device
     
     @property
     def dataloader(self):
@@ -50,4 +53,6 @@ class BaseModel(ABC):
     def predict(self, dataloader):
         pass
     
-    
+    @abstractmethod
+    def to(self, device):
+        pass

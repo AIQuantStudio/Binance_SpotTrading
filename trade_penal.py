@@ -28,18 +28,11 @@ class TradePanel(QFrame):
 
     def setup_left_area_ui(self, left_widget):
         vbox_layout = QVBoxLayout()
-
-        symbol_label = QLabel("交易对: ")
-        vbox_layout.addWidget(symbol_label)
-
-        config_info_label = QLabel("配置信息：")
-        vbox_layout.addWidget(config_info_label)
-
-        self.config_info_textbrowser = QTextBrowser()
-        self.config_info_textbrowser.setFont(QFont("Courier New"))
-        vbox_layout.addWidget(self.config_info_textbrowser)
-
         left_widget.setLayout(vbox_layout)
+
+        self.select_account_btn = QPushButton()
+        self.select_account_btn.setText("选择账号")
+        vbox_layout.addWidget(self.select_account_btn)
 
     def setup_right_area_ui(self, right_widget):
         vbox_layout = QVBoxLayout()
@@ -59,3 +52,6 @@ class TradePanel(QFrame):
         # vbox_layout.addLayout(h_layout)
 
         right_widget.setLayout(vbox_layout)
+
+    def close(self):
+        return super().close()

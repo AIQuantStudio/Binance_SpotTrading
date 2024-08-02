@@ -2,6 +2,8 @@ import uuid
 import torch
 import pandas as pd
 from model.lstm_v1.lstmv1 import LstmV1
+from exchange.binance_canvas import BinanceCanvas
+from exchange.binance_market import BinanceMarket
 
 
 def singleton(cls):
@@ -44,6 +46,9 @@ class ModelFactory:
 
     def get_model(self, model_id):
         return self._instance_models.get(model_id)
+    
+    def get_model_name(self, model_id):
+        return self._instance_models.get(model_id).name
   
     def create_dataloader(self, model_id, data):
         df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "Trades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
@@ -60,5 +65,19 @@ class ModelFactory:
         
     def cuda_is_available(self):
         return torch.cuda.is_available()
+    
+    def predict(self, model_id, gpu=False):
+        model = self._instance_models.get(model_id)
+        model.set_device("cuda" if gpu else "cpu")
+        model.to(model.device)
+        
+        data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
+        df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "Trades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
+        df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
+        df.set_index("datetime", inplace=True)
+        
+        dataloader = model.create_dataloader(df)
+        
+        return model.predict(dataloader)
         
  

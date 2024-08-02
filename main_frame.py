@@ -23,11 +23,8 @@ class MainFrame(QFrame):
         vbox_layout = QVBoxLayout()
         self.setLayout(vbox_layout)
 
-        self.model_penal_widget = ModelPanel(self, self.top_dock, self.app_engine)
-        vbox_layout.addWidget(self.model_penal_widget, stretch=6)
-        # penal_widget.setFixedHeight(100)
-        # penal_widget.setFixedWidth(100)
-        # penal_widget.setStyleSheet("background-color: blue;")
+        self.model_penal = ModelPanel(self, self.top_dock, self.app_engine)
+        vbox_layout.addWidget(self.model_penal, stretch=6)
 
         self.line = QFrame(self)
         self.line.setGeometry(QRect(0, 120, 341, 20))
@@ -36,9 +33,10 @@ class MainFrame(QFrame):
         self.line.setFrameShape(QFrame.Shape.HLine)
         vbox_layout.addWidget(self.line)
 
-        trade_penal_widget = TradePanel(self, self.top_dock, self.app_engine)
-        vbox_layout.addWidget(trade_penal_widget, stretch=4)
+        self.trade_penal = TradePanel(self, self.top_dock, self.app_engine)
+        vbox_layout.addWidget(self.trade_penal, stretch=4)
 
     def close(self):
-        self.model_penal_widget.close()
+        self.model_penal.close()
+        self.trade_penal.close()
         return super().close()

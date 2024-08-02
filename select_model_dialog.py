@@ -42,7 +42,7 @@ class SelectModelDialog(QDialog):
         if id < 0:
             QMessageBox.warning(self, "警告", f"模型 {list(ModelConfig.Models.keys())[idx]} 加载失败！", QMessageBox.StandardButton.Ok)
             return
-        
+
         filename, _ = QFileDialog.getOpenFileName(self.parentWidget(), "选择参数文件", Config_Data["model.path"], "参数文件(*.pth)")
         if filename is not None and len(filename) > 0:
             if not ModelFactory().load_data(id, filename):

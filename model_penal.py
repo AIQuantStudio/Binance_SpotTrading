@@ -129,17 +129,19 @@ class ModelPanel(QFrame):
         
     def gpu_changed(self):
         model = ModelFactory().get_model(self.top_dock.id)
-        model
+        
+        
     def refresh_kline(self):
         model = ModelFactory().get_model(self.top_dock.id)
         data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
         self.figure_canvas.plot_data(data)
         
     def predict(self):
-        model = ModelFactory().get_model(self.top_dock.id)
-        data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
-        dataloader = ModelFactory().create_dataloader(self.top_dock.id, data)
-        price = model.predict(dataloader)
+        # model = ModelFactory().get_model(self.top_dock.id)
+        
+        price = ModelFactory().predict(self.top_dock.id, gpu=self.gpu_checkbox.checkState() == Qt.CheckState.Checked)
+        # price = model.predict(dataloader)
+        print("*****************")
         print(price)
         
     def close(self):
