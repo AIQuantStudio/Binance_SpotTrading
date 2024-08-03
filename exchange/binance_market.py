@@ -11,7 +11,7 @@ class BinanceMarket:
         self.binance_market = Client()
     
         
-        
+
     def get_klines(self, symbol):
         """Kline/candlestick bars for a symbol. Klines are uniquely identified by their open time.
 

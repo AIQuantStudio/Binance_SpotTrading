@@ -1,22 +1,16 @@
 import uuid
 import torch
 import pandas as pd
+
+from common import singleton
 from model.lstm_v1.lstmv1 import LstmV1
 from exchange.binance_canvas import BinanceCanvas
 from exchange.binance_market import BinanceMarket
 
-
-def singleton(cls):
-    instances = {}
-    def wrapper(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-    return wrapper
-
     
 @singleton
 class ModelFactory:
+    
     def __init__(self):
         self._instance_models = {}
     

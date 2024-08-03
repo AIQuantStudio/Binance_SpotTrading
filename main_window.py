@@ -37,13 +37,13 @@ class MainWindow(QMainWindow):
         self.app_toolbar.addWidget(left_space)
 
         action = QAction(QIcon(QPixmap("./ico/load_model.ico")), "加载模型", self)
-        action.triggered.connect(self.on_click_load_model)
+        action.triggered.connect(self.on_click_select_model)
         self.app_toolbar.addAction(action)
         self.app_toolbar.addSeparator()
 
         self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.app_toolbar)
 
-    def on_click_load_model(self):
+    def on_click_select_model(self):
         id = SelectModelDialog(self).exec()
         if id == QDialog.DialogCode.Rejected:
             return

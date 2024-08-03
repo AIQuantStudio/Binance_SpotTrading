@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from frame import AssetBalancePenal, TradeSettingPenal, TradeHistoryMonitor
+from select_account_dialog import SelectAccountDialog
 
 class TradePanel(QFrame):
 
@@ -13,6 +14,7 @@ class TradePanel(QFrame):
         self.app_engine = app_engine
 
         self.setup_ui()
+        self.bind_event()
 
     def setup_ui(self):
         main_hbox_layout = QHBoxLayout()
@@ -82,6 +84,16 @@ class TradePanel(QFrame):
         # vbox_layout.addLayout(h_layout)
 
         right_widget.setLayout(vbox_layout)
-
+        
+    def bind_event(self):
+        self.select_account_btn.clicked.connect(self.on_click_select_account)
+        
+    def on_click_select_account(self):
+        ret = SelectAccountDialog(self, self.top_dock.id).exec()
+        if ret == QDialog.DialogCode.Accepted:
+            self.load_trade_panel()
+    
+    def load_trade_panel(self):
+        
     def close(self):
         return super().close()
