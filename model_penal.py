@@ -27,6 +27,7 @@ class ModelPanel(QFrame):
 
     def setup_ui(self):
         main_hbox_layout = QHBoxLayout()
+        main_hbox_layout.setContentsMargins(0,0,0,0)
         self.setLayout(main_hbox_layout)
 
         main_left_widget = QWidget()

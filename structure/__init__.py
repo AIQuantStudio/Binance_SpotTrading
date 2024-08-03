@@ -1,0 +1,1 @@
+from structure.trade_data import TradeData

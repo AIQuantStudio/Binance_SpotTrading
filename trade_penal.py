@@ -2,6 +2,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
+from frame import AssetBalancePenal, TradeSettingPenal, TradeHistoryMonitor
 
 class TradePanel(QFrame):
 
@@ -20,10 +21,14 @@ class TradePanel(QFrame):
         main_left_widget = QWidget()
         main_hbox_layout.addWidget(main_left_widget, stretch=3)
 
+        main_middle_widget = QWidget()
+        main_hbox_layout.addWidget(main_middle_widget, stretch=3)
+        
         main_right_widget = QWidget()
-        main_hbox_layout.addWidget(main_right_widget, stretch=10)
+        main_hbox_layout.addWidget(main_right_widget, stretch=5)
 
         self.setup_left_area_ui(main_left_widget)
+        self.setup_middle_area_ui(main_middle_widget)
         self.setup_right_area_ui(main_right_widget)
 
     def setup_left_area_ui(self, left_widget):
@@ -33,10 +38,35 @@ class TradePanel(QFrame):
         self.select_account_btn = QPushButton()
         self.select_account_btn.setText("选择账号")
         vbox_layout.addWidget(self.select_account_btn)
+        
+        self.asset_balance_panel = AssetBalancePenal(self, self.top_dock, self.app_engine)
+        vbox_layout.addWidget( self.asset_balance_panel)
 
+    def setup_middle_area_ui(self, middle_widget):
+        vbox_layout = QVBoxLayout()
+        middle_widget.setLayout(vbox_layout)
+        
+        self.trade_setting_panel = TradeSettingPenal(self, self.top_dock, self.app_engine)
+        vbox_layout.addWidget( self.trade_setting_panel)
+        
+        self.start_trade_btn = QPushButton()
+        self.start_trade_btn.setText("启动交易")
+        vbox_layout.addWidget(self.start_trade_btn)
+
+        # self.select_account_btn = QPushButton()
+        # self.select_account_btn.setText("选择账号")
+        # vbox_layout.addWidget(self.select_account_btn)
+        
+        # self.asset_balance_panel = AssetBalancePenal(self, self.top_dock, self.app_engine)
+        # vbox_layout.addWidget( self.asset_balance_panel)
+        
     def setup_right_area_ui(self, right_widget):
         vbox_layout = QVBoxLayout()
-
+        right_widget.setLayout(vbox_layout)
+        
+        self.trade_history_monitor = TradeHistoryMonitor(self, self.top_dock, self.app_engine)
+        vbox_layout.addWidget(self.trade_history_monitor)
+        
         # widget_control_bar = QWidget()
         # vbox_layout.addWidget(widget_control_bar, stretch=1)
         # h_layout = QHBoxLayout()
