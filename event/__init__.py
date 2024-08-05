@@ -16,5 +16,7 @@ from event.event import (
 
     EVENT_TRADER_STRATEGY,
     EVENT_TRADER_STOPORDER,
-    EVENT_PREDICT
+    EVENT_PREDICT,
+    
+    EVENT_ASSET_BALANCE
 )

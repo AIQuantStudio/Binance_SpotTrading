@@ -46,7 +46,7 @@ class SelectAccountDialog(QDialog):
 
         success = BinanceFactory().load_account(self.model_id, ba)
         if not success:
-            QMessageBox.warning(self, "警告", f"Binance账户[{data["Name"]}]加载失败！", QMessageBox.StandardButton.Ok)
+            QMessageBox.warning(self, "警告", f"Binance账户[{data['Name']}]加载失败！", QMessageBox.StandardButton.Ok)
             return
 
         filename, _ = QFileDialog.getOpenFileName(self.parentWidget(), "选择参数文件", Config_Data["model.path"], "参数文件(*.pth)")

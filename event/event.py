@@ -18,6 +18,8 @@ EVENT_TRADER_STOPORDER = "evtTraderStopOrder"
 
 EVENT_PREDICT = "ePredict"
 
+EVENT_ASSET_BALANCE = "eAssetBalance"
+
 
 class Event:
 

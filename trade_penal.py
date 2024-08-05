@@ -37,9 +37,17 @@ class TradePanel(QFrame):
         vbox_layout = QVBoxLayout()
         left_widget.setLayout(vbox_layout)
 
+        hbox_layout = QHBoxLayout()
+        hbox_layout.setContentsMargins(0,0,0,0)
+        vbox_layout.addLayout(hbox_layout)
+        
         self.select_account_btn = QPushButton()
         self.select_account_btn.setText("选择账号")
-        vbox_layout.addWidget(self.select_account_btn)
+        hbox_layout.addWidget(self.select_account_btn, stretch=4)
+        
+        self.binance_account_label = QLabel()
+        self.binance_account_label.setText("aaaa")
+        hbox_layout.addWidget(self.binance_account_label, stretch=6)
         
         self.asset_balance_panel = AssetBalancePenal(self, self.top_dock, self.app_engine)
         vbox_layout.addWidget( self.asset_balance_panel)
