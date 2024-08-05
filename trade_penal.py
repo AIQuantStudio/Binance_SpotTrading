@@ -94,6 +94,7 @@ class TradePanel(QFrame):
             self.load_trade_panel()
     
     def load_trade_panel(self):
+        pass
         
     def close(self):
         return super().close()

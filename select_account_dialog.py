@@ -7,6 +7,7 @@ from functools import partial
 
 from exchange import BinanceFactory
 from structure import BianceAccountData
+from config import Config_Data
 
 
 class SelectAccountDialog(QDialog):
@@ -57,3 +58,4 @@ class SelectAccountDialog(QDialog):
             self.done(id)
         else:
             ModelFactory().remove_model(id)
+            

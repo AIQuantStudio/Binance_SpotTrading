@@ -6,8 +6,8 @@ class BinanceAccount:
     def __init__(self):
         self.name
         self.id
-        self.api_key = 
-        self.api_secret =
+        self.api_key = ""
+        self.api_secret = ""
         
     def connect(self):
         try:
