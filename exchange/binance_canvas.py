@@ -25,6 +25,8 @@ STYLE_DICT = {
 class BinanceCanvas(FigureCanvas):
 
     def __init__(self, width=12, height=8, dpi=100):
+        self.predict_price = None
+        
         mcolors = mpf.make_marketcolors(up="green", down="red", edge="in", wick="in")
         my_style = mpf.make_mpf_style(base_mpf_style="binance", marketcolors=mcolors, facecolor="#19232D", figcolor="#111111", rc=STYLE_DICT)
         self.fig = mpf.figure(style=my_style, figsize=(width, height), dpi=dpi)
@@ -32,15 +34,18 @@ class BinanceCanvas(FigureCanvas):
         super(BinanceCanvas, self).__init__(self.fig)
 
         # self.fig.text(0.20, 0.90, '低价: ', fontdict={"color":"white","horizontalalignment":"right","fontname": "Heiti TC"})
-        self.fig.text(0.20, 0.90, 'low: ', fontdict={"color":"white","horizontalalignment":"right"})
-        self.t1 = self.fig.text(0.20, 0.90, '', fontdict={"color":"white","horizontalalignment":"left"})
-        self.fig.text(0.20, 0.95, 'high: ', fontdict={"color":"white","horizontalalignment":"right"})
-        self.t2 = self.fig.text(0.20, 0.95, '', fontdict={"color":"white","horizontalalignment":"left"})
+        self.fig.text(0.16, 0.90, 'low : ', fontdict={"color":"white","horizontalalignment":"right"})
+        self.t1 = self.fig.text(0.16, 0.90, '', fontdict={"color":"white","horizontalalignment":"left"})
+        self.fig.text(0.16, 0.95, 'high : ', fontdict={"color":"white","horizontalalignment":"right"})
+        self.t2 = self.fig.text(0.16, 0.95, '', fontdict={"color":"white","horizontalalignment":"left"})
         
-        self.fig.text(0.45, 0.93, 'volume: ', fontdict={"color":"white", "horizontalalignment":"right"})
-        self.t3 = self.fig.text(0.45, 0.93, '', fontdict={"color":"white","horizontalalignment":"left"})
-        self.fig.text(0.75, 0.93, 'price: ', fontdict={"color":"white", "horizontalalignment":"right"})
-        self.t4 = self.fig.text(0.75, 0.93, '', fontdict={"color":"white","horizontalalignment":"left"})
+        self.fig.text(0.45, 0.90, 'volume : ', fontdict={"color":"white", "horizontalalignment":"right"})
+        self.t3 = self.fig.text(0.45, 0.90, '', fontdict={"color":"white","horizontalalignment":"left"})
+        self.fig.text(0.45, 0.95, 'price : ', fontdict={"color":"white", "horizontalalignment":"right"})
+        self.t4 = self.fig.text(0.45, 0.95, '', fontdict={"color":"white","horizontalalignment":"left"})
+        
+        self.fig.text(0.78, 0.93, 'predict: ', fontdict={"color":"red", "horizontalalignment":"right"})
+        self.t5 = self.fig.text(0.78, 0.93, '', fontdict={"color":"white","horizontalalignment":"left"})
 
         self.ax_kline = self.fig.add_axes([0.08, 0.1, 0.90, 0.78])
         self.ax_kline.set_ylabel('Pri')
@@ -120,7 +125,6 @@ class BinanceCanvas(FigureCanvas):
         # # fig.show()
 
     def plot_data(self, data):
-
         df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "NumberTrades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
         df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
         df.set_index("datetime", inplace=True)
@@ -135,6 +139,9 @@ class BinanceCanvas(FigureCanvas):
         self.t2.set_text(f'{last_data["High"]}')
         self.t3.set_text(f'{last_data["Volume"]}')
         self.t4.set_text(f'{last_data["Close"]}')
+        
+        if self.predict_price is not None:
+            self.t5.set_text(f'{self.predict_price:.4f}')
 
         mpf.plot(
             df,
@@ -144,3 +151,6 @@ class BinanceCanvas(FigureCanvas):
             type="candle",
         )
         self.draw()
+        
+    def set_predict_price(self, price):
+        self.predict_price = price

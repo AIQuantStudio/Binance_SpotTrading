@@ -49,7 +49,7 @@ class TradePanel(QFrame):
         hbox_layout.addWidget(self.select_account_btn, stretch=4)
         
         self.binance_account_label = QLabel()
-        self.binance_account_label.setText("aaaa")
+        self.binance_account_label.setText("")
         hbox_layout.addWidget(self.binance_account_label, stretch=6)
         
         self.asset_balance_panel = AssetBalancePenal(self, self.top_dock, self.app_engine)
@@ -102,6 +102,7 @@ class TradePanel(QFrame):
     def on_click_select_account(self):
         ret = SelectAccountDialog(self, self.top_dock.id).exec()
         if ret == QDialog.DialogCode.Accepted:
+            self.binance_account_label.setText(BinanceFactory().get_account_name(self.top_dock.id))
             self.load_asset_balance_penal()
     
     def load_asset_balance_penal(self):
