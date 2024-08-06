@@ -61,7 +61,7 @@ class TradeHistoryMonitor(QTableWidget):
         self.setColumnCount(len(hearder_labels))
         self.setHorizontalHeaderLabels(hearder_labels)
         self.verticalHeader().setVisible(False)
-        # self.setEditTriggers(self.NoEditTriggers)
+        # self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.setAlternatingRowColors(True)
         self.setSortingEnabled(True)
 

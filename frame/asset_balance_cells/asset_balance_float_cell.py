@@ -11,7 +11,7 @@ class AssetBalanceFloatCell(QTableWidgetItem):
         super().__init__()
         self.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
         self.set_content(content)
-    
-    def set_content(self, content: float) -> None:
+
+    def set_content(self, content: float, precision=6) -> None:
         """"""
-        self.setText(str(content))
+        self.setText(format(content, f".{precision}f"))

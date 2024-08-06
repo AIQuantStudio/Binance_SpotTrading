@@ -48,7 +48,8 @@ class ModelConfig:
         },
         "LSTM_V2": {
             "class": "LstmV2"
-        }
+        },
+        
     }
         
     ModelValues =["lstmv1", "lstmv2"]

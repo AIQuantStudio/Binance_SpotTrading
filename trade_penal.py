@@ -4,6 +4,9 @@ from PyQt6.QtGui import *
 
 from frame import AssetBalancePenal, TradeSettingPenal, TradeHistoryMonitor
 from select_account_dialog import SelectAccountDialog
+from exchange import BinanceFactory
+from structure import AssetBalanceData
+from event import Event, EVENT_ASSET_BALANCE
 
 class TradePanel(QFrame):
 
@@ -99,10 +102,18 @@ class TradePanel(QFrame):
     def on_click_select_account(self):
         ret = SelectAccountDialog(self, self.top_dock.id).exec()
         if ret == QDialog.DialogCode.Accepted:
-            self.load_trade_panel()
+            self.load_asset_balance_penal()
     
-    def load_trade_panel(self):
-        pass
+    def load_asset_balance_penal(self):
+        balances = BinanceFactory().get_asset_balance(self.top_dock.id)
+        
+        for balance in balances:
+            account_data = AssetBalanceData(
+                    symbol=balance["asset"],
+                    free=float(balance["free"]),
+                    locked=float(balance["locked"])
+                )
+            self.app_engine.event_engine.put(Event(EVENT_ASSET_BALANCE, account_data))
         
     def close(self):
         return super().close()

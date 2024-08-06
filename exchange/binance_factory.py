@@ -23,6 +23,10 @@ class BinanceFactory:
     def get_account(self, model_id):
         return self._map_model_to_account.get(model_id)
     
+    def get_asset_balance(self, model_id):
+        binance = self._map_model_to_account.get(model_id)
+        return binance.get_all_asset_balance()
+    
 
 
 

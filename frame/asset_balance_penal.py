@@ -9,7 +9,7 @@ from event import Event, EVENT_ASSET_BALANCE
 from structure.asset_balance_data import AssetBalanceData
 
 
-class AssetBalancePenal(QToolBox):
+class AssetBalancePenal(QTableWidget):
 
     # def __init__(self, parent_widget, top_dock, app_engine):
     #     super().__init__(parent_widget)
@@ -30,12 +30,12 @@ class AssetBalancePenal(QToolBox):
         
     signal_refresh_asset_balance: pyqtSignal = pyqtSignal(Event)
     
+    record_key = "symbol"
     headers: Dict[str, dict] = {
-        "account_id": {"display": "账号", "type": AssetBalanceStrCell, "width_factor": 3},
-        "balance": {"display": "余额", "type": AssetBalanceFloatCell,  "width_factor": 2},
-        "frozen": {"display": "冻结", "type": AssetBalanceFloatCell,  "width_factor": 2},
-        "available": {"display": "可用", "type": AssetBalanceFloatCell,  "width_factor": 2},
-        "gateway_name": {"display": "接口", "type": AssetBalanceStrCell,  "width_factor": 2},
+        "symbol": {"display": "账号", "type": AssetBalanceStrCell, "width_factor": 2},
+        "total": {"display": "余额", "type": AssetBalanceFloatCell,  "width_factor": 4},
+        "locked": {"display": "冻结", "type": AssetBalanceFloatCell,  "width_factor": 4},
+        "free": {"display": "可用", "type": AssetBalanceFloatCell,  "width_factor": 4},
     }
     
     def __init__(self, parent_widget, top_dock, app_engine):
@@ -51,9 +51,34 @@ class AssetBalancePenal(QToolBox):
         
         self.init_ui()
         self.register_event()
+        # self.create_asset_balance_table()
+    
+    def event(self, event: QEvent) -> bool:
+        """ 重写 QTableWidget::event """
+        if event.type() == QEvent.Paint:
+            if not self._first_painted:
+                width_factors = [d["width_factor"] for d in self.headers.values()]
+                width_sum = sum(width_factors)
+                width = self.viewport().width()/width_sum
+                for i, factor in enumerate(width_factors):
+                    self.setColumnWidth(i, int(width * factor))
 
+                self._first_painted = True
+
+        return super().event(event)
+    
     def init_ui(self):
-        self.setCurrentIndex(0)
+        hearder_labels = [d["display"] for d in self.headers.values()]
+
+        self.setColumnCount(len(hearder_labels))
+        self.setHorizontalHeaderLabels(hearder_labels)
+        self.verticalHeader().setVisible(False)
+        self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.setAlternatingRowColors(True)
+        self.setSortingEnabled(True)
+        
+        # self.balances_table = None
+        # self.setCurrentIndex(0)
         
     def register_event(self) -> None:
         self.signal_refresh_asset_balance.connect(self.process_event)
@@ -77,61 +102,43 @@ class AssetBalancePenal(QToolBox):
         return table
     
     def process_event(self, event) -> None:
-        """监听事件触发方法"""
+        self.setSortingEnabled(False)
+        
         # self.setSortingEnabled(False)
         # 获取返回的数据
-        account_data: AssetBalanceData = event.data
-        print(account_data)
+        balance_data: AssetBalanceData = event.data
+        print(balance_data)
         
-        # 判断当前门户是否已生成表格
-        gatTable: QTableWidget = None
-        if gateway_name not in self.record_tables:
-            # 生成表格
-            gatTable = self.create_trade_table()
-            # 门户信息保存对应json文件名
-            settingFileName: str = f"connect_{gateway_name.lower()}.json"
-            # 获取当前门户保存的属性信息
-            settingData = Setting.load_setting_json(settingFileName)
-            # 获取用户名
-            # accountName = settingData['name']
-            accountName = settingData['activeGateway']
-            # 添加表格到折叠框中
-            self.addItem(gatTable, gateway_name + '-' + accountName)
-            self.record_tables[gateway_name] = gatTable
-            # 按比例设置单元格宽度
-            width_factors = [d["width_factor"] for d in self.headers.values()]
-            width_sum = sum(width_factors)
-            width = gatTable.viewport().width()/width_sum
-            for i, factor in enumerate(width_factors):
-                gatTable.setColumnWidth(i, width * factor)
-        else:
-            gatTable = self.record_tables[gateway_name]
-
         # 获取数据的key
-        record_key = account_data.__getattribute__(self.record_key)
+        record_key = balance_data.__getattribute__(self.record_key)
+        print(record_key)
         # 判断数据是否存在
         if record_key in self.record_cells:
-            self._update_row(account_data, gatTable)
+            print(1111)
+            self._update_row(balance_data)
         else:
-            self._insert_record(account_data, gatTable)
+            print(2222)
+            self._insert_record(balance_data)
 
-        # self.setSortingEnabled(True)
+        self.setSortingEnabled(True)
     
-    def _insert_record(self, data: AssetBalanceData, gatTable: QTableWidget):
+    def _insert_record(self, data: AssetBalanceData):
         """"""
-        gatTable.insertRow(0)
+        self.insertRow(0)
 
         row_cells = {}
         for column, header in enumerate(self.headers.keys()):
             content = data.__getattribute__(header)
             cell = self.headers[header]["type"](content)
-            gatTable.setItem(0, column, cell)
+            self.setItem(0, column, cell)
             row_cells[header] = cell
 
         record_key = data.__getattribute__(self.record_key)
         self.record_cells[record_key] = row_cells
+        print("-----")
+        print(self.record_cells)
 
-    def _update_row(self, data: AssetBalanceData, gatTable: QTableWidget) -> None:
+    def _update_row(self, data: AssetBalanceData) -> None:
         """"""
         record_key = data.__getattribute__(self.record_key)
         record = self.record_cells[record_key]

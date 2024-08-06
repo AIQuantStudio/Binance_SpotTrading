@@ -16,7 +16,7 @@ class SelectAccountDialog(QDialog):
         
         self.model_id = model_id
         self.setWindowTitle("选择Binance账号")
-        self.setFixedSize(300, 150)
+        self.setFixedSize(300, 120 + 30*len(Accounts.data))
 
         layout = QVBoxLayout()
         layout.setSpacing(10)
@@ -26,8 +26,6 @@ class SelectAccountDialog(QDialog):
         layout.addWidget(label)
 
         for idx, account in enumerate(Accounts.data):
-            print(idx)
-            print(account)
             btn = QPushButton(account["Name"], self)
             btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             btn.clicked.connect(partial(self.on_click_load_account, account))
@@ -49,13 +47,6 @@ class SelectAccountDialog(QDialog):
             QMessageBox.warning(self, "警告", f"Binance账户[{data['Name']}]加载失败！", QMessageBox.StandardButton.Ok)
             return
 
-        filename, _ = QFileDialog.getOpenFileName(self.parentWidget(), "选择参数文件", Config_Data["model.path"], "参数文件(*.pth)")
-        if filename is not None and len(filename) > 0:
-            if not ModelFactory().load_data(id, filename):
-                ModelFactory().remove_model(id)
-                QMessageBox.warning(self, "警告", f"数据加载失败,请检查！", QMessageBox.StandardButton.Ok)
-                return
-            self.done(id)
-        else:
-            ModelFactory().remove_model(id)
+        self.accept()
+        
             

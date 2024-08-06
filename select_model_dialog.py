@@ -13,7 +13,7 @@ class SelectModelDialog(QDialog):
         super().__init__(parent_widget)
 
         self.setWindowTitle("选择模型")
-        self.setFixedSize(300, 180)
+        self.setFixedSize(300, 120 + 30*len(ModelConfig.Models))
 
         layout = QVBoxLayout()
         layout.setSpacing(10)
