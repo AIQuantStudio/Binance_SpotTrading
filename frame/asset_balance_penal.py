@@ -114,10 +114,8 @@ class AssetBalancePenal(QTableWidget):
         print(record_key)
         # 判断数据是否存在
         if record_key in self.record_cells:
-            print(1111)
             self._update_row(balance_data)
         else:
-            print(2222)
             self._insert_record(balance_data)
 
         self.setSortingEnabled(True)
@@ -147,3 +145,15 @@ class AssetBalancePenal(QTableWidget):
             content = data.__getattribute__(header)
             cell.set_content(content)
 
+
+    def clear_table(self):
+        # 获取表格的行数和列数
+        rows = self.rowCount()
+        
+        columns = self.columnCount()
+    
+        # 从最后一行开始反向遍历，以便于删除行时不影响循环
+        self.record_cells = {}
+        for row in range(rows - 1, -1, -1):
+            self.removeRow(row)
+    

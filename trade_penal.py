@@ -5,6 +5,7 @@ from PyQt6.QtGui import *
 from frame import AssetBalancePenal, TradeSettingPenal, TradeHistoryMonitor
 from select_account_dialog import SelectAccountDialog
 from exchange import BinanceFactory
+from model import ModelFactory
 from structure import AssetBalanceData
 from event import Event, EVENT_ASSET_BALANCE
 
@@ -54,6 +55,11 @@ class TradePanel(QFrame):
         
         self.asset_balance_panel = AssetBalancePenal(self, self.top_dock, self.app_engine)
         vbox_layout.addWidget( self.asset_balance_panel)
+        
+        self.show_all_balance_checkbox = QCheckBox()
+        self.show_all_balance_checkbox.setText("显示全部")
+        self.show_all_balance_checkbox.setCheckState(Qt.CheckState.Checked)
+        vbox_layout.addWidget( self.show_all_balance_checkbox)
 
     def setup_middle_area_ui(self, middle_widget):
         vbox_layout = QVBoxLayout()
@@ -98,6 +104,16 @@ class TradePanel(QFrame):
         
     def bind_event(self):
         self.select_account_btn.clicked.connect(self.on_click_select_account)
+        self.show_all_balance_checkbox.stateChanged.connect(self.on_show_all_balance_changed)
+        
+    def on_show_all_balance_changed(self):
+        state = self.show_all_balance_checkbox.checkState()
+        if state == Qt.CheckState.Unchecked:
+            self.asset_balance_panel.clear_table()
+            self.load_asset_balance_penal(False)
+        else:
+            self.asset_balance_panel.clear_table()
+            self.load_asset_balance_penal(True)
         
     def on_click_select_account(self):
         ret = SelectAccountDialog(self, self.top_dock.id).exec()
@@ -105,10 +121,15 @@ class TradePanel(QFrame):
             self.binance_account_label.setText(BinanceFactory().get_account_name(self.top_dock.id))
             self.load_asset_balance_penal()
     
-    def load_asset_balance_penal(self):
+    def load_asset_balance_penal(self, show_all = True):
         balances = BinanceFactory().get_asset_balance(self.top_dock.id)
-        
+        model = ModelFactory().get_model(self.top_dock.id)
+        show_symbols = [model.base_currency, model.quote_currency]
         for balance in balances:
+            if show_all == False:
+                if balance["asset"] not in show_symbols:
+                    continue
+            
             account_data = AssetBalanceData(
                     symbol=balance["asset"],
                     free=float(balance["free"]),
