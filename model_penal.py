@@ -143,9 +143,7 @@ class ModelPanel(QFrame):
         price = ModelFactory().predict(self.top_dock.id, gpu=self.gpu_checkbox.checkState() == Qt.CheckState.Checked)
         self.figure_canvas.set_predict_price(price[0][0])
         self.refresh_kline()
-        # price = model.predict(dataloader)
-        # print("*****************")
-        # print(price[0][0])
+
         
     def close(self):
         self.app_engine.event_engine.unregister_timer(self.refresh_kline)

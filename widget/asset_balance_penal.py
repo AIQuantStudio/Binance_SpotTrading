@@ -3,8 +3,8 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from typing import Dict
 
-from frame.asset_balance_cells.asset_balance_str_cell import AssetBalanceStrCell
-from frame.asset_balance_cells.asset_balance_float_cell import AssetBalanceFloatCell
+from widget.asset_balance_cells.asset_balance_str_cell import AssetBalanceStrCell
+from widget.asset_balance_cells.asset_balance_float_cell import AssetBalanceFloatCell
 from event import Event, EVENT_ASSET_BALANCE
 from structure.asset_balance_data import AssetBalanceData
 

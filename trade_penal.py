@@ -2,7 +2,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from frame import AssetBalancePenal, TradeSettingPenal, TradeHistoryMonitor
+from widget import AssetBalancePenal, TradeSettingPenal, TradeHistoryMonitor
 from select_account_dialog import SelectAccountDialog
 from exchange import BinanceFactory
 from model import ModelFactory
@@ -68,9 +68,20 @@ class TradePanel(QFrame):
         self.trade_setting_panel = TradeSettingPenal(self, self.top_dock, self.app_engine)
         vbox_layout.addWidget( self.trade_setting_panel)
         
+        # self.start_trade_btn = QPushButton()
+        # self.start_trade_btn.setText("启动交易")
+        # vbox_layout.addWidget(self.start_trade_btn)
+        
+        
+        hbox_layout = QHBoxLayout()
         self.start_trade_btn = QPushButton()
         self.start_trade_btn.setText("启动交易")
-        vbox_layout.addWidget(self.start_trade_btn)
+        hbox_layout.addWidget(self.start_trade_btn)
+        self.stop_trade_btn = QPushButton()
+        self.stop_trade_btn.setText("停止交易")
+        self.stop_trade_btn.setDisabled(True)
+        hbox_layout.addWidget(self.stop_trade_btn)
+        vbox_layout.addLayout(hbox_layout)
 
         # self.select_account_btn = QPushButton()
         # self.select_account_btn.setText("选择账号")

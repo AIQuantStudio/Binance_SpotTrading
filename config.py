@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from logging import CRITICAL
 
+_Version = "v1.0"
+
+
 Config_Data = {
     "FontFamily": "Arial",
     "FontSize": 12,

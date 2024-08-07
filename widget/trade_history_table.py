@@ -7,11 +7,11 @@ from event import Event
 from event import EVENT_TRADE
 from structure import TradeData
 
-from frame.trade_history_cells.trade_history_str_cell import TradeHistoryStrCell
-from frame.trade_history_cells.trade_history_float_cell import TradeHistoryFloatCell
-from frame.trade_history_cells.trade_history_time_cell import TradeHistoryTimeCell
-from frame.trade_history_cells.trade_history_enum_cell import TradeHistoryEnumCell
-from frame.trade_history_cells.trade_history_direction_cell import TradeHistoryDirectionCell
+from widget.trade_history_cells.trade_history_str_cell import TradeHistoryStrCell
+from widget.trade_history_cells.trade_history_float_cell import TradeHistoryFloatCell
+from widget.trade_history_cells.trade_history_time_cell import TradeHistoryTimeCell
+from widget.trade_history_cells.trade_history_enum_cell import TradeHistoryEnumCell
+from widget.trade_history_cells.trade_history_direction_cell import TradeHistoryDirectionCell
 
 
 class TradeHistoryMonitor(QTableWidget):

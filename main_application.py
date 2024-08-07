@@ -24,7 +24,7 @@ def create_application(app_name):
     app.setQuitOnLastWindowClosed(True)
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt6())
     app.setFont(QFont(Config_Data["FontFamily"], Config_Data["FontSize"]))
-    app.setWindowIcon(QIcon(("logo.ico")))
+    app.setWindowIcon(QIcon(("app.ico")))
     app.setApplicationDisplayName(app_name)
     if "Windows" in platform.uname():
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_name)
