@@ -2,11 +2,11 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from widget import ModelPanel
-from widget import TradePanel
+from widget.model_penal import ModelPanel
+from widget.trade_penal import TradePanel
 
 
-class MainFrame(QFrame):
+class DockFrame(QFrame):
 
     def __init__(self, top_dock, app_engine):
         super().__init__(top_dock)
@@ -17,7 +17,6 @@ class MainFrame(QFrame):
         self.setLineWidth(1)
         self.setMidLineWidth(1)
         self.setFrameStyle(QFrame.Shape.Box | QFrame.Shadow.Sunken)
-        # self.setStyleSheet("QFrame { background-color: blue;}")
         self.setup_ui()
         
 

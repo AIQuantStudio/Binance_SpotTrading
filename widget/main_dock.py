@@ -2,19 +2,19 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from widget import MainFrame
+from widget.dock_frame import DockFrame
 
 
 class MainDock(QDockWidget):
     
-    def __init__(self, name, id, app_engine):
-        super().__init__(name)
+    def __init__(self, parent_widget, name, id, app_engine):
+        super().__init__(name, parent_widget)
         
         self.name = name
         self.id = id
         self.app_engine = app_engine
         
-        self.main_frame = MainFrame(self, app_engine)
+        self.main_frame = DockFrame(self, app_engine)
         self.setObjectName(str(self.id))
         self.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable | QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
         self.setAllowedAreas(Qt.DockWidgetArea.TopDockWidgetArea | Qt.DockWidgetArea.BottomDockWidgetArea)

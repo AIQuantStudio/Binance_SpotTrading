@@ -4,7 +4,5 @@ from widget.trade_history_table import TradeHistoryMonitor
 from widget.about_dialog import AboutDialog
 from widget.select_model_dialog import SelectModelDialog
 from widget.select_account_dialog import SelectAccountDialog
-from widget.model_penal import ModelPanel
-from widget.trade_penal import TradePanel
-from widget.main_frame import MainFrame
+
 from widget.main_dock import MainDock

@@ -49,7 +49,7 @@ import json
 import os
 from logging import CRITICAL
 from copy import copy
-from path import Path
+from pathlib import Path
 
 
 Version = "v1.0"
@@ -60,6 +60,8 @@ _custom_config_filepath = Path(".").joinpath(_congfig_filename)
 _saved_config_filepath = Path(".").joinpath(_config_folder, _congfig_filename)
 
 _global_config_data = {
+    "model.default_path": "./data",
+    
     "main_window.width": 1600,
     "main_window.height": 900,
     "font.family": "Arial",

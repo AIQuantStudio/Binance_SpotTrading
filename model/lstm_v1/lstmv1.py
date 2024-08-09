@@ -4,7 +4,7 @@ from dataclasses import asdict
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from torch.utils.data import TensorDataset, DataLoader
 
-from model import BaseModel
+from model.base_model import BaseModel
 from model.lstm_v1.model_config import ModelConfig
 from model.lstm_v1.lstmv1_module import LstmV1Model
 
@@ -75,28 +75,28 @@ class LstmV1(BaseModel):
         # self.current_model_id = "|".join(map(str, current_model_id))
         
     def load_data(self, filename_data):
-        checkpoint = torch.load(filename_data, map_location='cpu')
-        # self.symbol = checkpoint["symbol"]
-        self.symbol = "ADA_USDT"
-        self._base_currency = self.symbol.split("_")[0]
-        self._quote_currency = self.symbol.split("_")[1]
-        self.config = ModelConfig(**checkpoint["model_config"])
-        self.scaler = checkpoint["model_scaler"]
-        print(self.scaler)
-        print(self.scaler.n_samples_seen_)
-        print(self.scaler.mean_)
-        print(self.scaler.var_)
-        print(self.scaler.scale_)
-        
-        self.model = LstmV1Model(config=self.config)
-        self.model.load_state_dict(checkpoint["model_state_dict"])
-        # self.model.to("cuda")
-        
-    def validate_config(self):
-        if self.scaler is None or self.config is None or self.symbol is None:
+        try:
+            checkpoint = torch.load(filename_data, map_location='cpu')
+            # self.symbol = checkpoint["symbol"]
+            self.symbol = "ADA_USDT"
+            self._base_currency = self.symbol.split("_")[0]
+            self._quote_currency = self.symbol.split("_")[1]
+            self.config = ModelConfig(**checkpoint["model_config"])
+            self.scaler = checkpoint["model_scaler"]
+            print(self.scaler)
+            print(self.scaler.n_samples_seen_)
+            print(self.scaler.mean_)
+            print(self.scaler.var_)
+            print(self.scaler.scale_)
+            
+            self.model = LstmV1Model(config=self.config)
+            self.model.load_state_dict(checkpoint["model_state_dict"])
+            # self.model.to("cuda")
+        except:
             return False
+        
         return True
-    
+
     def get_config(self):
         return asdict(self.config)
 

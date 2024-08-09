@@ -22,9 +22,6 @@ class BaseModel(ABC):
     def device(self):
         return self._device
     
-    def set_device(self, device):
-        self._device = device
-    
     @property
     def dataloader(self):
         return self._dataloader
@@ -37,12 +34,11 @@ class BaseModel(ABC):
     def quote_currency(self):
         return self._quote_currency
     
+    def set_device(self, device):
+        self._device = device
+        
     @abstractmethod
-    def load_data(self, filename_data):
-        pass
-
-    @abstractmethod
-    def validate_config(self):
+    def load_data(self, filename):
         pass
     
     @abstractmethod

@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         load_model_action.triggered.connect(self.on_click_select_model)
         self.app_toolbar.addAction(load_model_action)
         self.app_toolbar.addSeparator()
-        
+
         about_action = QAction(QIcon(QPixmap("./ico/about.ico")), "加载模型", self)
         about_action.triggered.connect(self.on_click_about)
         self.app_toolbar.addAction(about_action)
@@ -48,10 +48,14 @@ class MainWindow(QMainWindow):
         self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.app_toolbar)
 
     def on_click_select_model(self):
-        id = SelectModelDialog(self).exec()
-        if id != QDialog.DialogCode.Rejected:
-            self.create_model_panel(id)
-    
+        model_id = SelectModelDialog(self).exec()
+        if model_id != QDialog.DialogCode.Rejected:
+            model_name = ModelFactory().get_model_name(model_id)
+            model_dock = MainDock(self, model_name, model_id, self.app_engine)
+            self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, model_dock, Qt.Orientation.Vertical)
+        
+            # self.create_model_panel(id)
+
     def on_click_about(self):
         dialog = AboutDialog(self, self.app_engine)
         dialog.exec()

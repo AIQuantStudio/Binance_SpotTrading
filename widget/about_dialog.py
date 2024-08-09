@@ -28,7 +28,7 @@ class AboutDialog(QDialog):
                  Python - {platform.python_version()}
                  PyQt6 - {PYQT_VERSION_STR}
                  Numpy - {np.__version__}
-        
+
             """
 
         content_label = QLabel()
