@@ -1,29 +1,25 @@
-import json
+from PyQt6.QtGui import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
 import sys
-import os
 import traceback
 import types
 import qdarkstyle
 import platform
 import ctypes
-from pathlib import Path
-from PyQt6.QtGui import *
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import *
 
-
-from config import Config_Data, init_cfg
+from config import Config
 
 
 def create_application(app_name):
-    create_config()
-
     sys.excepthook = excepthook
+    
+    Config.init_config()
 
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(True)
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt6())
-    app.setFont(QFont(Config_Data["FontFamily"], Config_Data["FontSize"]))
+    app.setFont(QFont(Config.get("font.family"), Config.get("font.size")))
     app.setWindowIcon(QIcon(("app.ico")))
     app.setApplicationDisplayName(app_name)
     if "Windows" in platform.uname():
@@ -31,26 +27,8 @@ def create_application(app_name):
     return app
 
 
-def create_config():
-    try:
-        application_path = os.path.dirname(__file__)
-        if getattr(sys, 'frozen', False):
-            application_path = os.path.dirname(sys.executable)
-
-        filename = Path(application_path).joinpath('config.ini')
-        if filename.exists():
-            with open(filename, mode="r", encoding="UTF-8") as f:
-                init_cfg(json.load(f))
-        else:
-            with open(filename, mode="w+", encoding="UTF-8") as f:
-                json.dump(Config_Data, f, indent=4, ensure_ascii=False)
-    except Exception as e:
-        sys.stderr(e)
-        sys.exit(1)
-
-
 def excepthook(exctype: type, value: Exception, tb: types.TracebackType) -> None:
-    """ 自定义全局异常钩子，由对话框展示异常信息 """
+    """自定义全局异常钩子，由对话框展示异常信息"""
 
     class ExceptionDialog(QDialog):
         def __init__(self, msg: str):
@@ -87,13 +65,11 @@ def excepthook(exctype: type, value: Exception, tb: types.TracebackType) -> None
             self.setLayout(vbox)
 
         def doCopyText(self) -> None:
-            """"""
             self.msg_edit.selectAll()
             self.msg_edit.copy()
 
         def doDestory(self) -> None:
-            """"""
-            ret = QMessageBox.question(self, '确认', '是否确定退出程序？', QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            ret = QMessageBox.question(self, "确认", "是否确定退出程序？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if ret == QMessageBox.StandardButton.Yes:
                 QApplication.exit(0)
 

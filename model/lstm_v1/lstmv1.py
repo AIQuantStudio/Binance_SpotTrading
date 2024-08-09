@@ -4,9 +4,10 @@ from dataclasses import asdict
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from torch.utils.data import TensorDataset, DataLoader
 
+from model import BaseModel
 from model.lstm_v1.model_config import ModelConfig
 from model.lstm_v1.lstmv1_module import LstmV1Model
-from model import BaseModel
+
 
 
 

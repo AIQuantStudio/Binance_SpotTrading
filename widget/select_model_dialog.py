@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from functools import partial
 
-from config import ModelConfig, Config_Data
+from config import Config, ModelConfig
 from model import ModelFactory
 
 

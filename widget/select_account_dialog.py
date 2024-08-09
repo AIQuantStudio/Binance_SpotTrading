@@ -7,7 +7,7 @@ from functools import partial
 
 from exchange import BinanceFactory
 from structure import BianceAccountData
-from config import Config_Data
+from config import Config
 
 
 class SelectAccountDialog(QDialog):

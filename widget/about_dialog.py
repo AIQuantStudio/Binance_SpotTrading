@@ -6,36 +6,53 @@ import requests
 import platform
 import numpy as np
 
-from config import _Version
+from config import Version
 
 
 class AboutDialog(QDialog):
 
-    def __init__(self):
-        super().__init__()
-        self.init_ui()
+    def __init__(self, parent_widget, app_engine):
+        super().__init__(parent_widget)
 
-    def init_ui(self) -> None:
-        self.setWindowTitle(f"关于")
-        
+        self.app_engine = app_engine
+
+        self.init_ui()
+        self.bind_event()
+
+    def init_ui(self):
+        self.setWindowTitle("关于")
+
         text = f"""
-            Spot Trading (Binance) {_Version}
+            Spot Trading (Binance) {Version}
             
                  Python - {platform.python_version()}
                  PyQt6 - {PYQT_VERSION_STR}
                  Numpy - {np.__version__}
-            
-            {requests.get('https://myip.ipip.net', timeout=5).text}
+        
             """
 
         content_label = QLabel()
         content_label.setText(text)
-        content_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        content_label.setMinimumWidth(500)
+        content_label.setMinimumWidth(360)
+
+        self.ip_label = QLabel()
+        self.ip_label.setContentsMargins(10, 0, 0, 0)
+        self.ip_label.setText("-")
+        self.ip_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 
         vbox_layout = QVBoxLayout()
         vbox_layout.addWidget(content_label)
+        vbox_layout.addWidget(self.ip_label)
         vbox_layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
         self.setLayout(vbox_layout)
-        
 
+    def bind_event(self):
+        self.app_engine.event_engine.run_async(self.request_ip)
+
+    def request_ip(self):
+        try:
+            response = requests.get("https://myip.ipip.net", timeout=5)
+            if response.status_code == 200:
+                self.ip_label.setText(response.text)
+        except:
+            return

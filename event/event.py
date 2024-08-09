@@ -21,6 +21,10 @@ EVENT_PREDICT = "ePredict"
 EVENT_ASSET_BALANCE = "eAssetBalance"
 
 
+
+EVENT_TIMER = "eTimer"
+EVENT_ASYNC = "eAsync"
+
 class Event:
 
     def __init__(self, type, data = None):

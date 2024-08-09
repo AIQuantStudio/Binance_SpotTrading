@@ -8,4 +8,4 @@
 ### 安装成功检测
     pyinstaller -v
 ### 执行命令
-    pyinstaller -F -w -i logo.ico main.py
+    pyinstaller -F -w -i app.ico main.py

@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from datetime import datetime
 
-from config import Config_Data
+from config import Config
 from event import EVENT_LOG
 # from harvester.setting import Setting
 # from harvester.structure import LogData
@@ -17,20 +17,20 @@ class LogService(BaseService):
 
         self.app_engine = app_engine
 
-        if not Config_Data["log.active"]:
+        if not Config.get("log.active"):
             return
 
         self.logger = logging.getLogger("Logger")
-        self.level = Config_Data["log.level"]
-        self.formatter = logging.Formatter(Config_Data["log.formatter"])
+        self.level = Config.get("log.level")
+        self.formatter = logging.Formatter(Config.get("log.formatter"))
         self.logger.setLevel(self.level)
 
         self.add_null_handler()
 
-        if Config_Data["log.console"]:
+        if Config.get("log.console"):
             self.add_console_handler()
 
-        if Config_Data["log.file"]:
+        if Config.get("log.file"):
             self.add_file_handler()
 
         # self._register_event()

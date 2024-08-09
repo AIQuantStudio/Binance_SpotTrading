@@ -4,7 +4,7 @@ from queue import Empty, Queue
 from threading import Thread
 from time import sleep
 
-from event.event import Event, EVENT_TIMER
+from event.event import Event, EVENT_TIMER, EVENT_ASYNC
 
 
 class EventEngine:
@@ -18,12 +18,23 @@ class EventEngine:
 
         self.event_handler_map = defaultdict(list)
         self.event_timer_handler_list = list()
-        # self.general_handler_list = []
 
     def event_loop(self):
         while self.active:
             try:
                 event = self.event_queue.get(block=True, timeout=1)
+
+                if event.type == EVENT_ASYNC:
+                    handler = event.data["handler"]
+                    data = event.data["data"]
+                    if handler is not None and callable(handler):
+                        try:
+                            if data is not None:
+                                handler(data)
+                            else:
+                                handler()
+                        except:
+                            print(f"异步事件响应失败[{event.type}] \n {traceback.format_exc()}")
 
                 # 定时器事件
                 if event.type == EVENT_TIMER:
@@ -117,6 +128,12 @@ class EventEngine:
             if handler == timer_data.get("handler", None):
                 self.event_timer_handler_list.remove(timer_data)
                 return
+
+    def run_async(self, handler, data=None):
+        if not callable(handler):
+            return
+
+        self.event_queue.put(Event(EVENT_ASYNC, {"handler": handler, "data": data}))
 
     # def register_general(self, handler):
     #     if not callable(handler):

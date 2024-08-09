@@ -2,8 +2,8 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from model_penal import ModelPanel
-from trade_penal import TradePanel
+from widget import ModelPanel
+from widget import TradePanel
 
 
 class MainFrame(QFrame):
