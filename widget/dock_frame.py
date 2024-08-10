@@ -36,7 +36,6 @@ class DockFrame(QFrame):
         vbox_layout.addWidget(self.trade_penal, stretch=4)
 
     def close(self):
-        print("============================")
         self.model_penal.close()
         self.trade_penal.close()
         return super().close()
