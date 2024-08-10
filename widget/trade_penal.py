@@ -2,7 +2,9 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from widget import AssetBalancePenal, TradeSettingPenal, TradeHistoryMonitor
+from widget.asset_balance_penal import AssetBalancePenal
+from widget.trade_setting_penal import TradeSettingPenal
+from widget.trade_history_table import TradeHistoryMonitor
 from widget import SelectAccountDialog
 from exchange import BinanceFactory
 from model import ModelFactory

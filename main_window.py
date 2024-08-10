@@ -13,6 +13,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.app_engine = app_engine
+        self.dock_widgets = []
 
         self.setWindowTitle(app_title)
         self.setup_ui()
@@ -51,24 +52,25 @@ class MainWindow(QMainWindow):
         model_id = SelectModelDialog(self).exec()
         if model_id != QDialog.DialogCode.Rejected:
             model_name = ModelFactory().get_model_name(model_id)
-            model_dock = MainDock(self, model_name, model_id, self.app_engine)
-            self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, model_dock, Qt.Orientation.Vertical)
-        
-            # self.create_model_panel(id)
+            main_dock = MainDock(self, model_name, model_id, self.app_engine)
+            self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, main_dock, Qt.Orientation.Vertical)
+            self.dock_widgets.append(main_dock)
 
     def on_click_about(self):
         dialog = AboutDialog(self, self.app_engine)
         dialog.exec()
-
-    def create_model_panel(self, model_id):
-        name = ModelFactory().get_model_name(model_id)
-        model_dock = MainDock(name, model_id, self.app_engine)
-        self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, model_dock, Qt.Orientation.Vertical)
+        
+    def remove_dock_widget(self, dock_widget):
+        if dock_widget in self.dock_widgets:
+            self.dock_widgets.remove(dock_widget)
 
     def closeEvent(self, event):
         """重写 QMainWindow::closeEvent"""
         reply = QMessageBox.question(self, "退出", "确认退出？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
+            for dock in self.dock_widgets:
+                dock.dock_frame.close()
+            self.dock_widgets = []
             self.app_engine.close()
             event.accept()
             QApplication.quit()

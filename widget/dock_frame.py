@@ -17,12 +17,9 @@ class DockFrame(QFrame):
         self.setLineWidth(1)
         self.setMidLineWidth(1)
         self.setFrameStyle(QFrame.Shape.Box | QFrame.Shadow.Sunken)
-        self.setup_ui()
-        
 
-    def setup_ui(self):
         vbox_layout = QVBoxLayout()
-        vbox_layout.setContentsMargins(5,0,0,0)
+        vbox_layout.setContentsMargins(5, 0, 0, 0)
         self.setLayout(vbox_layout)
 
         self.model_penal = ModelPanel(self, self.top_dock, self.app_engine)
@@ -39,6 +36,7 @@ class DockFrame(QFrame):
         vbox_layout.addWidget(self.trade_penal, stretch=4)
 
     def close(self):
+        print("============================")
         self.model_penal.close()
         self.trade_penal.close()
         return super().close()
