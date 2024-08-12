@@ -6,6 +6,11 @@ class EmptyEnum(Enum):
     NONE = ""
 
 
+class Trend(Enum):
+    """"""
+    RISE = "涨"
+    FALL = "跌"
+    
 class Direction(Enum):
     """"""
     BUY = "多"

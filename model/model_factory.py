@@ -39,6 +39,9 @@ class ModelFactory:
 
     def delete_model(self, model_id):
         self._instance_models.pop(model_id)
+        
+    def get_model(self, model_id):
+        return self._instance_models.get(model_id)
 
     def load_data(self, model_id, filename):
         model: BaseModel = self._instance_models.get(model_id, None)
@@ -49,9 +52,6 @@ class ModelFactory:
             return False
 
         return True
-
-    def get_model(self, model_id):
-        return self._instance_models.get(model_id)
 
     def get_model_name(self, model_id):
         return self._instance_models.get(model_id).name

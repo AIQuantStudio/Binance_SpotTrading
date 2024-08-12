@@ -2,6 +2,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
+from widget.predict_price_table import PredictPriceTable
 from exchange.binance_canvas import BinanceCanvas
 from exchange.binance_market import BinanceMarket
 from model import ModelFactory
@@ -65,18 +66,41 @@ class ModelPanel(QFrame):
         prediction_record_label = QLabel("预测记录")
         vbox_layout.addWidget(prediction_record_label)
         
-        self.zz = QTextBrowser()
-        self.zz.setFont(QFont("Courier New", 11))
-        # self.zz.setMaximumHeight(200)
-        vbox_layout.addWidget(self.zz)
+        self.predict_price_table = PredictPriceTable(self, self.top_dock, self.app_engine)
+        vbox_layout.addWidget( self.predict_price_table)
+        
+        # self.zz = QTextBrowser()
+        # self.zz.setFont(QFont("Courier New", 11))
+        # # self.zz.setMaximumHeight(200)
+        # vbox_layout.addWidget(self.zz)
 
+        hbox_layout = QHBoxLayout()
+        hbox_layout.setContentsMargins(0,0,0,0)
+        
         self.gpu_checkbox = QCheckBox()
         self.gpu_checkbox.setText("GPU")
         self.gpu_checkbox.setCheckState(Qt.CheckState.Checked)
         if not ModelFactory().cuda_is_available():
             self.gpu_checkbox.setCheckState(Qt.CheckState.Unchecked)
             self.gpu_checkbox.setDisabled(True)
-        vbox_layout.addWidget(self.gpu_checkbox)
+        hbox_layout.addWidget(self.gpu_checkbox)
+        
+        
+        self.label1 = QLabel()
+        self.label1.setText("预测间隔时间")
+        # self.label1.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.interval_input = QLineEdit()
+        # self.interval_input.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.label2 = QLabel()
+        self.label2.setText("秒")
+        # self.label2.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        
+        hbox_layout.addSpacing(80)
+        hbox_layout.addWidget(self.label1)
+        hbox_layout.addWidget(self.interval_input)
+        hbox_layout.addWidget(self.label2)
+        vbox_layout.addLayout(hbox_layout)
 
         hbox_layout = QHBoxLayout()
         self.start_prediction_btn = QPushButton()
@@ -124,8 +148,8 @@ class ModelPanel(QFrame):
         self.top_dock.setWindowTitle(title)
 
     def show_config_info(self):
-        model = ModelFactory().get_model(self.top_dock.id)
-        config = model.get_config()
+        config = ModelFactory().get_config_dict(self.top_dock.id)
+        # config = model.get_config()
         if config is not None:
             s = ""
             max_len = 0
