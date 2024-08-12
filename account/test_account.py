@@ -1,11 +1,13 @@
 import sqlite3
 
+
 class TestAccount:
 
     def __init__(self, account_data):
-        self.name = account_data.name
-        self.id = account_data.id
-        self.db = account_data.db
+        print(account_data)
+        self.name = account_data["Name"]
+        self.id = account_data["Account"]
+        self.db = account_data["DB"]
 
     def connect(self):
         try:
@@ -17,19 +19,10 @@ class TestAccount:
         return True
 
     def get_all_asset_balance(self):
-        c = self.conn.cursor()
-        print ("数据库打开成功")
-
-        cursor = c.execute("SELECT *  from asset")
+        cursor = self.conn.cursor().execute("SELECT * from asset")
+        balances = []
         for row in cursor:
-            print ("ID = ", row[0])
-            print ("NAME = ", row[1])
-            print ("ADDRESS = ", row[2])
+            balance = {"asset": row[0], "free": row[1], "locked": row[2]}
+            balances.append(balance)
 
-            print ("数据操作成功")
-        
-        return []
-
-        # data = self.client.get_account()
-        # balances = data["balances"]
-        # return [balance for balance in balances if float(balance["free"]) > 0 or float(balance["locked"]) > 0]
+        return balances

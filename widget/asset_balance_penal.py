@@ -107,11 +107,11 @@ class AssetBalancePenal(QTableWidget):
         # self.setSortingEnabled(False)
         # 获取返回的数据
         balance_data: AssetBalanceData = event.data
-        print(balance_data)
+        # print(balance_data)
         
         # 获取数据的key
         record_key = balance_data.__getattribute__(self.record_key)
-        print(record_key)
+        # print(record_key)
         # 判断数据是否存在
         if record_key in self.record_cells:
             self._update_row(balance_data)

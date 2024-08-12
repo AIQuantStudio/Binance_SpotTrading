@@ -4,10 +4,10 @@ from binance import Client
 class BinanceAccount:
 
     def __init__(self, account_data):
-        self.name = account_data.name
-        self.id = account_data.id
-        self.api_key =  account_data.api_key
-        self.api_secret = account_data.secret_key
+        self.name = account_data["Name"]
+        self.id = account_data["Account"]
+        self.api_key =  account_data["ApiKey"]
+        self.api_secret = account_data["SecertKey"]
 
     def connect(self):
         try:

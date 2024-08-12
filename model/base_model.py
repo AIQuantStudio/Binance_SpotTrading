@@ -28,11 +28,11 @@ class BaseModel(ABC):
     
     @property
     def base_currency(self):
-        return self._base_currency
+        return self._base_currency.upper()
     
     @property
     def quote_currency(self):
-        return self._quote_currency
+        return self._quote_currency.upper()
     
     def set_device(self, device):
         self._device = device

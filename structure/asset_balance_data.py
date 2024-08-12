@@ -4,7 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class AssetBalanceData:
 
-    symbol: str = ""
+    currency: str = ""
     free: float = 0
     locked: float = 0
 

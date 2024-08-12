@@ -7,6 +7,7 @@ from widget.trade_setting_penal import TradeSettingPenal
 from widget.trade_history_table import TradeHistoryMonitor
 from widget import SelectAccountDialog
 from exchange import BinanceFactory
+from account import AccountFactory
 from model import ModelFactory
 from structure import AssetBalanceData
 from event import Event, EVENT_ASSET_BALANCE
@@ -118,35 +119,36 @@ class TradePanel(QFrame):
         
     def bind_event(self):
         self.select_account_btn.clicked.connect(self.on_click_select_account)
-        self.show_all_balance_checkbox.stateChanged.connect(self.on_show_all_balance_changed)
+        self.show_all_balance_checkbox.stateChanged.connect(self.refresh_asset_balance)
         
-    def on_show_all_balance_changed(self):
-        state = self.show_all_balance_checkbox.checkState()
-        if state == Qt.CheckState.Unchecked:
-            self.asset_balance_panel.clear_table()
-            self.load_asset_balance_penal(False)
-        else:
-            self.asset_balance_panel.clear_table()
-            self.load_asset_balance_penal(True)
+    # def on_show_all_balance_changed(self):
+    #     state = self.show_all_balance_checkbox.checkState()
+    #     if state == Qt.CheckState.Unchecked:
+    #         self.asset_balance_panel.clear_table()
+    #         self.refresh_asset_balance(False)
+    #     else:
+    #         self.asset_balance_panel.clear_table()
+    #         self.refresh_asset_balance(True)
         
     def on_click_select_account(self):
         ret = SelectAccountDialog(self, self.top_dock.id).exec()
         if ret == QDialog.DialogCode.Accepted:
             self.load_trade_penal_status()
             # self.account_label.setText(BinanceFactory().get_account_name(self.top_dock.id))
-            self.load_asset_balance_penal()
+            self.refresh_asset_balance()
     
-    def load_asset_balance_penal(self, show_all = True):
-        balances = BinanceFactory().get_asset_balance(self.top_dock.id)
-        model = ModelFactory().get_model(self.top_dock.id)
-        show_symbols = [model.base_currency, model.quote_currency]
+    def refresh_asset_balance(self):
+        show_all = self.show_all_balance_checkbox.checkState() == Qt.CheckState.Checked
+        balances = AccountFactory().get_asset_balance(self.top_dock.id)
+        currencies = ModelFactory().get_model_curreny(self.top_dock.id)
+        # show_symbols = [model.base_currency, model.quote_currency]
         for balance in balances:
             if show_all == False:
-                if balance["asset"] not in show_symbols:
+                if balance["asset"].upper()  not in currencies:
                     continue
             
             account_data = AssetBalanceData(
-                    symbol=balance["asset"],
+                    currency=balance["asset"].upper(),
                     free=float(balance["free"]),
                     locked=float(balance["locked"])
                 )

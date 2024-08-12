@@ -25,7 +25,7 @@ class AccountSetting:
             "SecertKey": "R2rh9FwjRCWRxm5I8muCmErmFeSyKMsjx8ecg5kqXYcqEbPWzfEFq7VZBOb1xdnY"
         },
         {
-            "Name": "[TEST]ADA",
+            "Name": "[TEST] ADA_USDT",
             "Account": "13812665650",
             "DB": "./test.db"
         },

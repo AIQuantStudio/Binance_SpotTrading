@@ -56,6 +56,10 @@ class ModelFactory:
     def get_model_name(self, model_id):
         return self._instance_models.get(model_id).name
 
+    def get_model_curreny(self, model_id):
+        model = self._instance_models.get(model_id)
+        return [model.base_currency, model.quote_currency]
+        
     def create_dataloader(self, model_id, data):
         df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "Trades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
         df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
