@@ -40,7 +40,7 @@ class SelectModelDialog(QDialog):
     def on_click_load_parameters(self, idx):
         id = ModelFactory().create_model_by_idx(idx)
         if id < 0:
-            QMessageBox.warning(self, "警告", f"模型 {ModelFactory().models[idx]["name"]} 加载失败！", QMessageBox.StandardButton.Ok)
+            QMessageBox.warning(self, "警告", f"模型 {ModelFactory().models[idx]['name']} 加载失败！", QMessageBox.StandardButton.Ok)
             return
 
         filename, _ = QFileDialog.getOpenFileName(self.parentWidget(), "选择参数文件", Config.get("model.default_path", "."), "参数文件(*.pth)")

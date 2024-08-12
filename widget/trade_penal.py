@@ -51,9 +51,9 @@ class TradePanel(QFrame):
         self.select_account_btn.setText("选择账号")
         hbox_layout.addWidget(self.select_account_btn, stretch=4)
         
-        self.binance_account_label = QLabel()
-        self.binance_account_label.setText("")
-        hbox_layout.addWidget(self.binance_account_label, stretch=6)
+        self.account_label = QLabel()
+        self.account_label.setText("")
+        hbox_layout.addWidget(self.account_label, stretch=6)
         
         self.asset_balance_panel = AssetBalancePenal(self, self.top_dock, self.app_engine)
         vbox_layout.addWidget( self.asset_balance_panel)
@@ -61,7 +61,8 @@ class TradePanel(QFrame):
         self.show_all_balance_checkbox = QCheckBox()
         self.show_all_balance_checkbox.setText("显示全部")
         self.show_all_balance_checkbox.setCheckState(Qt.CheckState.Checked)
-        vbox_layout.addWidget( self.show_all_balance_checkbox)
+        self.show_all_balance_checkbox.setDisabled(True)
+        vbox_layout.addWidget(self.show_all_balance_checkbox)
 
     def setup_middle_area_ui(self, middle_widget):
         vbox_layout = QVBoxLayout()
@@ -131,7 +132,8 @@ class TradePanel(QFrame):
     def on_click_select_account(self):
         ret = SelectAccountDialog(self, self.top_dock.id).exec()
         if ret == QDialog.DialogCode.Accepted:
-            self.binance_account_label.setText(BinanceFactory().get_account_name(self.top_dock.id))
+            self.load_trade_penal_status()
+            # self.account_label.setText(BinanceFactory().get_account_name(self.top_dock.id))
             self.load_asset_balance_penal()
     
     def load_asset_balance_penal(self, show_all = True):
@@ -149,6 +151,10 @@ class TradePanel(QFrame):
                     locked=float(balance["locked"])
                 )
             self.app_engine.event_engine.put(Event(EVENT_ASSET_BALANCE, account_data))
+    
+    def load_trade_penal_status(self):
+        self.account_label.setText(AccountFactory().get_account_name(self.top_dock.id))
+        self.show_all_balance_checkbox.setEnabled(True)
         
     def close(self):
         return super().close()

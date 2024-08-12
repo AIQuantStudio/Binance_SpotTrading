@@ -14,6 +14,19 @@ class ModelSetting:
         }
     ]
       
-        
-    # ModelValues =["lstmv1", "lstmv2"]
-    
+
+@dataclass
+class AccountSetting:
+    Accounts = [
+        {
+            "Name": "ZhuZheng",
+            "Account": "23194749@qq.com",
+            "ApiKey": "tPMBEjZCnFiAszSuXMzk1r8ASdd20dUwlaVFsOv4LvnfVW5xEPPZYK5JqlrOTnSU",
+            "SecertKey": "R2rh9FwjRCWRxm5I8muCmErmFeSyKMsjx8ecg5kqXYcqEbPWzfEFq7VZBOb1xdnY"
+        },
+        {
+            "Name": "[TEST]ADA",
+            "Account": "13812665650",
+            "DB": "./test.db"
+        },
+    ]

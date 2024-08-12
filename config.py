@@ -131,34 +131,34 @@ class Config:
 
 
 
-@dataclass
-class ModelConfig:
-    Models = {
-        "LSTM_V1": {
-            "class": "LstmV1"
-        },
-        "LSTM_V2": {
-            "class": "LstmV2"
-        },
+# @dataclass
+# class ModelConfig:
+#     Models = {
+#         "LSTM_V1": {
+#             "class": "LstmV1"
+#         },
+#         "LSTM_V2": {
+#             "class": "LstmV2"
+#         },
         
-    }
+#     }
         
-    ModelValues =["lstmv1", "lstmv2"]
+#     ModelValues =["lstmv1", "lstmv2"]
     
-@dataclass
-class Accounts:
-    data = [
-        {
-            "Name": "ZhuZheng",
-            "Account": "23194749@qq.com",
-            "ApiKey": "tPMBEjZCnFiAszSuXMzk1r8ASdd20dUwlaVFsOv4LvnfVW5xEPPZYK5JqlrOTnSU",
-            "SecertKey": "R2rh9FwjRCWRxm5I8muCmErmFeSyKMsjx8ecg5kqXYcqEbPWzfEFq7VZBOb1xdnY"
-        },
-        {
-            "Name": "Test",
-            "Account": "13812665650",
-            "ApiKey": "111",
-            "SecertKey": "222"
-        },
-    ]
+# @dataclass
+# class Accounts:
+#     data = [
+#         {
+#             "Name": "ZhuZheng",
+#             "Account": "23194749@qq.com",
+#             "ApiKey": "tPMBEjZCnFiAszSuXMzk1r8ASdd20dUwlaVFsOv4LvnfVW5xEPPZYK5JqlrOTnSU",
+#             "SecertKey": "R2rh9FwjRCWRxm5I8muCmErmFeSyKMsjx8ecg5kqXYcqEbPWzfEFq7VZBOb1xdnY"
+#         },
+#         {
+#             "Name": "Test",
+#             "Account": "13812665650",
+#             "ApiKey": "111",
+#             "SecertKey": "222"
+#         },
+#     ]
         

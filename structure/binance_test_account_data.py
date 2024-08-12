@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 
 @dataclass
-class BianceAccountData:
+class BianceTestAccountData:
 
     name: str
     id: str
-    api_key: str
-    secret_key: str
+    db: str
