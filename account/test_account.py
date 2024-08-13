@@ -4,7 +4,6 @@ import sqlite3
 class TestAccount:
 
     def __init__(self, account_data):
-        print(account_data)
         self.name = account_data["Name"]
         self.id = account_data["Account"]
         self.db = account_data["DB"]

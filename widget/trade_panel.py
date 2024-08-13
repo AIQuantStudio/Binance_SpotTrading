@@ -2,8 +2,8 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from widget.asset_balance_table import AssetBalancePenal
-from widget.trade_setting_penal import TradeSettingPenal
+from widget.asset_balance_table import AssetBalanceTable
+from widget.trade_setting_panel import TradeSettingPanel
 from widget.trade_history_table import TradeHistoryMonitor
 from widget import SelectAccountDialog
 from exchange import BinanceFactory
@@ -52,13 +52,18 @@ class TradePanel(QFrame):
         self.select_account_btn = QPushButton()
         self.select_account_btn.setText("选择账号")
         hbox_layout.addWidget(self.select_account_btn, stretch=4)
+        
+        self.remove_account_btn = QPushButton()
+        self.remove_account_btn.setText("移除账号")
+        self.remove_account_btn.setVisible(False)
+        hbox_layout.addWidget(self.remove_account_btn, stretch=4)
 
         self.account_label = QLabel()
         self.account_label.setText("")
         hbox_layout.addWidget(self.account_label, stretch=6)
 
-        self.asset_balance_panel = AssetBalancePenal(self, self.top_dock, self.app_engine)
-        vbox_layout.addWidget(self.asset_balance_panel)
+        self.asset_balance_table = AssetBalanceTable(self, self.top_dock, self.app_engine)
+        vbox_layout.addWidget(self.asset_balance_table)
 
         self.show_all_balance_checkbox = QCheckBox()
         self.show_all_balance_checkbox.setText("显示全部")
@@ -70,7 +75,7 @@ class TradePanel(QFrame):
         vbox_layout = QVBoxLayout()
         middle_widget.setLayout(vbox_layout)
 
-        self.trade_setting_panel = TradeSettingPenal(self, self.top_dock, self.app_engine)
+        self.trade_setting_panel = TradeSettingPanel(self, self.top_dock, self.app_engine)
         vbox_layout.addWidget(self.trade_setting_panel)
 
         # self.start_trade_btn = QPushButton()
@@ -80,6 +85,7 @@ class TradePanel(QFrame):
         hbox_layout = QHBoxLayout()
         self.start_trade_btn = QPushButton()
         self.start_trade_btn.setText("启动交易")
+        self.start_trade_btn.setDisabled(True)
         hbox_layout.addWidget(self.start_trade_btn)
         self.stop_trade_btn = QPushButton()
         self.stop_trade_btn.setText("停止交易")
@@ -91,8 +97,8 @@ class TradePanel(QFrame):
         # self.select_account_btn.setText("选择账号")
         # vbox_layout.addWidget(self.select_account_btn)
 
-        # self.asset_balance_panel = AssetBalancePenal(self, self.top_dock, self.app_engine)
-        # vbox_layout.addWidget( self.asset_balance_panel)
+        # self.asset_balance_table = AssetBalanceTable(self, self.top_dock, self.app_engine)
+        # vbox_layout.addWidget( self.asset_balance_table)
 
     def setup_right_area_ui(self, right_widget):
         vbox_layout = QVBoxLayout()
@@ -119,28 +125,44 @@ class TradePanel(QFrame):
 
     def bind_event(self):
         self.select_account_btn.clicked.connect(self.on_click_select_account)
+        self.remove_account_btn.clicked.connect(self.on_click_remove_account)
         self.show_all_balance_checkbox.stateChanged.connect(self.refresh_asset_balance)
-
-    # def on_show_all_balance_changed(self):
-    #     state = self.show_all_balance_checkbox.checkState()
-    #     if state == Qt.CheckState.Unchecked:
-    #         self.asset_balance_panel.clear_table()
-    #         self.refresh_asset_balance(False)
-    #     else:
-    #         self.asset_balance_panel.clear_table()
-    #         self.refresh_asset_balance(True)
+        self.start_trade_btn.clicked.connect(self.on_click_start_trade)
+        self.stop_trade_btn.clicked.connect(self.on_click_stop_trade)
 
     def on_click_select_account(self):
         ret = SelectAccountDialog(self, self.top_dock.id).exec()
         if ret == QDialog.DialogCode.Accepted:
-            self.load_trade_penal_status()
-            # self.account_label.setText(BinanceFactory().get_account_name(self.top_dock.id))
+            self.load_trade_panel_status()
             self.refresh_asset_balance()
+            
+    def on_click_remove_account(self):
+        rule = TradeFactory().get_trade_rule(self.top_dock.id)
+        if rule is None:
+            self.clear_trade_panel_status()
+            return
 
+        if rule.is_running:
+            QMessageBox.warning(self, "警告", f"账号正在交易运行，请先停止！", QMessageBox.StandardButton.Ok)
+            return
+        
+        reply = QMessageBox.question(self, "移除账号", "确认移除账号？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
+        if reply == QMessageBox.StandardButton.Yes:
+            self.clear_trade_panel_status()
+            
+    def on_click_start_trade(self):
+        rule = TradeFactory().create_trade_rule(self.top_dock.id)
+        rule.start()
+        
+    def on_click_stop_trade(self):
+        rule = TradeFactory().get_trade_rule(self.top_dock.id)
+        rule.stop()
+        
     def refresh_asset_balance(self):
         show_all = self.show_all_balance_checkbox.checkState() == Qt.CheckState.Checked
         balances = AccountFactory().get_asset_balance(self.top_dock.id)
         currencies = ModelFactory().get_model_curreny(self.top_dock.id)
+        self.asset_balance_table.clear_contents()
         for balance in balances:
             if show_all == False:
                 if balance["asset"].upper() not in currencies:
@@ -149,9 +171,24 @@ class TradePanel(QFrame):
             account_data = AssetBalanceData(currency=balance["asset"].upper(), free=float(balance["free"]), locked=float(balance["locked"]))
             self.app_engine.event_engine.put(Event(EVENT_ASSET_BALANCE, account_data))
 
-    def load_trade_penal_status(self):
+    def load_trade_panel_status(self):
         self.account_label.setText(AccountFactory().get_account_name(self.top_dock.id))
         self.show_all_balance_checkbox.setEnabled(True)
-
+        self.start_trade_btn.setEnabled(True)
+        self.stop_trade_btn.setEnabled(False)
+        self.remove_account_btn.setVisible(True)
+        self.select_account_btn.setVisible(False)
+        
+    def clear_trade_panel_status(self):
+        self.account_label.setText("")
+        self.show_all_balance_checkbox.setEnabled(False)
+        self.start_trade_btn.setEnabled(False)
+        self.stop_trade_btn.setEnabled(False)
+        self.remove_account_btn.setVisible(False)
+        self.select_account_btn.setVisible(True)
+        
+        self.asset_balance_table.clear_contents()
+        
     def close(self):
+        self.asset_balance_table.close()
         return super().close()

@@ -34,7 +34,7 @@ class PredictPriceTable(QTableWidget):
         self._first_painted = False
         
         self.init_ui()
-        self.register_event()
+        # self.register_event()
         # self.create_asset_balance_table()
     
     def event(self, event: QEvent) -> bool:
@@ -64,9 +64,9 @@ class PredictPriceTable(QTableWidget):
         # self.balances_table = None
         # self.setCurrentIndex(0)
         
-    def register_event(self) -> None:
-        self.signal_refresh_asset_balance.connect(self.process_event)
-        self.app_engine.event_engine.register(EVENT_ASSET_BALANCE, self.signal_refresh_asset_balance.emit)
+    # def register_event(self) -> None:
+    #     self.signal_refresh_asset_balance.connect(self.process_event)
+    #     self.app_engine.event_engine.register(EVENT_ASSET_BALANCE, self.signal_refresh_asset_balance.emit)
         
     def create_asset_balance_table(self):
         table = QTableWidget()

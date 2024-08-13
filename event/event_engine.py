@@ -93,18 +93,27 @@ class EventEngine:
         self.event_timer.join()
         self.event_thread.join()
 
-    def put(self, event):
+    def put(self, event, suffix=None):
+        if suffix is not None:
+            event.type += suffix
+
         self.event_queue.put(event)
 
-    def register(self, type, handler):
+    def register(self, type, handler, suffix=None):
         if not callable(handler):
             return
+        
+        if suffix is not None:
+            type += suffix
 
         handler_list = self.event_handler_map[type]
         if handler not in handler_list:
             handler_list.append(handler)
 
-    def unregister(self, type, handler):
+    def unregister(self, type, handler, suffix=None):
+        if suffix is not None:
+            type += suffix
+            
         handler_list = self.event_handler_map[type]
         if handler in handler_list:
             handler_list.remove(handler)

@@ -16,7 +16,7 @@ class AssetBalanceTable(QTableWidget):
     
     record_key = "currency"
     headers: Dict[str, dict] = {
-        "symbol": {"display": "账号", "type": AssetBalanceStrCell, "width_factor": 2},
+        "currency": {"display": "账号", "type": AssetBalanceStrCell, "width_factor": 2},
         "total": {"display": "余额", "type": AssetBalanceFloatCell,  "width_factor": 4},
         "locked": {"display": "冻结", "type": AssetBalanceFloatCell,  "width_factor": 4},
         "free": {"display": "可用", "type": AssetBalanceFloatCell,  "width_factor": 4},
@@ -33,7 +33,7 @@ class AssetBalanceTable(QTableWidget):
         self._first_painted = False
         
         self.init_ui()
-        self.register_event()
+        # self.register_event()
         
         self.signal_refresh_asset_balance.connect(self.process_refresh_asset_balance_event)
         self.app_engine.event_engine.register(EVENT_ASSET_BALANCE, self.signal_refresh_asset_balance.emit)
@@ -98,9 +98,12 @@ class AssetBalanceTable(QTableWidget):
             cell.set_content(content)
 
 
-    def clear_table(self):
+    def clear_contents(self):
         rows = self.rowCount()
         self.record_cells = {}
         for row in range(rows - 1, -1, -1):
             self.removeRow(row)
     
+    def close(self):
+        self.app_engine.event_engine.unregister(EVENT_ASSET_BALANCE, self.signal_refresh_asset_balance.emit)
+        return super().close()

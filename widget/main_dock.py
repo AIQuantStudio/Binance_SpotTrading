@@ -2,6 +2,8 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
+from model import ModelFactory
+
 from widget.dock_frame import DockFrame
 
 
@@ -18,8 +20,7 @@ class MainDock(QDockWidget):
         self.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable | QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
         self.setAllowedAreas(Qt.DockWidgetArea.TopDockWidgetArea | Qt.DockWidgetArea.BottomDockWidgetArea)
         self.setWidget(self.dock_frame)
-        self.windowTitle()
-        
+ 
     def closeEvent(self, event):
         """重写 MainDock::closeEvent"""
         reply = QMessageBox.question(self, "关闭", "确认关闭？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
@@ -29,6 +30,10 @@ class MainDock(QDockWidget):
             event.accept()
         else:
             event.ignore()
+            
+    def close(self):
+        self.dock_frame.close()
+
         
         
         

@@ -61,6 +61,7 @@ _saved_config_filepath = Path(".").joinpath(_config_folder, _congfig_filename)
 
 _global_config_data = {
     "model.default_path": "./data",
+    "model.predict_interval": 60,
     
     "main_window.width": 1600,
     "main_window.height": 900,

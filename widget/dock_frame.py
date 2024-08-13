@@ -2,8 +2,8 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from widget.model_penal import ModelPanel
-from widget.trade_penal import TradePanel
+from widget.model_panel import ModelPanel
+from widget.trade_panel import TradePanel
 
 
 class DockFrame(QFrame):
@@ -22,8 +22,8 @@ class DockFrame(QFrame):
         vbox_layout.setContentsMargins(5, 0, 0, 0)
         self.setLayout(vbox_layout)
 
-        self.model_penal = ModelPanel(self, self.top_dock, self.app_engine)
-        vbox_layout.addWidget(self.model_penal, stretch=6)
+        self.model_panel = ModelPanel(self, self.top_dock, self.app_engine)
+        vbox_layout.addWidget(self.model_panel, stretch=6)
 
         self.line = QFrame(self)
         self.line.setGeometry(QRect(0, 120, 341, 20))
@@ -32,10 +32,10 @@ class DockFrame(QFrame):
         self.line.setFrameShape(QFrame.Shape.HLine)
         vbox_layout.addWidget(self.line)
 
-        self.trade_penal = TradePanel(self, self.top_dock, self.app_engine)
-        vbox_layout.addWidget(self.trade_penal, stretch=4)
+        self.trade_panel = TradePanel(self, self.top_dock, self.app_engine)
+        vbox_layout.addWidget(self.trade_panel, stretch=4)
 
     def close(self):
-        self.model_penal.close()
-        self.trade_penal.close()
+        self.model_panel.close()
+        self.trade_panel.close()
         return super().close()
