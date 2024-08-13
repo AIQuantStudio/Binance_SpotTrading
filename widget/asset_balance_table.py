@@ -10,7 +10,7 @@ from widget.asset_balance_cells.asset_balance_str_cell import AssetBalanceStrCel
 from widget.asset_balance_cells.asset_balance_float_cell import AssetBalanceFloatCell
 
 
-class AssetBalancePenal(QTableWidget):
+class AssetBalanceTable(QTableWidget):
 
     signal_refresh_asset_balance: pyqtSignal = pyqtSignal(Event)
     
@@ -23,7 +23,6 @@ class AssetBalancePenal(QTableWidget):
     }
     
     def __init__(self, parent_widget, top_dock, app_engine):
-        """"""
         super().__init__(parent_widget)
         
         self.top_dock = top_dock
@@ -69,10 +68,7 @@ class AssetBalancePenal(QTableWidget):
 
         balance_data: AssetBalanceData = event.data
         
-        # 获取数据的key
         record_key = balance_data.__getattribute__(self.record_key)
-        # print(record_key)
-        # 判断数据是否存在
         if record_key in self.record_cells:
             self._update_row(balance_data)
         else:
@@ -81,7 +77,6 @@ class AssetBalancePenal(QTableWidget):
         self.setSortingEnabled(True)
     
     def _insert_record(self, data: AssetBalanceData):
-        """"""
         self.insertRow(0)
 
         row_cells = {}
@@ -93,11 +88,8 @@ class AssetBalancePenal(QTableWidget):
 
         record_key = data.__getattribute__(self.record_key)
         self.record_cells[record_key] = row_cells
-        print("-----")
-        print(self.record_cells)
 
-    def _update_row(self, data: AssetBalanceData) -> None:
-        """"""
+    def _update_row(self, data: AssetBalanceData):
         record_key = data.__getattribute__(self.record_key)
         record = self.record_cells[record_key]
 
@@ -107,12 +99,7 @@ class AssetBalancePenal(QTableWidget):
 
 
     def clear_table(self):
-        # 获取表格的行数和列数
         rows = self.rowCount()
-        
-        columns = self.columnCount()
-    
-        # 从最后一行开始反向遍历，以便于删除行时不影响循环
         self.record_cells = {}
         for row in range(rows - 1, -1, -1):
             self.removeRow(row)

@@ -2,7 +2,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from widget.asset_balance_penal import AssetBalancePenal
+from widget.asset_balance_table import AssetBalancePenal
 from widget.trade_setting_penal import TradeSettingPenal
 from widget.trade_history_table import TradeHistoryMonitor
 from widget import SelectAccountDialog
@@ -11,6 +11,7 @@ from account import AccountFactory
 from model import ModelFactory
 from structure import AssetBalanceData
 from event import Event, EVENT_ASSET_BALANCE
+
 
 class TradePanel(QFrame):
 
@@ -32,7 +33,7 @@ class TradePanel(QFrame):
 
         main_middle_widget = QWidget()
         main_hbox_layout.addWidget(main_middle_widget, stretch=3)
-        
+
         main_right_widget = QWidget()
         main_hbox_layout.addWidget(main_right_widget, stretch=5)
 
@@ -45,20 +46,20 @@ class TradePanel(QFrame):
         left_widget.setLayout(vbox_layout)
 
         hbox_layout = QHBoxLayout()
-        hbox_layout.setContentsMargins(0,0,0,0)
+        hbox_layout.setContentsMargins(0, 0, 0, 0)
         vbox_layout.addLayout(hbox_layout)
-        
+
         self.select_account_btn = QPushButton()
         self.select_account_btn.setText("选择账号")
         hbox_layout.addWidget(self.select_account_btn, stretch=4)
-        
+
         self.account_label = QLabel()
         self.account_label.setText("")
         hbox_layout.addWidget(self.account_label, stretch=6)
-        
+
         self.asset_balance_panel = AssetBalancePenal(self, self.top_dock, self.app_engine)
-        vbox_layout.addWidget( self.asset_balance_panel)
-        
+        vbox_layout.addWidget(self.asset_balance_panel)
+
         self.show_all_balance_checkbox = QCheckBox()
         self.show_all_balance_checkbox.setText("显示全部")
         self.show_all_balance_checkbox.setCheckState(Qt.CheckState.Checked)
@@ -68,15 +69,14 @@ class TradePanel(QFrame):
     def setup_middle_area_ui(self, middle_widget):
         vbox_layout = QVBoxLayout()
         middle_widget.setLayout(vbox_layout)
-        
+
         self.trade_setting_panel = TradeSettingPenal(self, self.top_dock, self.app_engine)
-        vbox_layout.addWidget( self.trade_setting_panel)
-        
+        vbox_layout.addWidget(self.trade_setting_panel)
+
         # self.start_trade_btn = QPushButton()
         # self.start_trade_btn.setText("启动交易")
         # vbox_layout.addWidget(self.start_trade_btn)
-        
-        
+
         hbox_layout = QHBoxLayout()
         self.start_trade_btn = QPushButton()
         self.start_trade_btn.setText("启动交易")
@@ -90,17 +90,17 @@ class TradePanel(QFrame):
         # self.select_account_btn = QPushButton()
         # self.select_account_btn.setText("选择账号")
         # vbox_layout.addWidget(self.select_account_btn)
-        
+
         # self.asset_balance_panel = AssetBalancePenal(self, self.top_dock, self.app_engine)
         # vbox_layout.addWidget( self.asset_balance_panel)
-        
+
     def setup_right_area_ui(self, right_widget):
         vbox_layout = QVBoxLayout()
         right_widget.setLayout(vbox_layout)
-        
+
         self.trade_history_monitor = TradeHistoryMonitor(self, self.top_dock, self.app_engine)
         vbox_layout.addWidget(self.trade_history_monitor)
-        
+
         # widget_control_bar = QWidget()
         # vbox_layout.addWidget(widget_control_bar, stretch=1)
         # h_layout = QHBoxLayout()
@@ -116,11 +116,11 @@ class TradePanel(QFrame):
         # vbox_layout.addLayout(h_layout)
 
         right_widget.setLayout(vbox_layout)
-        
+
     def bind_event(self):
         self.select_account_btn.clicked.connect(self.on_click_select_account)
         self.show_all_balance_checkbox.stateChanged.connect(self.refresh_asset_balance)
-        
+
     # def on_show_all_balance_changed(self):
     #     state = self.show_all_balance_checkbox.checkState()
     #     if state == Qt.CheckState.Unchecked:
@@ -129,34 +129,29 @@ class TradePanel(QFrame):
     #     else:
     #         self.asset_balance_panel.clear_table()
     #         self.refresh_asset_balance(True)
-        
+
     def on_click_select_account(self):
         ret = SelectAccountDialog(self, self.top_dock.id).exec()
         if ret == QDialog.DialogCode.Accepted:
             self.load_trade_penal_status()
             # self.account_label.setText(BinanceFactory().get_account_name(self.top_dock.id))
             self.refresh_asset_balance()
-    
+
     def refresh_asset_balance(self):
         show_all = self.show_all_balance_checkbox.checkState() == Qt.CheckState.Checked
         balances = AccountFactory().get_asset_balance(self.top_dock.id)
         currencies = ModelFactory().get_model_curreny(self.top_dock.id)
-        # show_symbols = [model.base_currency, model.quote_currency]
         for balance in balances:
             if show_all == False:
-                if balance["asset"].upper()  not in currencies:
+                if balance["asset"].upper() not in currencies:
                     continue
-            
-            account_data = AssetBalanceData(
-                    currency=balance["asset"].upper(),
-                    free=float(balance["free"]),
-                    locked=float(balance["locked"])
-                )
+
+            account_data = AssetBalanceData(currency=balance["asset"].upper(), free=float(balance["free"]), locked=float(balance["locked"]))
             self.app_engine.event_engine.put(Event(EVENT_ASSET_BALANCE, account_data))
-    
+
     def load_trade_penal_status(self):
         self.account_label.setText(AccountFactory().get_account_name(self.top_dock.id))
         self.show_all_balance_checkbox.setEnabled(True)
-        
+
     def close(self):
         return super().close()
