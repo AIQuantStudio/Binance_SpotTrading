@@ -3,34 +3,18 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from typing import Dict
 
+from structure import AssetBalanceData
+from event import Event, EVENT_ASSET_BALANCE
+
 from widget.asset_balance_cells.asset_balance_str_cell import AssetBalanceStrCell
 from widget.asset_balance_cells.asset_balance_float_cell import AssetBalanceFloatCell
-from event import Event, EVENT_ASSET_BALANCE
-from structure.asset_balance_data import AssetBalanceData
 
 
 class AssetBalancePenal(QTableWidget):
 
-    # def __init__(self, parent_widget, top_dock, app_engine):
-    #     super().__init__(parent_widget)
-
-    #     self.top_dock = top_dock
-    #     self.app_engine = app_engine
-
-    #     self.setup_ui()
-
-    # def setup_ui(self):
-    #     vbox_layout = QVBoxLayout()
-    #     self.setLayout(vbox_layout)
-
-    #     self.table = QTableWidget(4,3,self)
-    #     self.table.setHorizontalHeaderLabels(['第一列', '第二列', '第三列'])
-
-    #     vbox_layout.addWidget(self.table)
-        
     signal_refresh_asset_balance: pyqtSignal = pyqtSignal(Event)
     
-    record_key = "symbol"
+    record_key = "currency"
     headers: Dict[str, dict] = {
         "symbol": {"display": "账号", "type": AssetBalanceStrCell, "width_factor": 2},
         "total": {"display": "余额", "type": AssetBalanceFloatCell,  "width_factor": 4},
@@ -45,16 +29,18 @@ class AssetBalancePenal(QTableWidget):
         self.top_dock = top_dock
         self.app_engine = app_engine
 
-        self.record_cells: Dict[str, dict] = {} # 记录返回数据
-        self.record_tables: Dict[str, QTableWidget] = {} # 记录表格
+        self.record_cells: Dict[str, dict] = {}
+        self.record_tables: Dict[str, QTableWidget] = {}
         self._first_painted = False
         
         self.init_ui()
         self.register_event()
-        # self.create_asset_balance_table()
+        
+        self.signal_refresh_asset_balance.connect(self.process_refresh_asset_balance_event)
+        self.app_engine.event_engine.register(EVENT_ASSET_BALANCE, self.signal_refresh_asset_balance.emit)
     
     def event(self, event: QEvent) -> bool:
-        """ 重写 QTableWidget::event """
+        """ 重写 QTableWidget::event 用于设定列宽 """
         if event.type() == QEvent.Paint:
             if not self._first_painted:
                 width_factors = [d["width_factor"] for d in self.headers.values()]
@@ -69,45 +55,19 @@ class AssetBalancePenal(QTableWidget):
     
     def init_ui(self):
         hearder_labels = [d["display"] for d in self.headers.values()]
-
         self.setColumnCount(len(hearder_labels))
         self.setHorizontalHeaderLabels(hearder_labels)
         self.verticalHeader().setVisible(False)
+        # 将表格变为禁止编辑
         self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.setAlternatingRowColors(True)
         self.setSortingEnabled(True)
-        
-        # self.balances_table = None
-        # self.setCurrentIndex(0)
-        
-    def register_event(self) -> None:
-        self.signal_refresh_asset_balance.connect(self.process_event)
-        self.app_engine.event_engine.register(EVENT_ASSET_BALANCE, self.signal_refresh_asset_balance.emit)
-        
-    def create_asset_balance_table(self):
-        table = QTableWidget()
-        hearder_labels = [d["display"] for d in self.headers.values()]
-        table.setColumnCount(len(hearder_labels))
-        table.setHorizontalHeaderLabels(hearder_labels)
-        # 表格头的显示与隐藏
-        #垂直方向
-        table.verticalHeader().setVisible(False)
-        # 将表格变为禁止编辑
-        table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        table.setAlternatingRowColors(True)
-        table.setSortingEnabled(True)
-        # 设置表格头为伸缩模式
-        # accTable.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
-        return table
     
-    def process_event(self, event) -> None:
+    def process_refresh_asset_balance_event(self, event):
         self.setSortingEnabled(False)
-        
-        # self.setSortingEnabled(False)
-        # 获取返回的数据
+
         balance_data: AssetBalanceData = event.data
-        # print(balance_data)
         
         # 获取数据的key
         record_key = balance_data.__getattribute__(self.record_key)
