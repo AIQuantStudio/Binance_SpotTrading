@@ -23,9 +23,9 @@ class ModelPanel(QFrame):
         self.bind_event()
 
         self.show_model_info()
-        # self.show_market()
+        self.show_market()
 
-        self.app_engine.event_engine.register_timer(self.refresh_kline, 1)
+        # self.app_engine.event_engine.register_timer(self.refresh_kline, 1)
 
     def setup_ui(self):
         main_hbox_layout = QHBoxLayout()
@@ -106,20 +106,9 @@ class ModelPanel(QFrame):
         right_widget.setLayout(vbox_layout)
 
         self.market_canvas = MarketCanvas(self, self.top_dock, self.app_engine)
-        # self.binance_market_frame.setLineWidth(1)
-        # self.binance_market_frame.setMidLineWidth(1)
-        # self.binance_market_frame.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Raised)
-        # self.binance_market_frame.setStyleSheet("background-color:#2a2a2a")
         vbox_layout.addWidget(self.market_canvas)
         
-        # layout = QVBoxLayout()
-        # self.binance_market_frame.setLayout(layout)
-
-        # self.figure_canvas = MarketCanvas()
-        # layout.addWidget(self.figure_canvas)
-
     def bind_event(self):
-        # self.gpu_checkbox.stateChanged.connect(self.on_gpu_changed)
         self.start_prediction_btn.clicked.connect(self.on_start_predict)
         self.stop_prediction_btn.clicked.connect(self.on_stop_predict)
 
@@ -136,13 +125,8 @@ class ModelPanel(QFrame):
 
             self.config_info_textbrowser.setText(s)
 
-    # def show_market(self):
-    #     vbox_layout = QVBoxLayout()
-    #     self.binance_market_frame.setLayout(vbox_layout)
-
-        
-    #     self.figure_canvas = MarketCanvas()
-    #     layout.addWidget(self.figure_canvas)
+    def show_market(self):
+        self.market_canvas.start_market()
         
     def refresh_kline(self):
         model = ModelFactory().get_model(self.top_dock.id)
