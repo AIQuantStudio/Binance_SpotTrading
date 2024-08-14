@@ -7,7 +7,7 @@ from model import ModelFactory
 from event import Event, EVENT_PREDICT
 
 from widget.predict_price_table import PredictPriceTable
-from exchange.binance_canvas import BinanceCanvas
+from widget.market_canvas import MarketCanvas
 from exchange.binance_market import BinanceMarket
 
 
@@ -23,7 +23,7 @@ class ModelPanel(QFrame):
         self.bind_event()
 
         self.show_model_info()
-        # self.show_kline()
+        # self.show_market()
 
         self.app_engine.event_engine.register_timer(self.refresh_kline, 1)
 
@@ -105,18 +105,18 @@ class ModelPanel(QFrame):
         vbox_layout = QVBoxLayout()
         right_widget.setLayout(vbox_layout)
 
-        self.binance_kline_frame = QFrame(right_widget)
-        self.binance_kline_frame.setLineWidth(1)
-        self.binance_kline_frame.setMidLineWidth(1)
-        self.binance_kline_frame.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Raised)
-
-        vbox_layout.addWidget(self.binance_kline_frame)
+        self.market_canvas = MarketCanvas(self, self.top_dock, self.app_engine)
+        # self.binance_market_frame.setLineWidth(1)
+        # self.binance_market_frame.setMidLineWidth(1)
+        # self.binance_market_frame.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Raised)
+        # self.binance_market_frame.setStyleSheet("background-color:#2a2a2a")
+        vbox_layout.addWidget(self.market_canvas)
         
-        layout = QVBoxLayout()
-        self.binance_kline_frame.setLayout(layout)
+        # layout = QVBoxLayout()
+        # self.binance_market_frame.setLayout(layout)
 
-        self.figure_canvas = BinanceCanvas()
-        layout.addWidget(self.figure_canvas)
+        # self.figure_canvas = MarketCanvas()
+        # layout.addWidget(self.figure_canvas)
 
     def bind_event(self):
         # self.gpu_checkbox.stateChanged.connect(self.on_gpu_changed)
@@ -136,9 +136,14 @@ class ModelPanel(QFrame):
 
             self.config_info_textbrowser.setText(s)
 
-    # def show_kline(self):
-        
+    # def show_market(self):
+    #     vbox_layout = QVBoxLayout()
+    #     self.binance_market_frame.setLayout(vbox_layout)
 
+        
+    #     self.figure_canvas = MarketCanvas()
+    #     layout.addWidget(self.figure_canvas)
+        
     def refresh_kline(self):
         model = ModelFactory().get_model(self.top_dock.id)
         data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")

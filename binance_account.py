@@ -8,13 +8,10 @@ class BinanceAccount:
         self.name = name
         self.apikey = apikey
         self.secretkey = secretkey
-        
-        
-        
-        print("--------------------")
+
         asyncio.run(self.create_client())
         print("********************")
-        
+
     async def create_client(self):
         print(self.apikey)
         print(self.secretkey)

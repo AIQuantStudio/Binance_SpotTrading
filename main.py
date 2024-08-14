@@ -13,3 +13,4 @@ if __name__ == "__main__":
     main_window = MainWindow(_app_title, app_engine)
     main_window.show()
     sys.exit(app.exec())
+    
