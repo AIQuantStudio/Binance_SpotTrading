@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 
 from PyQt6.QtCore import QTimer
 
@@ -12,7 +13,7 @@ class BinanceMarket:
     
         
 
-    def get_klines(self, symbol):
+    def get_last_klines(self, symbol):
         """Kline/candlestick bars for a symbol. Klines are uniquely identified by their open time.
 
         https://binance-docs.github.io/apidocs/spot/en/#kline-candlestick-data
@@ -52,11 +53,13 @@ class BinanceMarket:
         :raises: BinanceRequestException, BinanceAPIException
 
         """
-
+        
+        
         data = self.binance_client.get_klines(
             symbol=symbol,
             interval=Client.KLINE_INTERVAL_15MINUTE,
-            limit=200
+            limit=5,
+            startTime=int(a*1000)
         )
-
+        print(data)
         return data

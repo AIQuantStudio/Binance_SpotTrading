@@ -1,6 +1,8 @@
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
+import pandas as pd
+import numpy as np
 
 from widget.market_figure import MarketFigure
 
@@ -51,11 +53,17 @@ class MarketCanvas(QFrame):
         
 
     def start_market(self):
-        self.app_engine.event_engine.register_timer(self.refresh_kline, interval=1)
+        self.app_engine.event_engine.register_timer(self.refresh_cline, interval=1)
         
     def stop_market(self):
-        self.app_engine.event_engine.unregister_timer(self.refresh_kline)
+        self.app_engine.event_engine.unregister_timer(self.refresh_cline)
         
-    def refresh_kline(self):
-        data = BinanceMarket().get_klines(self.symbol)
+    def refresh_cline(self):
+        data = BinanceMarket().get_last_klines(self.symbol)
+        
+        # df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "NumberTrades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
+        # df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
+        
+        
         self.market_figure.plot_data(data)
+        
