@@ -58,7 +58,7 @@ class ModelFactory:
     
     def get_model_symbol(self, model_id):
         model = self._instance_models.get(model_id)
-        return f"{model.base_currency.upper()}_{model.quote_currency.upper()}"
+        return f"{model.base_currency.upper()}{model.quote_currency.upper()}"
 
     def get_model_curreny(self, model_id):
         model = self._instance_models.get(model_id)

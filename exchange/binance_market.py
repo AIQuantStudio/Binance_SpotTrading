@@ -8,7 +8,7 @@ from binance import Client
 class BinanceMarket:
     def __init__(self):
         # self.symbol = pair
-        self.binance_market = Client()
+        self.binance_client = Client()
     
         
 
@@ -53,7 +53,7 @@ class BinanceMarket:
 
         """
 
-        data = self.binance_market.get_klines(
+        data = self.binance_client.get_klines(
             symbol=symbol,
             interval=Client.KLINE_INTERVAL_15MINUTE,
             limit=200

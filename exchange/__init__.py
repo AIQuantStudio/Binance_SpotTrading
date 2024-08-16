@@ -1,1 +1,2 @@
 from exchange.binance_factory import BinanceFactory
+from exchange.binance_market import BinanceMarket

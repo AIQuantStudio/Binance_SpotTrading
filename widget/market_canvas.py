@@ -5,7 +5,7 @@ from PyQt6.QtGui import *
 from widget.market_figure import MarketFigure
 
 from model import ModelFactory
-from exchange import Bin
+from exchange import BinanceMarket
 
 
 class MarketCanvas(QFrame):
@@ -51,8 +51,11 @@ class MarketCanvas(QFrame):
         
 
     def start_market(self):
-        self.app_engine.event_engine.register_timer(self.refresh_kline, 1)
+        self.app_engine.event_engine.register_timer(self.refresh_kline, interval=1)
+        
+    def stop_market(self):
+        self.app_engine.event_engine.unregister_timer(self.refresh_kline)
         
     def refresh_kline(self):
         data = BinanceMarket().get_klines(self.symbol)
-        self.figure_canvas.plot_data(data)
+        self.market_figure.plot_data(data)
