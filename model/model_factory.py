@@ -64,13 +64,13 @@ class ModelFactory:
         model = self._instance_models.get(model_id)
         return [model.base_currency, model.quote_currency]
         
-    def create_dataloader(self, model_id, data):
-        df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "Trades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
-        df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
-        df.set_index("datetime", inplace=True)
+    # def create_dataloader(self, model_id, data):
+    #     df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "Trades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
+    #     df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
+    #     df.set_index("datetime", inplace=True)
 
-        model = self._instance_models.get(model_id)
-        return model.create_dataloader(df)
+    #     model = self._instance_models.get(model_id)
+    #     return model.create_dataloader(df)
 
     def get_config_dict(self, model_id):
         model = self._instance_models.get(model_id)
@@ -85,10 +85,11 @@ class ModelFactory:
         model.set_device("cuda" if gpu else "cpu")
         model.to(model.device)
 
-        data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
+        data = BinanceMarket().get_last_klines(self.get_model_symbol(model_id))
         df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "Trades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
         df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
         df.set_index("datetime", inplace=True)
+        df = df.drop(df.index[-1])
 
         dataloader = model.create_dataloader(df)
 

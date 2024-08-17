@@ -28,6 +28,7 @@ class MarketCanvas(QFrame):
         self.last_low = QLabel("2")
         self.last_close = QLabel("3")
         self.last_volume = QLabel("4")
+        self.predict_price = QLabel("5")
         
         vbox_layout = QVBoxLayout(self)
         grid = QGridLayout()
@@ -35,15 +36,19 @@ class MarketCanvas(QFrame):
         grid.addWidget(QLabel("最低价"), 1, 0, Qt.AlignmentFlag.AlignRight)
         grid.addWidget(QLabel("成交价"), 0, 2,Qt.AlignmentFlag.AlignRight)
         grid.addWidget(QLabel("交易量"), 1, 2,Qt.AlignmentFlag.AlignRight)
+        grid.addWidget(QLabel("预测价格"), 0, 4,Qt.AlignmentFlag.AlignRight)
         grid.addWidget(self.last_high, 0, 1,Qt.AlignmentFlag.AlignLeft)
         grid.addWidget(self.last_low, 1, 1,Qt.AlignmentFlag.AlignLeft)
         grid.addWidget(self.last_close, 0, 3,Qt.AlignmentFlag.AlignLeft)
         grid.addWidget(self.last_volume, 1, 3,Qt.AlignmentFlag.AlignLeft)
+        grid.addWidget(self.predict_price, 0, 5,Qt.AlignmentFlag.AlignLeft)
         
         grid.setColumnStretch(0,1)
         grid.setColumnStretch(1,6)
         grid.setColumnStretch(2,1)
         grid.setColumnStretch(3,6)
+        grid.setColumnStretch(4,1)
+        grid.setColumnStretch(5,4)
         vbox_layout.addLayout(grid)
 
         self.market_figure = MarketFigure()
@@ -66,4 +71,7 @@ class MarketCanvas(QFrame):
         
         
         self.market_figure.plot_data(data)
+        
+    def set_predict_price(self, price):
+        self.predict_price.setText(str(price))
         

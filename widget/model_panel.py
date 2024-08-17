@@ -128,10 +128,10 @@ class ModelPanel(QFrame):
     def show_market(self):
         self.market_canvas.start_market()
         
-    def refresh_kline(self):
-        model = ModelFactory().get_model(self.top_dock.id)
-        data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
-        self.figure_canvas.plot_data(data)
+    # def refresh_kline(self):
+    #     model = ModelFactory().get_model(self.top_dock.id)
+    #     data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
+    #     self.figure_canvas.plot_data(data)
     
     # def on_gpu_changed(self):
     #     model = ModelFactory().get_model(self.top_dock.id)
@@ -140,19 +140,26 @@ class ModelPanel(QFrame):
         self.start_prediction_btn.setDisabled(True)
         self.stop_prediction_btn.setEnabled(True)
 
-        self.app_engine.event_engine.register_timer(self.predict, once=True)
+        interval = int(self.predict_interval_edit.text())
+        self.app_engine.event_engine.register_timer(self.predict, interval=interval)
     
     def on_stop_predict(self):
         self.start_prediction_btn.setEnabled(True)
         self.stop_prediction_btn.setDisabled(True)
         
+        self.app_engine.event_engine.unregister_timer(self.predict)
+        
     def predict(self):
-        price = ModelFactory().predict(self.top_dock.id, gpu=self.gpu_checkbox.checkState() == Qt.CheckState.Checked)
+        predict_price = ModelFactory().predict(self.top_dock.id, gpu=self.gpu_checkbox.checkState() == Qt.CheckState.Checked)
 
-        self.app_engine.event_engine.put(Event(EVENT_PREDICT, price, self.top_dock.id))
-        self.figure_canvas.set_predict_price(price[0][0])
-        self.refresh_kline()
+        print(predict_price[0][0])
+        self.market_canvas.set_predict_price(predict_price[0][0])
+        # self.app_engine.event_engine.put(Event(EVENT_PREDICT, price, self.top_dock.id))
+        # self.figure_canvas.set_predict_price(price[0][0])
+        # self.refresh_kline()
 
     def close(self):
-        self.app_engine.event_engine.unregister_timer(self.refresh_kline)
+        # self.app_engine.event_engine.unregister_timer(self.refresh_kline)
+        self.on_stop_predict()
+        self.market_canvas.stop_market()
         return super().close()
