@@ -78,7 +78,6 @@ class TradeHistoryMonitor(QTableWidget):
         self.setSortingEnabled(True)
 
     def _insert_record(self, data: TradeData):
-        """"""
         self.insertRow(0)
         for column, header in enumerate(self.headers.keys()):
             content = data.__getattribute__(header)

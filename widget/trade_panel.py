@@ -9,11 +9,11 @@ from widget.trade_test_setting_panel import TradeTestSettingPanel
 from widget.trade_history_table import TradeHistoryMonitor
 from widget import SelectAccountDialog
 
-from structure import TradeSettingMode
-from exchange import BinanceFactory
+from structure import TradeSettingMode, AssetBalanceData
+# from exchange import BinanceFactory
 from account import AccountFactory
 from model import ModelFactory
-from structure import AssetBalanceData
+from trading import TradingFactory
 from event import Event, EVENT_ASSET_BALANCE
 
 
@@ -124,15 +124,7 @@ class TradePanel(QFrame):
 
         right_widget.setLayout(vbox_layout)
         
-    def switch_trade_setting_panel(self, mode):
-        if mode == TradeSettingMode.EMPTY:
-            self.stacked_setting_panel.setCurrentIndex(0)
-            
-        elif mode == TradeSettingMode.NORMAL:
-            self.stacked_setting_panel.setCurrentIndex(1)
-
-        elif mode == TradeSettingMode.TEST:
-            self.stacked_setting_panel.setCurrentIndex(2)
+    
             
             
     def bind_event(self):
@@ -141,6 +133,8 @@ class TradePanel(QFrame):
         self.show_all_balance_checkbox.stateChanged.connect(self.refresh_asset_balance)
         self.start_trade_btn.clicked.connect(self.on_click_start_trade)
         self.stop_trade_btn.clicked.connect(self.on_click_stop_trade)
+        
+        # self.app_engine.event_engine.register(EVENT_TRADE_RECORD, self.event_trade_record)
 
     def on_click_select_account(self):
         ret = SelectAccountDialog(self, self.top_dock.id).exec()
@@ -163,12 +157,12 @@ class TradePanel(QFrame):
             self.clear_trade_panel_status()
             
     def on_click_start_trade(self):
-        rule = TradeFactory().create_trade_rule(self.top_dock.id)
-        rule.start()
+        daemon = TradingFactory().create_daemon(self.top_dock.id)
+        daemon.start()
         
     def on_click_stop_trade(self):
-        rule = TradeFactory().get_trade_rule(self.top_dock.id)
-        rule.stop()
+        daemon = TradingFactory().get_daemon(self.top_dock.id)
+        daemon.stop()
         
     def refresh_asset_balance(self):
         show_all = self.show_all_balance_checkbox.checkState() == Qt.CheckState.Checked
@@ -184,13 +178,18 @@ class TradePanel(QFrame):
             self.app_engine.event_engine.put(Event(EVENT_ASSET_BALANCE, account_data))
 
     def load_trade_panel_status(self):
-        self.account_label.setText(AccountFactory().get_account_name(self.top_dock.id))
+        self.account_label.setText(AccountFactory().get_name(self.top_dock.id))
         self.show_all_balance_checkbox.setEnabled(True)
         self.start_trade_btn.setEnabled(True)
         self.stop_trade_btn.setEnabled(False)
         self.remove_account_btn.setVisible(True)
         self.select_account_btn.setVisible(False)
-        
+
+        if AccountFactory().is_test(self.top_dock.id):
+            self.switch_trade_setting_panel(TradeSettingMode.TEST)
+        else:
+            self.switch_trade_setting_panel(TradeSettingMode.NORMAL)
+
     def clear_trade_panel_status(self):
         self.account_label.setText("")
         self.show_all_balance_checkbox.setEnabled(False)
@@ -200,7 +199,22 @@ class TradePanel(QFrame):
         self.select_account_btn.setVisible(True)
         
         self.asset_balance_table.clear_contents()
+        self.switch_trade_setting_panel(TradeSettingMode.EMPTY)
         
+    def switch_trade_setting_panel(self, mode):
+        self.mode = mode
+        if self.mode == TradeSettingMode.EMPTY:
+            self.stacked_setting_panel.setCurrentIndex(0)
+            
+        elif self.mode == TradeSettingMode.NORMAL:
+            self.stacked_setting_panel.setCurrentIndex(1)
+
+        elif self.mode == TradeSettingMode.TEST:
+            self.stacked_setting_panel.setCurrentIndex(2)
+    
+    def event_trade_record(self, data):
+        trade_data = data
+    
     def close(self):
         self.asset_balance_table.close()
         return super().close()

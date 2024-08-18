@@ -8,3 +8,6 @@ class TradeRule:
         self.is_running = True
         
         
+    
+        
+        

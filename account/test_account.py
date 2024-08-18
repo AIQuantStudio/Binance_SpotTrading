@@ -1,11 +1,13 @@
 import sqlite3
 
+from account.base_account import BaseAccount
 
-class TestAccount:
 
-    def __init__(self, account_data):
-        self.name = account_data["Name"]
-        self.id = account_data["Account"]
+class TestAccount(BaseAccount):
+
+    def __init__(self, model_id, account_data):
+        super().__init__(model_id, account_data["Name"], account_data["Account"])
+ 
         self.db = account_data["DB"]
 
     def connect(self):
@@ -16,8 +18,11 @@ class TestAccount:
             return False
 
         return True
+    
+    def close(self):
+        self.conn.close()
 
-    def get_all_asset_balance(self):
+    def get_asset_balance(self):
         cursor = self.conn.cursor().execute("SELECT * from asset")
         balances = []
         for row in cursor:

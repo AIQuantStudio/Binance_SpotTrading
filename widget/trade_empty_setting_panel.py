@@ -15,6 +15,6 @@ class TradeEmptySettingPanel(QFrame):
 
         self.setLineWidth(2)
         self.setMidLineWidth(2)
-        self.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Raised)
+        self.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Sunken)
 
     

@@ -1,11 +1,12 @@
 from binance import Client
+from account.base_account import BaseAccount
 
+class BinanceAccount(BaseAccount):
 
-class BinanceAccount:
-
-    def __init__(self, account_data):
-        self.name = account_data["Name"]
-        self.id = account_data["Account"]
+    def __init__(self, model_id, account_data):
+        super().__init__(model_id, account_data["Name"], account_data["Account"])
+        # self.name = account_data["Name"]
+        # self.id = account_data["Account"]
         self.api_key =  account_data["ApiKey"]
         self.api_secret = account_data["SecertKey"]
 
@@ -18,8 +19,11 @@ class BinanceAccount:
             return False
 
         return True
+    
+    def close(self):
+        self.client.close_connection()
 
-    def get_all_asset_balance(self):
+    def get_asset_balance(self):
         data = self.client.get_account()
         balances = data["balances"]
         return [balance for balance in balances if float(balance["free"]) > 0 or float(balance["locked"]) > 0]
