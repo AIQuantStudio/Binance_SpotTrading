@@ -9,6 +9,16 @@ class TradeSettingMode(Enum):
     NORMAL = 1
     TEST = 2
     
+
+class TradingDecision(Enum):
+    EMPTY = 0
+    BUY = 1
+    SELL = 2
+    
+    
+    
+    
+    
 class Trend(Enum):
     """"""
     RISE = "涨"

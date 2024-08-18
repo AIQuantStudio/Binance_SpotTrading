@@ -31,7 +31,7 @@ class AppEngine:
             print(f"找不到服务：{service_name}")
         return service
 
-    def close(self) -> None:
+    def close(self):
         """ 首先停止 event_engine, 然后依次关闭所有的 service """
         self._event_engine.stop()
 
