@@ -2,3 +2,5 @@ from structure.trade_data import TradeData
 from structure.binance_account_data import BianceAccountData
 from structure.asset_balance_data import AssetBalanceData
 from structure.binance_test_account_data import BianceTestAccountData
+
+from structure.enumeration import TradeSettingMode

@@ -4,8 +4,12 @@ from PyQt6.QtGui import *
 
 from widget.asset_balance_table import AssetBalanceTable
 from widget.trade_setting_panel import TradeSettingPanel
+from widget.trade_empty_setting_panel import TradeEmptySettingPanel
+from widget.trade_test_setting_panel import TradeTestSettingPanel
 from widget.trade_history_table import TradeHistoryMonitor
 from widget import SelectAccountDialog
+
+from structure import TradeSettingMode
 from exchange import BinanceFactory
 from account import AccountFactory
 from model import ModelFactory
@@ -20,6 +24,7 @@ class TradePanel(QFrame):
 
         self.top_dock = top_dock
         self.app_engine = app_engine
+        self.mode = TradeSettingMode.EMPTY
 
         self.setup_ui()
         self.bind_event()
@@ -28,18 +33,18 @@ class TradePanel(QFrame):
         main_hbox_layout = QHBoxLayout()
         self.setLayout(main_hbox_layout)
 
-        main_left_widget = QWidget()
-        main_hbox_layout.addWidget(main_left_widget, stretch=3)
+        self.main_left_widget = QWidget()
+        main_hbox_layout.addWidget(self.main_left_widget, stretch=3)
 
-        main_middle_widget = QWidget()
-        main_hbox_layout.addWidget(main_middle_widget, stretch=3)
+        self.main_middle_widget = QWidget()
+        main_hbox_layout.addWidget(self.main_middle_widget, stretch=3)
 
-        main_right_widget = QWidget()
-        main_hbox_layout.addWidget(main_right_widget, stretch=5)
+        self.main_right_widget = QWidget()
+        main_hbox_layout.addWidget(self.main_right_widget, stretch=5)
 
-        self.setup_left_area_ui(main_left_widget)
-        self.setup_middle_area_ui(main_middle_widget)
-        self.setup_right_area_ui(main_right_widget)
+        self.setup_left_area_ui(self.main_left_widget)
+        self.setup_middle_area_ui(self.main_middle_widget)
+        self.setup_right_area_ui(self.main_right_widget)
 
     def setup_left_area_ui(self, left_widget):
         vbox_layout = QVBoxLayout()
@@ -75,12 +80,14 @@ class TradePanel(QFrame):
         vbox_layout = QVBoxLayout()
         middle_widget.setLayout(vbox_layout)
 
-        self.trade_setting_panel = TradeSettingPanel(self, self.top_dock, self.app_engine)
-        vbox_layout.addWidget(self.trade_setting_panel)
-
-        # self.start_trade_btn = QPushButton()
-        # self.start_trade_btn.setText("启动交易")
-        # vbox_layout.addWidget(self.start_trade_btn)
+        self.stacked_setting_panel = QStackedWidget(middle_widget)
+        
+        self.stacked_setting_panel.addWidget(TradeEmptySettingPanel(self, self.top_dock, self.app_engine))
+        self.stacked_setting_panel.addWidget(TradeSettingPanel(self, self.top_dock, self.app_engine))
+        self.stacked_setting_panel.addWidget(TradeTestSettingPanel(self, self.top_dock, self.app_engine))
+        
+        self.trade_setting_panel = self.switch_trade_setting_panel(self.mode)
+        vbox_layout.addWidget(self.stacked_setting_panel)
 
         hbox_layout = QHBoxLayout()
         self.start_trade_btn = QPushButton()
@@ -93,12 +100,6 @@ class TradePanel(QFrame):
         hbox_layout.addWidget(self.stop_trade_btn)
         vbox_layout.addLayout(hbox_layout)
 
-        # self.select_account_btn = QPushButton()
-        # self.select_account_btn.setText("选择账号")
-        # vbox_layout.addWidget(self.select_account_btn)
-
-        # self.asset_balance_table = AssetBalanceTable(self, self.top_dock, self.app_engine)
-        # vbox_layout.addWidget( self.asset_balance_table)
 
     def setup_right_area_ui(self, right_widget):
         vbox_layout = QVBoxLayout()
@@ -122,7 +123,18 @@ class TradePanel(QFrame):
         # vbox_layout.addLayout(h_layout)
 
         right_widget.setLayout(vbox_layout)
+        
+    def switch_trade_setting_panel(self, mode):
+        if mode == TradeSettingMode.EMPTY:
+            self.stacked_setting_panel.setCurrentIndex(0)
+            
+        elif mode == TradeSettingMode.NORMAL:
+            self.stacked_setting_panel.setCurrentIndex(1)
 
+        elif mode == TradeSettingMode.TEST:
+            self.stacked_setting_panel.setCurrentIndex(2)
+            
+            
     def bind_event(self):
         self.select_account_btn.clicked.connect(self.on_click_select_account)
         self.remove_account_btn.clicked.connect(self.on_click_remove_account)

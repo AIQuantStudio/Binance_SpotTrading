@@ -22,7 +22,7 @@ class OrderType(Enum):
     FOK = "FOK"
     RFQ = "询价"
     
-class TradeSettingPanel(QFrame):
+class TradeTestSettingPanel(QFrame):
 
     def __init__(self, parent_widget, top_dock, app_engine):
         super().__init__(parent_widget)

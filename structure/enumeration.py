@@ -2,10 +2,13 @@ from enum import Enum
 
 
 class EmptyEnum(Enum):
-    """"""
     NONE = ""
 
-
+class TradeSettingMode(Enum):
+    EMPTY = 0
+    NORMAL = 1
+    TEST = 2
+    
 class Trend(Enum):
     """"""
     RISE = "涨"

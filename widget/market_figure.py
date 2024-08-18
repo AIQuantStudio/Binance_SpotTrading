@@ -11,7 +11,7 @@ matplotlib.use("QtAgg")
 
 plt.rcParams["axes.unicode_minus"] = False
 
-STYLE_DICT = {"xtick.color": "white", "ytick.color": "white", "xtick.labelcolor": "white", "ytick.labelcolor": "white", "axes.spines.top": False, "axes.spines.right": False, "axes.labelcolor": "white"}
+# STYLE_DICT = {"xtick.color": "white", "ytick.color": "white", "xtick.labelcolor": "white", "ytick.labelcolor": "white", "axes.spines.top": False, "axes.spines.right": False, "axes.labelcolor": "white"}
 
 
 class MarketFigure(FigureCanvasQTAgg):
@@ -19,12 +19,14 @@ class MarketFigure(FigureCanvasQTAgg):
     def __init__(self, width=12, height=8, dpi=100):
         self.predict_price = None
 
-        mcolors = mpf.make_marketcolors(up="green", down="red", edge="in", wick="in")
-        my_style = mpf.make_mpf_style(base_mpf_style="binance", marketcolors=mcolors, facecolor="#19232D", figcolor="#111111", rc=STYLE_DICT)
+        # mcolors = mpf.make_marketcolors(up="green", down="red", edge="in", wick="in")
+        # my_style = mpf.make_mpf_style(base_mpf_style="binance", marketcolors=mcolors, facecolor="#19232D", figcolor="#111111", rc=STYLE_DICT)
         self.fig = Figure(figsize=(width, height), dpi=dpi, facecolor='#333', edgecolor='black')
 
         self.axes = self.fig.add_subplot(111)
         self.axes.set_facecolor('#333')
+        self.axes.set_xlabel('time')
+        self.axes.set_ylabel('price')
 
         super(MarketFigure, self).__init__(self.fig)
         
@@ -32,12 +34,15 @@ class MarketFigure(FigureCanvasQTAgg):
         df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "NumberTrades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
         df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
         # df.set_index("datetime", inplace=True)
-        self.axes.set_xlabel('time')
-        self.axes.set_ylabel('number')
         
         self.axes.plot(df["datetime"], df["Close"],color = 'r')
 
         self.draw()
+        
+    def plot(self, close_df, predict_df):
+        self.axes.plot(close_df["datetime"], close_df["Close"], color = 'r')
+        if predict_df is not None:
+            self.axes.plot(predict_df["datetime"], predict_df["Close"], color = 'g')
 
-    def set_predict_price(self, price):
-        self.predict_price = price
+    # def set_predict_price(self, price):
+    #     self.predict_price = price
