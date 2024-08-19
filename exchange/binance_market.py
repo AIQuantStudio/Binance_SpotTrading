@@ -1,6 +1,5 @@
 import asyncio
-import datetime
-
+from datetime import date, datetime, timedelta
 from PyQt6.QtCore import QTimer
 
 from binance import Client
@@ -62,3 +61,30 @@ class BinanceMarket:
         )
         # print(data)
         return data
+
+    def load_klines(self, symbol, start_datetime, end_datetime):
+        start_time = start_datetime.timestamp()
+        end_time = end_datetime.timestamp()
+        # last_time = (end_datetime-timedelta(minutes=15)).timestamp()
+        result = []
+        while start_time > end_time:
+            data = self.binance_client.get_klines(
+                symbol=symbol,
+                interval=Client.KLINE_INTERVAL_15MINUTE,
+                startTime=start_time,
+                endTime=end_time
+            )
+            start_time = data[-1][0] + timedelta(minutes=15).microseconds
+            result = result + data
+            
+        return result
+            
+    def __enter__(self):
+        self.binance_client = Client()
+        return self.binance_client
+	
+
+    def __exit__(self):
+        self.binance_client.close()
+
+        

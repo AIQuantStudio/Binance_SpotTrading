@@ -19,7 +19,7 @@ class Backtester:
             # self._write_log("已有任务在运行中，请等待完成")
             return False
 
-        self._thread = Thread(target=self._run)
+        self._thread = Thread(target=self.run)
         self._thread.start()
 
     def run(self):

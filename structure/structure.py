@@ -1,3 +1,4 @@
+from PyQt6.QtCore import *
 from dataclasses import dataclass
 
 
@@ -33,8 +34,8 @@ class BianceTestAccountData:
 @dataclass
 class BacktestSettingStruct:
 
-    begin_datetime: float
-    end_datetime: float
+    begin_datetime: QDateTime
+    end_datetime: QDateTime
     refer_currency: str
     trade_amount: float
     

@@ -1,8 +1,14 @@
+from PyQt6.QtCore import *
+from datetime import date, datetime, timedelta
+
+from structure import BacktestSettingStruct
 
 
 class BacktesterEngine:
     
     def __init__(self):
+        
+        self.backtest_setting_data: BacktestSettingStruct = None
         self._history_data = []
     
     def clear_data(self):
@@ -32,11 +38,11 @@ class BacktesterEngine:
     def load_history_data(self):
         # self.write_log("开始加载历史数据")
 
-        if not self._end:
-            self._end = datetime.now()
+        if self.backtest_setting_data.end_datetime is None:
+            self.backtest_setting_data.end_datetime = QDateTime.currentDateTime()
 
-        if self._start >= self._end:
-            self.write_log("起始日期必须小于结束日期")
+        if self.backtest_setting_data.begin_datetime >= self.backtest_setting_data.end_datetime:
+            # self.write_log("起始日期必须小于结束日期")
             return
 
         self._history_data.clear()
@@ -45,7 +51,7 @@ class BacktesterEngine:
         interval_delta = None
         if self._interval == Interval.MINUTE:
             progress_delta = timedelta(hours=4)
-            interval_delta = timedelta(minutes=1)
+            interval_delta = timedelta(minutes=15)
         elif self._interval == Interval.HOUR:
             progress_delta = timedelta(days=4)
             interval_delta = timedelta(hours=1)
@@ -119,3 +125,13 @@ class BacktesterEngine:
                 return
 
         self.write_log("历史数据回放结束")
+
+
+
+@lru_cache(maxsize=999)
+def load_bar_data(symbol: str, start: datetime, end: datetime):
+    binance_market = BinanceMarket()
+    with BinanceMarket() as market:
+        data = market.load_klines(symbol, start, end)
+    binance_market.close()
+    return .load_bar_data(symbol, exchange, interval, start, end)
