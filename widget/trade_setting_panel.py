@@ -107,3 +107,12 @@ class TradeSettingPanel(QFrame):
         grid.addWidget(self.gateway_combo, 8, 1, 1, 2)
 
         vbox_layout.addLayout(grid)
+
+    def lock_all_input(self):
+        pass
+    
+    def unlock_all_input(self):
+        pass
+    
+    def get_setting_data(self):
+        pass

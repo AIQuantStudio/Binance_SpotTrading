@@ -28,3 +28,14 @@ class BianceTestAccountData:
     name: str
     id: str
     db: str
+
+
+@dataclass
+class BacktestSettingStruct:
+
+    begin_datetime: float
+    end_datetime: float
+    refer_currency: str
+    trade_amount: float
+    
+    predict_begin: bool

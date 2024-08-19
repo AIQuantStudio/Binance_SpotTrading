@@ -25,6 +25,9 @@ EVENT_PREDICT = "ePredict"
 EVENT_TIMER = "eTimer"
 EVENT_ASYNC = "eAsync"
 
+EVENT_MAKE_ORDER = "eMakeOrder"
+EVENT_DEAL_ORDER = "eDealOrder"
+
 class Event:
 
     def __init__(self, type, data = None):

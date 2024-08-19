@@ -17,4 +17,11 @@ class TradeEmptySettingPanel(QFrame):
         self.setMidLineWidth(2)
         self.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Sunken)
 
+    def lock_all_input(self):
+        pass
     
+    def unlock_all_input(self):
+        pass
+    
+    def get_setting_data(self):
+        pass

@@ -1,2 +1,2 @@
 from structure.enumeration import TradeSettingMode, TradingDecision
-from structure.struct_data import BianceAccountData, AssetBalanceData, BianceTestAccountData
+from structure.structure import BianceAccountData, AssetBalanceData, BianceTestAccountData, BacktestSettingStruct

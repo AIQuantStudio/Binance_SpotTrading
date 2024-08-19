@@ -157,10 +157,17 @@ class TradePanel(QFrame):
             self.clear_trade_panel_status()
             
     def on_click_start_trade(self):
-        daemon = TradingFactory().create_daemon(self.top_dock.id)
+        setting_panel = self.stacked_setting_panel.currentWidget()
+        setting_panel.lock_all_input()
+        setting_data = setting_panel.get_setting_data()
+        
+        daemon = TradingFactory().create_daemon(self.app_engine, self.top_dock.id, self.mode, setting_data)
         daemon.start()
         
     def on_click_stop_trade(self):
+        setting_panel = self.stacked_setting_panel.currentWidget()
+        setting_panel.unlock_all_input()
+        
         daemon = TradingFactory().get_daemon(self.top_dock.id)
         daemon.stop()
         

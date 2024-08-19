@@ -115,3 +115,20 @@ class TradeTestSettingPanel(QFrame):
         # grid.addWidget(self.gateway_combo, 8, 1, 1, 2)
 
         vbox_layout.addLayout(grid)
+
+
+    def lock_all_input(self):
+        self.begin_datetime.setDisabled(True)
+        self.end_datetime.setDisabled(True)
+    
+    def unlock_all_input(self):
+        self.begin_datetime.setEnabled(True)
+        self.end_datetime.setEnabled(True)
+        
+    def get_setting_data(self):
+        data = {}
+        data["Begin"] = self.begin_datetime.dateTime().toMSecsSinceEpoch()
+        data["End"] = self.end_datetime.dateTime().toMSecsSinceEpoch()
+        
+        return data
+        

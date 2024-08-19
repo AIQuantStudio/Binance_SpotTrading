@@ -1,12 +1,14 @@
 from threading import Thread
 
 from trading.backtester_engine import BacktesterEngine
-
+from structure import BacktestSettingStruct
 
 class Backtester:
     def __init__(self):
         self._backtesting: BacktesterEngine = None
         self._thread = None
+        
+        self.backtest_setting_data: BacktestSettingStruct = None
     
     def init(self, data):
         self._backtesting = BacktesterEngine(data)
