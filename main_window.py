@@ -2,6 +2,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
+from app_engine import AppEngine
 from config import Config
 from widget import MainDock, SelectModelDialog, AboutDialog
 from model import ModelFactory
@@ -9,14 +10,17 @@ from model import ModelFactory
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, app_title, app_engine):
+    signal_close_dock: pyqtSignal = pyqtSignal(MainDock)
+    
+    def __init__(self, app_title):
         super().__init__()
 
-        self.app_engine = app_engine
         self.dock_widgets = []
 
         self.setWindowTitle(app_title)
         self.setup_ui()
+        
+        self.signal_close_dock.connect(self.process_close_dock)
 
     def setup_ui(self):
         self.resize(Config.get("main_window.width", 900), Config.get("main_window.height", 600))
@@ -53,26 +57,27 @@ class MainWindow(QMainWindow):
         if model_id != QDialog.DialogCode.Rejected:
             model_name = ModelFactory().get_model_name(model_id)
             model_symbol = ModelFactory().get_model_symbol(model_id)
-            main_dock = MainDock(self, f"{model_name} {model_symbol}", model_id, self.app_engine)
+            main_dock = MainDock(self, f"{model_name} {model_symbol}", model_id)
+            main_dock.register_close_signal(self.signal_close_dock)
             self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, main_dock, Qt.Orientation.Vertical)
             self.dock_widgets.append(main_dock)
 
     def on_click_about(self):
-        dlg = AboutDialog(self, self.app_engine)
+        dlg = AboutDialog(self)
         dlg.exec()
         
-    def remove_dock_widget(self, dock_widget):
+    def process_close_dock(self, dock_widget:MainDock):
         if dock_widget in self.dock_widgets:
             self.dock_widgets.remove(dock_widget)
 
-    def closeEvent(self, event):
+    def closeEvent(self, event:QEvent) -> None:
         """ 重写 QMainWindow::closeEvent """
         reply = QMessageBox.question(self, "退出", "确认退出？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
             for dock in self.dock_widgets:
                 dock.close()
             self.dock_widgets = []
-            self.app_engine.close()
+            AppEngine.close()
             event.accept()
             QApplication.quit()
         else:

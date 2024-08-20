@@ -1,20 +1,21 @@
 import smtplib
-from threading import Thread
 from functools import partial
-from queue import Empty, Queue
+from queue import Empty
 from email.message import EmailMessage
 from PyQt6 import QtCore
 
-# from harvester.setting import Setting
 from config import Config
+from event import EventEngine
 
 from service.base_service import BaseService
 
 
 class EmailService(BaseService):
 
-    def __init__(self, app_engine):
+    def __init__(self, event_engine: EventEngine):
         super().__init__("email")
+        
+        self.event_engine = event_engine
     
 
     def send(self, subject, content, receiver = ""):

@@ -9,8 +9,8 @@ _app_title = f"Binance现货交易系统 {Version}"
 
 if __name__ == "__main__":
     app = create_application(_app_title)
-    app_engine = AppEngine()
-    main_window = MainWindow(_app_title, app_engine)
+    AppEngine.start()
+    main_window = MainWindow(_app_title)
     main_window.show()
     sys.exit(app.exec())
     

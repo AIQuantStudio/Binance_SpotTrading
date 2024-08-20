@@ -6,15 +6,14 @@ import requests
 import platform
 import numpy as np
 
+from app_engine import AppEngine
 from config import Version
 
 
 class AboutDialog(QDialog):
 
-    def __init__(self, parent_widget, app_engine):
+    def __init__(self, parent_widget):
         super().__init__(parent_widget)
-
-        self.app_engine = app_engine
 
         self.init_ui()
         self.bind_event()
@@ -47,7 +46,7 @@ class AboutDialog(QDialog):
         self.setLayout(vbox_layout)
 
     def bind_event(self):
-        self.app_engine.event_engine.run_async(self.request_ip)
+        AppEngine.event_engine.run_async(self.request_ip)
 
     def request_ip(self):
         try:

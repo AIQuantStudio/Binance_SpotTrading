@@ -7,36 +7,36 @@ from structure import BacktestSettingStruct
 class BacktesterEngine:
     
     def __init__(self):
-        
         self.backtest_setting_data: BacktestSettingStruct = None
         self._history_data = []
     
     def clear_data(self):
-        self._result_df = None
-        self._result_statistics = None
-        self._result_values = None
+        self._history_data.clear()
+        # self._result_df = None
+        # self._result_statistics = None
+        # self._result_values = None
 
-        self.strategy = None
-        self.tick = None
-        self.bar = None
-        self.datetime = None
+        # self.strategy = None
+        # self.tick = None
+        # self.bar = None
+        # self.datetime = None
 
-        self.stop_order_count = 0
-        self.stop_orders.clear()
-        self.active_stop_orders.clear()
+        # self.stop_order_count = 0
+        # self.stop_orders.clear()
+        # self.active_stop_orders.clear()
 
-        self.limit_order_count = 0
-        self.limit_orders.clear()
-        self.active_limit_orders.clear()
+        # self.limit_order_count = 0
+        # self.limit_orders.clear()
+        # self.active_limit_orders.clear()
 
-        self.trade_count = 0
-        self.trades.clear()
+        # self.trade_count = 0
+        # self.trades.clear()
 
-        self.logs.clear()
-        self.daily_results.clear()
+        # self.logs.clear()
+        # self.daily_results.clear()
 
     def load_history_data(self):
-        # self.write_log("开始加载历史数据")
+        self.write_log("开始加载历史数据")
 
         if self.backtest_setting_data.end_datetime is None:
             self.backtest_setting_data.end_datetime = QDateTime.currentDateTime()
@@ -126,12 +126,12 @@ class BacktesterEngine:
 
         self.write_log("历史数据回放结束")
 
+#     def log(self):
 
-
-@lru_cache(maxsize=999)
-def load_bar_data(symbol: str, start: datetime, end: datetime):
-    binance_market = BinanceMarket()
-    with BinanceMarket() as market:
-        data = market.load_klines(symbol, start, end)
-    binance_market.close()
-    return .load_bar_data(symbol, exchange, interval, start, end)
+# @lru_cache(maxsize=999)
+# def load_bar_data(symbol: str, start: datetime, end: datetime):
+#     binance_market = BinanceMarket()
+#     with BinanceMarket() as market:
+#         data = market.load_klines(symbol, start, end)
+#     binance_market.close()
+#     return .load_bar_data(symbol, exchange, interval, start, end)

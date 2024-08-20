@@ -95,7 +95,7 @@ class EventEngine:
 
     def put(self, event, suffix=None):
         if suffix is not None:
-            event.type += suffix
+            event.type += str(suffix)
 
         self.event_queue.put(event)
 
@@ -104,7 +104,7 @@ class EventEngine:
             return
         
         if suffix is not None:
-            type += suffix
+            type += str(suffix)
 
         handler_list = self.event_handler_map[type]
         if handler not in handler_list:
@@ -112,7 +112,7 @@ class EventEngine:
 
     def unregister(self, type, handler, suffix=None):
         if suffix is not None:
-            type += suffix
+            type += str(suffix)
             
         handler_list = self.event_handler_map[type]
         if handler in handler_list:

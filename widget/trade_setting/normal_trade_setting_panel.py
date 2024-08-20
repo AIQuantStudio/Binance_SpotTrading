@@ -1,38 +1,21 @@
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
-from enum import Enum
 
-class Offset(Enum):
-    """"""
-    NONE = ""
-    OPEN = "开"
-    CLOSE = "平"
-    CLOSETODAY = "平今"
-    CLOSEYESTERDAY = "平昨"
-    
-class OrderType(Enum):
-    """
-    订单类型
-    """
-    LIMIT = "限价"
-    MARKET = "市价"
-    STOP = "STOP"
-    FAK = "FAK"
-    FOK = "FOK"
-    RFQ = "询价"
-    
-class TradeSettingPanel(QFrame):
+from widget.trade_setting.trade_setting_interface import TradeSettingInterface
 
-    def __init__(self, parent_widget, top_dock, app_engine):
+    
+class NormalTradeSettingPanel(QFrame, TradeSettingInterface):
+
+    def __init__(self, parent_widget, top_dock):
         super().__init__(parent_widget)
 
         self.top_dock = top_dock
-        self.app_engine = app_engine
-
-        self.setup_ui()
-
-    def setup_ui(self):
+        
+        self.setLineWidth(2)
+        self.setMidLineWidth(2)
+        self.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Sunken)
+        
         vbox_layout = QVBoxLayout()
         self.setLayout(vbox_layout)
 
@@ -49,11 +32,11 @@ class TradeSettingPanel(QFrame):
         
 
         self.offset_combo = QComboBox()
-        self.offset_combo.addItems([offset.value for offset in Offset])
+        # self.offset_combo.addItems([offset.value for offset in Offset])
         self.offset_combo.setItemDelegate(QStyledItemDelegate())
 
         self.order_type_combo = QComboBox()
-        self.order_type_combo.addItems([order_type.value for order_type in OrderType])
+        # self.order_type_combo.addItems([order_type.value for order_type in OrderType])
         self.order_type_combo.setItemDelegate(QStyledItemDelegate())
 
         double_validator = QDoubleValidator()

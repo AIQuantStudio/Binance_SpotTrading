@@ -3,19 +3,18 @@ from pathlib import Path
 from datetime import datetime
 
 from config import Config
-from event import EVENT_LOG
-# from harvester.setting import Setting
-# from harvester.structure import LogData
+from structure import LogStruct
+from event import EventEngine, Event, EVENT_LOG
 
 from service.base_service import BaseService
 
 
 class LogService(BaseService):
 
-    def __init__(self, app_engine):
+    def __init__(self, event_engine: EventEngine):
         super().__init__("log")
 
-        self.app_engine = app_engine
+        self.event_engine = event_engine
 
         if not Config.get("log.active"):
             return
@@ -33,8 +32,7 @@ class LogService(BaseService):
         if Config.get("log.file"):
             self.add_file_handler()
 
-        # self._register_event()
-        self.app_engine.event_engine.register(EVENT_LOG, self.process_log_event)
+        self.event_engine.register(EVENT_LOG, self.process_log_event)
 
     def add_null_handler(self):
         null_handler = logging.NullHandler()
@@ -46,7 +44,7 @@ class LogService(BaseService):
         console_handler.setFormatter(self.formatter)
         self.logger.addHandler(console_handler)
 
-    def add_file_handler(self) -> None:
+    def add_file_handler(self):
         filename = f"log_{datetime.now().strftime('%Y%m%d')}.log"
         log_path = Path(".").joinpath("log")
         if not log_path.exists():
@@ -59,16 +57,14 @@ class LogService(BaseService):
         file_handler.setFormatter(self.formatter)
         self.logger.addHandler(file_handler)
 
-    # def _register_event(self) -> None:
-    #     self._event_engine.register(EVENT_LOG, self._process_log_event)
-
-    def process_log_event(self, event):
-        log = event.data
+    def process_log_event(self, event: Event):
+        log: LogStruct = event.data
         self.logger.log(log.level, log.msg)
 
-    # def write(self, msg: str, gateway_name: str = "") -> None:
-    #     event = Event(EVENT_LOG, LogData(msg=msg, gateway_name=gateway_name))
-    #     self._event_engine.put(event)
+    def write(self, msg: str):
+        event = Event(EVENT_LOG, LogStruct(msg=msg))
+        self.event_engine.put(event)
 
     def close(self):
+        self.event_engine.unregister(EVENT_LOG, self.process_log_event)
         super().close()

@@ -7,7 +7,7 @@ EVENT_ORDER = "eOrder."
 EVENT_POSITION = "ePosition."
 EVENT_ACCOUNT = "eAccount."
 EVENT_CONTRACT = "eContract."
-EVENT_LOG = "eLog"
+
 EVENT_TIMER = "eTimer"
 
 EVENT_MARKETMANAGER_UPDATE = "eMarketManagerUpdate"
@@ -17,6 +17,11 @@ EVENT_TRADER_STRATEGY = "evtTraderStrategy"
 EVENT_TRADER_STOPORDER = "evtTraderStopOrder"
 
 
+
+
+
+
+EVENT_LOG = "eLog"
 
 EVENT_ASSET_BALANCE = "eAssetBalance"
 EVENT_PREDICT = "ePredict"

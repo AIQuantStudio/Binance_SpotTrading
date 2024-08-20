@@ -1,16 +1,19 @@
+from common import singleton
 from event import EventEngine
 from service import BaseService, LogService, EmailService
 
 
-class AppEngine:
+@singleton
+class AppEngineSingleton:
 
     def __init__(self):
-        self._event_engine = EventEngine()
-        self._event_engine.start()
-
         self._services = {}
         self._log_servic = None
         self._email_service = None
+        
+    def start(self):
+        self._event_engine = EventEngine()
+        self._event_engine.start()
 
         self.add_service(LogService)
         self.add_service(EmailService)
@@ -21,7 +24,7 @@ class AppEngine:
 
     def add_service(self, service_class):
         if issubclass(service_class, BaseService):
-            service = service_class(self)
+            service = service_class(self._event_engine)
             self._services[service.name] = service
         return service
 
@@ -32,14 +35,13 @@ class AppEngine:
         return service
 
     def close(self):
-        """ 首先停止 event_engine, 然后依次关闭所有的 service """
         self._event_engine.stop()
 
         for service in self._services.values():
             service.close()
 
     @property
-    def log_service(self):
+    def log_service(self) -> LogService:
         if self._log_service is None:
             self._log_service = self.get_service(LogService.name)
 
@@ -51,3 +53,9 @@ class AppEngine:
             self._email_service = self.get_service(EmailService.name)
 
         return self._email_service
+
+    def write_log(self, msg: str):
+        self.log_service.write(msg)
+        
+
+AppEngine = AppEngineSingleton()

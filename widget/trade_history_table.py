@@ -5,7 +5,8 @@ from PyQt6.QtGui import *
 from typing import Dict
 from event import Event
 from event import EVENT_TRADE
-from structure import TradeData
+from app_engine import AppEngine
+# from structure import TradeData
 
 from widget.trade_history_cells.trade_history_str_cell import TradeHistoryStrCell
 from widget.trade_history_cells.trade_history_float_cell import TradeHistoryFloatCell
@@ -30,11 +31,10 @@ class TradeHistoryMonitor(QTableWidget):
         "gateway_name": {"display": "接口", "type": TradeHistoryStrCell, "width_factor": 1},
     }
 
-    def __init__(self, parent_widget, top_dock, app_engine):
+    def __init__(self, parent_widget, top_dock):
         super().__init__(parent_widget)
 
         self.top_dock = top_dock
-        self.app_engine = app_engine
 
         self._first_painted = False
 
@@ -67,7 +67,7 @@ class TradeHistoryMonitor(QTableWidget):
 
     def register_event(self) -> None:
         self.signal.connect(self.process_event)
-        self.app_engine.event_engine.register(EVENT_TRADE, self.signal.emit)
+        AppEngine.event_engine.register(EVENT_TRADE, self.signal.emit)
 
     def process_event(self, event: Event) -> None:
         self.setSortingEnabled(False)
@@ -77,7 +77,7 @@ class TradeHistoryMonitor(QTableWidget):
 
         self.setSortingEnabled(True)
 
-    def _insert_record(self, data: TradeData):
+    def _insert_record(self, data):
         self.insertRow(0)
         for column, header in enumerate(self.headers.keys()):
             content = data.__getattribute__(header)

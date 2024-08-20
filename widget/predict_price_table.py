@@ -7,7 +7,7 @@ from widget.predict_price_cells.predict_price_time_cell import PrdictPriceTimeCe
 from widget.predict_price_cells.predict_price_float_cell import PredictPriceFloatCell
 from widget.predict_price_cells.predict_price_trend_cell import PredictPriceTrendCell
 from event import Event, EVENT_ASSET_BALANCE
-from structure.asset_balance_data import AssetBalanceData
+from structure import AssetBalanceData
 
 
 class PredictPriceTable(QTableWidget):
@@ -22,12 +22,11 @@ class PredictPriceTable(QTableWidget):
         "trend": {"display": "涨跌", "type": PredictPriceTrendCell,  "width_factor": 2},
     }
     
-    def __init__(self, parent_widget, top_dock, app_engine):
+    def __init__(self, parent_widget, top_dock):
         """"""
         super().__init__(parent_widget)
         
         self.top_dock = top_dock
-        self.app_engine = app_engine
 
         self.record_cells: Dict[str, dict] = {} # 记录返回数据
         self.record_tables: Dict[str, QTableWidget] = {} # 记录表格

@@ -3,21 +3,21 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from config import Config
+from app_engine import AppEngine
 from model import ModelFactory
 from event import Event, EVENT_PREDICT
 
-from widget.predict_price_table import PredictPriceTable
+from widget.log_monitor import LogMonitor
 from widget.market_canvas import MarketCanvas
 from exchange.binance_market import BinanceMarket
 
 
 class ModelPanel(QFrame):
 
-    def __init__(self, parent_widget, top_dock, app_engine):
+    def __init__(self, parent_widget, top_dock):
         super().__init__(parent_widget)
 
         self.top_dock = top_dock
-        self.app_engine = app_engine
 
         self.setup_ui()
         self.bind_event()
@@ -58,11 +58,17 @@ class ModelPanel(QFrame):
         vertical_sep_line.setFrameShadow(QFrame.Shadow.Sunken)
         vbox_layout.addWidget(vertical_sep_line)
 
-        prediction_record_label = QLabel("预测记录")
-        vbox_layout.addWidget(prediction_record_label)
+        # prediction_record_label = QLabel("预测记录")
+        # vbox_layout.addWidget(prediction_record_label)
 
-        self.predict_price_table = PredictPriceTable(self, self.top_dock, self.app_engine)
-        vbox_layout.addWidget(self.predict_price_table)
+        # self.predict_price_table = PredictPriceTable(self, self.top_dock, self.app_engine)
+        # vbox_layout.addWidget(self.predict_price_table)
+        
+        log_monitor_label = QLabel("日志")
+        vbox_layout.addWidget(log_monitor_label)
+        
+        self.log_monitor = LogMonitor(self, self.top_dock)
+        vbox_layout.addWidget(self.log_monitor)
 
         hbox_layout = QHBoxLayout()
         hbox_layout.setContentsMargins(0, 0, 0, 0)
@@ -105,7 +111,7 @@ class ModelPanel(QFrame):
         vbox_layout = QVBoxLayout()
         right_widget.setLayout(vbox_layout)
 
-        self.market_canvas = MarketCanvas(self, self.top_dock, self.app_engine)
+        self.market_canvas = MarketCanvas(self, self.top_dock)
         vbox_layout.addWidget(self.market_canvas)
         
     def bind_event(self):
@@ -141,13 +147,13 @@ class ModelPanel(QFrame):
         self.stop_prediction_btn.setEnabled(True)
 
         interval = int(self.predict_interval_edit.text())
-        self.app_engine.event_engine.register_timer(self.predict, interval=interval)
+        AppEngine.event_engine.register_timer(self.predict, interval=interval)
     
     def on_stop_predict(self):
         self.start_prediction_btn.setEnabled(True)
         self.stop_prediction_btn.setDisabled(True)
         
-        self.app_engine.event_engine.unregister_timer(self.predict)
+        AppEngine.event_engine.unregister_timer(self.predict)
         
     def predict(self):
         predict_price = ModelFactory().predict(self.top_dock.id, gpu=self.gpu_checkbox.checkState() == Qt.CheckState.Checked)
@@ -160,6 +166,8 @@ class ModelPanel(QFrame):
 
     def close(self):
         # self.app_engine.event_engine.unregister_timer(self.refresh_kline)
+        print("_______________")
         self.on_stop_predict()
         self.market_canvas.stop_market()
+        self.log_monitor.close()
         return super().close()

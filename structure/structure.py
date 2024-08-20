@@ -1,5 +1,7 @@
 from PyQt6.QtCore import *
 from dataclasses import dataclass
+from datetime import datetime
+from logging import INFO
 
 
 @dataclass
@@ -40,3 +42,12 @@ class BacktestSettingStruct:
     trade_amount: float
     
     predict_begin: bool
+    
+    
+@dataclass
+class LogStruct:
+    msg: str
+    level: int = INFO
+
+    def __post_init__(self):
+        self.time = datetime.now()

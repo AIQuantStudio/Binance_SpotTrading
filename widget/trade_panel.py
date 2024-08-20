@@ -3,14 +3,19 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from widget.asset_balance_table import AssetBalanceTable
-from widget.trade_setting_panel import TradeSettingPanel
-from widget.trade_empty_setting_panel import TradeEmptySettingPanel
-from widget.trade_test_setting_panel import TradeTestSettingPanel
+
 from widget.trade_history_table import TradeHistoryMonitor
 from widget import SelectAccountDialog
 
+from widget.trade_setting.trade_setting_interface import TradeSettingInterface
+from widget.trade_setting.empty_trade_setting_panel import EmptyTradeSettingPanel
+from widget.trade_setting.normal_trade_setting_panel import NormalTradeSettingPanel
+from widget.trade_setting.test_trade_setting_panel import TestTradeSettingPanel
+
 from structure import TradeSettingMode, AssetBalanceData
+
 # from exchange import BinanceFactory
+from app_engine import AppEngine
 from account import AccountFactory
 from model import ModelFactory
 from trading import TradingFactory
@@ -19,11 +24,10 @@ from event import Event, EVENT_ASSET_BALANCE
 
 class TradePanel(QFrame):
 
-    def __init__(self, parent_widget, top_dock, app_engine):
+    def __init__(self, parent_widget, top_dock):
         super().__init__(parent_widget)
 
         self.top_dock = top_dock
-        self.app_engine = app_engine
         self.mode = TradeSettingMode.EMPTY
 
         self.setup_ui()
@@ -46,7 +50,7 @@ class TradePanel(QFrame):
         self.setup_middle_area_ui(self.main_middle_widget)
         self.setup_right_area_ui(self.main_right_widget)
 
-    def setup_left_area_ui(self, left_widget):
+    def setup_left_area_ui(self, left_widget: QWidget):
         vbox_layout = QVBoxLayout()
         left_widget.setLayout(vbox_layout)
 
@@ -57,7 +61,7 @@ class TradePanel(QFrame):
         self.select_account_btn = QPushButton()
         self.select_account_btn.setText("选择账号")
         hbox_layout.addWidget(self.select_account_btn, stretch=4)
-        
+
         self.remove_account_btn = QPushButton()
         self.remove_account_btn.setText("移除账号")
         self.remove_account_btn.setVisible(False)
@@ -67,7 +71,7 @@ class TradePanel(QFrame):
         self.account_label.setText("")
         hbox_layout.addWidget(self.account_label, stretch=6)
 
-        self.asset_balance_table = AssetBalanceTable(self, self.top_dock, self.app_engine)
+        self.asset_balance_table = AssetBalanceTable(self, self.top_dock)
         vbox_layout.addWidget(self.asset_balance_table)
 
         self.show_all_balance_checkbox = QCheckBox()
@@ -76,16 +80,16 @@ class TradePanel(QFrame):
         self.show_all_balance_checkbox.setDisabled(True)
         vbox_layout.addWidget(self.show_all_balance_checkbox)
 
-    def setup_middle_area_ui(self, middle_widget):
+    def setup_middle_area_ui(self, middle_widget: QWidget):
         vbox_layout = QVBoxLayout()
         middle_widget.setLayout(vbox_layout)
 
         self.stacked_setting_panel = QStackedWidget(middle_widget)
-        
-        self.stacked_setting_panel.addWidget(TradeEmptySettingPanel(self, self.top_dock, self.app_engine))
-        self.stacked_setting_panel.addWidget(TradeSettingPanel(self, self.top_dock, self.app_engine))
-        self.stacked_setting_panel.addWidget(TradeTestSettingPanel(self, self.top_dock, self.app_engine))
-        
+
+        self.stacked_setting_panel.addWidget(EmptyTradeSettingPanel(self, self.top_dock))
+        self.stacked_setting_panel.addWidget(NormalTradeSettingPanel(self, self.top_dock))
+        self.stacked_setting_panel.addWidget(TestTradeSettingPanel(self, self.top_dock))
+
         self.trade_setting_panel = self.switch_trade_setting_panel(self.mode)
         vbox_layout.addWidget(self.stacked_setting_panel)
 
@@ -100,12 +104,11 @@ class TradePanel(QFrame):
         hbox_layout.addWidget(self.stop_trade_btn)
         vbox_layout.addLayout(hbox_layout)
 
-
-    def setup_right_area_ui(self, right_widget):
+    def setup_right_area_ui(self, right_widget: QWidget):
         vbox_layout = QVBoxLayout()
         right_widget.setLayout(vbox_layout)
 
-        self.trade_history_monitor = TradeHistoryMonitor(self, self.top_dock, self.app_engine)
+        self.trade_history_monitor = TradeHistoryMonitor(self, self.top_dock)
         vbox_layout.addWidget(self.trade_history_monitor)
 
         # widget_control_bar = QWidget()
@@ -123,25 +126,22 @@ class TradePanel(QFrame):
         # vbox_layout.addLayout(h_layout)
 
         right_widget.setLayout(vbox_layout)
-        
-    
-            
-            
+
     def bind_event(self):
         self.select_account_btn.clicked.connect(self.on_click_select_account)
         self.remove_account_btn.clicked.connect(self.on_click_remove_account)
         self.show_all_balance_checkbox.stateChanged.connect(self.refresh_asset_balance)
         self.start_trade_btn.clicked.connect(self.on_click_start_trade)
         self.stop_trade_btn.clicked.connect(self.on_click_stop_trade)
-        
-        # self.app_engine.event_engine.register(EVENT_TRADE_RECORD, self.event_trade_record)
+
+        # AppEngine.event_engine.register(EVENT_TRADE_RECORD, self.event_trade_record)
 
     def on_click_select_account(self):
         ret = SelectAccountDialog(self, self.top_dock.id).exec()
         if ret == QDialog.DialogCode.Accepted:
             self.load_trade_panel_status()
             self.refresh_asset_balance()
-            
+
     def on_click_remove_account(self):
         rule = TradeFactory().get_trade_rule(self.top_dock.id)
         if rule is None:
@@ -151,26 +151,26 @@ class TradePanel(QFrame):
         if rule.is_running:
             QMessageBox.warning(self, "警告", f"账号正在交易运行，请先停止！", QMessageBox.StandardButton.Ok)
             return
-        
+
         reply = QMessageBox.question(self, "移除账号", "确认移除账号？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
             self.clear_trade_panel_status()
-            
+
     def on_click_start_trade(self):
-        setting_panel = self.stacked_setting_panel.currentWidget()
-        setting_panel.lock_all_input()
-        setting_data = setting_panel.get_setting_data()
-        
-        daemon = TradingFactory().create_daemon(self.app_engine, self.top_dock.id, self.mode, setting_data)
+        trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
+        trade_setting.lock_all()
+        setting_data = trade_setting.get_setting_data()
+
+        daemon = TradingFactory().create_daemon(self.top_dock.id, self.mode, setting_data)
         daemon.start()
-        
+
     def on_click_stop_trade(self):
-        setting_panel = self.stacked_setting_panel.currentWidget()
-        setting_panel.unlock_all_input()
-        
+        trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
+        trade_setting.unlock_all()
+
         daemon = TradingFactory().get_daemon(self.top_dock.id)
         daemon.stop()
-        
+
     def refresh_asset_balance(self):
         show_all = self.show_all_balance_checkbox.checkState() == Qt.CheckState.Checked
         balances = AccountFactory().get_asset_balance(self.top_dock.id)
@@ -182,7 +182,7 @@ class TradePanel(QFrame):
                     continue
 
             account_data = AssetBalanceData(currency=balance["asset"].upper(), free=float(balance["free"]), locked=float(balance["locked"]))
-            self.app_engine.event_engine.put(Event(EVENT_ASSET_BALANCE, account_data))
+            AppEngine.event_engine.put(Event(EVENT_ASSET_BALANCE, account_data))
 
     def load_trade_panel_status(self):
         self.account_label.setText(AccountFactory().get_name(self.top_dock.id))
@@ -204,24 +204,24 @@ class TradePanel(QFrame):
         self.stop_trade_btn.setEnabled(False)
         self.remove_account_btn.setVisible(False)
         self.select_account_btn.setVisible(True)
-        
+
         self.asset_balance_table.clear_contents()
         self.switch_trade_setting_panel(TradeSettingMode.EMPTY)
-        
+
     def switch_trade_setting_panel(self, mode):
         self.mode = mode
         if self.mode == TradeSettingMode.EMPTY:
             self.stacked_setting_panel.setCurrentIndex(0)
-            
+
         elif self.mode == TradeSettingMode.NORMAL:
             self.stacked_setting_panel.setCurrentIndex(1)
 
         elif self.mode == TradeSettingMode.TEST:
             self.stacked_setting_panel.setCurrentIndex(2)
-    
+
     def event_trade_record(self, data):
         trade_data = data
-    
+
     def close(self):
         self.asset_balance_table.close()
         return super().close()
