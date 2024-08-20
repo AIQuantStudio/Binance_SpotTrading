@@ -1,15 +1,23 @@
 from PyQt6.QtCore import *
+from functools import lru_cache
 from datetime import date, datetime, timedelta
+import time
 
-from structure import BacktestSettingStruct
+from app_engine import AppEngine
+from model import ModelFactory
+from structure import TestSettingStruct, LogStruct
+from event import Event, EVENT_LOG
+from exchange import BinanceMarket
 
 
 class BacktesterEngine:
-    
-    def __init__(self):
-        self.backtest_setting_data: BacktestSettingStruct = None
+
+    def __init__(self, model_id, setting_data):
+        self.model_id = model_id
+
+        self.backtest_setting_data: TestSettingStruct = setting_data
         self._history_data = []
-    
+
     def clear_data(self):
         self._history_data.clear()
         # self._result_df = None
@@ -38,43 +46,42 @@ class BacktesterEngine:
     def load_history_data(self):
         self.write_log("开始加载历史数据")
 
-        if self.backtest_setting_data.end_datetime is None:
-            self.backtest_setting_data.end_datetime = QDateTime.currentDateTime()
+        if not self.backtest_setting_data.end_datetime:
+            self.backtest_setting_data.end_datetime = datetime.now()
 
         if self.backtest_setting_data.begin_datetime >= self.backtest_setting_data.end_datetime:
-            # self.write_log("起始日期必须小于结束日期")
+            self.write_log("起始日期必须小于结束日期")
             return
 
         self._history_data.clear()
 
-        progress_delta = None
-        interval_delta = None
-        if self._interval == Interval.MINUTE:
-            progress_delta = timedelta(hours=4)
-            interval_delta = timedelta(minutes=15)
-        elif self._interval == Interval.HOUR:
-            progress_delta = timedelta(days=4)
-            interval_delta = timedelta(hours=1)
-        elif self._interval == Interval.DAILY:
-            progress_delta = timedelta(days=60)
-            interval_delta = timedelta(days=1)
+        progress_delta = timedelta(hours=4)
+        interval_delta = timedelta(minutes=15)
+        # if self._interval == Interval.MINUTE:
+        #     progress_delta = timedelta(hours=4)
+        #     interval_delta = timedelta(minutes=15)
+        # elif self._interval == Interval.HOUR:
+        #     progress_delta = timedelta(days=4)
+        #     interval_delta = timedelta(hours=1)
+        # elif self._interval == Interval.DAILY:
+        #     progress_delta = timedelta(days=60)
+        #     interval_delta = timedelta(days=1)
 
-        if progress_delta is None or interval_delta is None:
-            self.write_log(f"K线周期设定错误 interval({self._interval})")
-            return
+        # if progress_delta is None or interval_delta is None:
+        #     self.write_log(f"K线周期设定错误 interval({self._interval})")
+        #     return
 
-        total_delta = self._end - self._start
-        start = self._start
-        end = self._start + progress_delta
+        total_delta = self.backtest_setting_data.end_datetime - self.backtest_setting_data.begin_datetime
+        start = self.backtest_setting_data.begin_datetime
+        end = self.backtest_setting_data.begin_datetime + progress_delta
         progress = 0
 
-        while start < self._end:
-            end = min(end, self._end)  # 确保结束时间在设定的范围内
+        while start < self.backtest_setting_data.end_datetime:
+            end = min(end, self.backtest_setting_data.end_datetime)
 
-
-            data = load_bar_data(self.symbol, self.exchange, self._interval, start, end)
-
-
+            data, data_end_time = load_bar_data(ModelFactory().get_model_symbol(self.model_id), start, end, interval_delta)
+            
+  
             self._history_data.extend(data)
 
             progress += progress_delta / total_delta
@@ -82,12 +89,11 @@ class BacktesterEngine:
             progress_bar = "#" * int(progress * 10)
             self.write_log(f"加载进度：{progress_bar} [{progress:.0%}]")
 
-            start = end + interval_delta
+            start = datetime.fromtimestamp(data_end_time/1000.0) + interval_delta
             end += (progress_delta + interval_delta)
 
         self.write_log(f"历史数据加载完成，数据量：{len(self._history_data)}")
-        
-    
+
     def run_backtesting(self):
         self.strategy.on_init()
 
@@ -126,12 +132,14 @@ class BacktesterEngine:
 
         self.write_log("历史数据回放结束")
 
-#     def log(self):
+    def write_log(self, msg):
+        AppEngine.write_log(msg)
+        AppEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.model_id)
 
-# @lru_cache(maxsize=999)
-# def load_bar_data(symbol: str, start: datetime, end: datetime):
-#     binance_market = BinanceMarket()
-#     with BinanceMarket() as market:
-#         data = market.load_klines(symbol, start, end)
-#     binance_market.close()
-#     return .load_bar_data(symbol, exchange, interval, start, end)
+
+@lru_cache(maxsize=999)
+def load_bar_data(symbol: str, start: datetime, end: datetime, interval_delta:timedelta):
+    with BinanceMarket() as market:
+        data = market.load_klines(symbol, start, end, interval_delta)
+
+    return data, data[-1][0]

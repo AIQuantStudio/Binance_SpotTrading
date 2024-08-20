@@ -38,7 +38,7 @@ class PredictPriceTable(QTableWidget):
     
     def event(self, event: QEvent) -> bool:
         """ 重写 QTableWidget::event """
-        if event.type() == QEvent.Paint:
+        if event.type() == QEvent.Type.Paint:
             if not self._first_painted:
                 width_factors = [d["width_factor"] for d in self.headers.values()]
                 width_sum = sum(width_factors)

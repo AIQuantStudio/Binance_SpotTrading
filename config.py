@@ -47,7 +47,7 @@ from dataclasses import dataclass
     
 import json
 import os
-from logging import CRITICAL
+from logging import CRITICAL, INFO
 from copy import copy
 from pathlib import Path
 
@@ -69,7 +69,7 @@ _global_config_data = {
     "font.size": 12,
 
     "log.active": True,
-    "log.level": CRITICAL,
+    "log.level": INFO,
     "log.console": True,
     "log.file": True,
     "log.formatter": "%(asctime)s  %(levelname)s: %(message)s",

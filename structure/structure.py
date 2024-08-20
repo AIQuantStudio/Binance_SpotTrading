@@ -34,14 +34,13 @@ class BianceTestAccountData:
 
 
 @dataclass
-class BacktestSettingStruct:
-
-    begin_datetime: QDateTime
-    end_datetime: QDateTime
+class TestSettingStruct:
+    
+    predict_at_first_time: bool
+    begin_datetime: datetime
+    end_datetime: datetime
     refer_currency: str
     trade_amount: float
-    
-    predict_begin: bool
     
     
 @dataclass

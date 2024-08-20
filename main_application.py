@@ -1,6 +1,7 @@
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
+from app_engine import AppEngine
 import sys
 import traceback
 import types
@@ -15,6 +16,7 @@ def create_application(app_name):
     sys.excepthook = excepthook
     
     Config.init_config()
+    AppEngine.start()
 
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(True)

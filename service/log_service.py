@@ -11,11 +11,13 @@ from service.base_service import BaseService
 
 class LogService(BaseService):
 
+    name = "log"
+    
     def __init__(self, event_engine: EventEngine):
-        super().__init__("log")
+        super().__init__()
 
         self.event_engine = event_engine
-
+        
         if not Config.get("log.active"):
             return
 
@@ -43,7 +45,7 @@ class LogService(BaseService):
         console_handler.setLevel(self.level)
         console_handler.setFormatter(self.formatter)
         self.logger.addHandler(console_handler)
-
+ 
     def add_file_handler(self):
         filename = f"log_{datetime.now().strftime('%Y%m%d')}.log"
         log_path = Path(".").joinpath("log")

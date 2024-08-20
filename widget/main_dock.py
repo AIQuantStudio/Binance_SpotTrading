@@ -24,7 +24,7 @@ class MainDock(QDockWidget):
     def register_close_signal(self, signal: pyqtSignal):
         self.close_signal = signal
 
-    def closeEvent(self, event: QEvent) -> None:
+    def closeEvent(self, event: QCloseEvent) -> None:
         """重写 MainDock::closeEvent"""
         reply = QMessageBox.question(self, "关闭", "确认关闭？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
@@ -35,6 +35,5 @@ class MainDock(QDockWidget):
         else:
             event.ignore()
 
-    def close(self):
-        self.dock_frame.close()
-        
+    def close(self) -> bool:
+        return self.dock_frame.close()

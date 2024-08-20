@@ -4,8 +4,12 @@ from trading.backtester_engine import BacktesterEngine
 from structure import BacktestSettingStruct
 
 class Backtester:
-    def __init__(self):
-        self._backtesting: BacktesterEngine = None
+    
+    def __init__(self, model_id):
+        super().__init__()
+        
+        self.model_id = model_id
+        self._backtesting: BacktesterEngine = BacktesterEngine(self.model_id)
         self._thread = None
         
         self.backtest_setting_data: BacktestSettingStruct = None
@@ -15,7 +19,7 @@ class Backtester:
         
         
     def start(self):
-        if self._thread is None:
+        if self._thread is not None:
             # self._write_log("已有任务在运行中，请等待完成")
             return False
 

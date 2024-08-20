@@ -11,15 +11,15 @@ from model import ModelFactory
 class MainWindow(QMainWindow):
 
     signal_close_dock: pyqtSignal = pyqtSignal(MainDock)
-    
+
     def __init__(self, app_title):
         super().__init__()
 
-        self.dock_widgets = []
+        self.dock_widgets: list[MainDock] = list()
 
         self.setWindowTitle(app_title)
         self.setup_ui()
-        
+
         self.signal_close_dock.connect(self.process_close_dock)
 
     def setup_ui(self):
@@ -65,13 +65,13 @@ class MainWindow(QMainWindow):
     def on_click_about(self):
         dlg = AboutDialog(self)
         dlg.exec()
-        
-    def process_close_dock(self, dock_widget:MainDock):
+
+    def process_close_dock(self, dock_widget: MainDock):
         if dock_widget in self.dock_widgets:
             self.dock_widgets.remove(dock_widget)
 
-    def closeEvent(self, event:QEvent) -> None:
-        """ 重写 QMainWindow::closeEvent """
+    def closeEvent(self, event: QEvent) -> None:
+        """重写 QMainWindow::closeEvent"""
         reply = QMessageBox.question(self, "退出", "确认退出？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
             for dock in self.dock_widgets:

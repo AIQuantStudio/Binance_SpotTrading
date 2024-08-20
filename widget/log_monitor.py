@@ -13,8 +13,8 @@ class LogMonitor(QTableWidget):
 
     signal: pyqtSignal = pyqtSignal(Event)
     headers = {
-        "time": {"display": "时间", "type": LogTimeCell, "width_factor": 2},
-        "msg": {"display": "信息", "type": LogMsgCell, "width_factor": 8},
+        "time": {"display": "时间", "type": LogTimeCell, "width_factor": 3},
+        "msg": {"display": "信息", "type": LogMsgCell, "width_factor": 7},
     }
 
     def __init__(self, parent_widget, top_dock):

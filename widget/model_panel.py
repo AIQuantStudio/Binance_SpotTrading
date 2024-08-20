@@ -41,7 +41,7 @@ class ModelPanel(QFrame):
         self.setup_left_area_ui(main_left_widget)
         self.setup_right_area_ui(main_right_widget)
 
-    def setup_left_area_ui(self, left_widget):
+    def setup_left_area_ui(self, left_widget: QWidget):
         vbox_layout = QVBoxLayout()
 
         config_info_label = QLabel("配置信息")
@@ -63,47 +63,47 @@ class ModelPanel(QFrame):
 
         # self.predict_price_table = PredictPriceTable(self, self.top_dock, self.app_engine)
         # vbox_layout.addWidget(self.predict_price_table)
-        
-        log_monitor_label = QLabel("日志")
-        vbox_layout.addWidget(log_monitor_label)
-        
+
+        # log_monitor_label = QLabel("日志")
+        # vbox_layout.addWidget(log_monitor_label)
+
         self.log_monitor = LogMonitor(self, self.top_dock)
         vbox_layout.addWidget(self.log_monitor)
 
-        hbox_layout = QHBoxLayout()
-        hbox_layout.setContentsMargins(0, 0, 0, 0)
+        # hbox_layout = QHBoxLayout()
+        # hbox_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.gpu_checkbox = QCheckBox()
-        self.gpu_checkbox.setText("GPU")
-        self.gpu_checkbox.setCheckState(Qt.CheckState.Checked)
-        if not ModelFactory().cuda_is_available():
-            self.gpu_checkbox.setCheckState(Qt.CheckState.Unchecked)
-            self.gpu_checkbox.setDisabled(True)
-        hbox_layout.addWidget(self.gpu_checkbox)
+        # self.gpu_checkbox = QCheckBox()
+        # self.gpu_checkbox.setText("GPU")
+        # self.gpu_checkbox.setCheckState(Qt.CheckState.Checked)
+        # if not ModelFactory().cuda_is_available():
+        #     self.gpu_checkbox.setCheckState(Qt.CheckState.Unchecked)
+        #     self.gpu_checkbox.setDisabled(True)
+        # hbox_layout.addWidget(self.gpu_checkbox)
 
-        label1 = QLabel()
-        label1.setText("预测间隔时间")
-        self.predict_interval_edit = QLineEdit()
-        self.predict_interval_edit.setValidator(QIntValidator())
-        self.predict_interval_edit.setText(str(Config.get("model.predict_interval", 60)))
-        label2 = QLabel()
-        label2.setText("秒")
+        # label1 = QLabel()
+        # label1.setText("预测间隔时间")
+        # self.predict_interval_edit = QLineEdit()
+        # self.predict_interval_edit.setValidator(QIntValidator())
+        # self.predict_interval_edit.setText(str(Config.get("model.predict_interval", 60)))
+        # label2 = QLabel()
+        # label2.setText("秒")
 
-        hbox_layout.addSpacing(80)
-        hbox_layout.addWidget(label1)
-        hbox_layout.addWidget(self.predict_interval_edit)
-        hbox_layout.addWidget(label2)
-        vbox_layout.addLayout(hbox_layout)
+        # hbox_layout.addSpacing(80)
+        # hbox_layout.addWidget(label1)
+        # hbox_layout.addWidget(self.predict_interval_edit)
+        # hbox_layout.addWidget(label2)
+        # vbox_layout.addLayout(hbox_layout)
 
-        hbox_layout = QHBoxLayout()
-        self.start_prediction_btn = QPushButton()
-        self.start_prediction_btn.setText("启动预测")
-        hbox_layout.addWidget(self.start_prediction_btn)
-        self.stop_prediction_btn = QPushButton()
-        self.stop_prediction_btn.setText("停止预测")
-        self.stop_prediction_btn.setDisabled(True)
-        hbox_layout.addWidget(self.stop_prediction_btn)
-        vbox_layout.addLayout(hbox_layout)
+        # hbox_layout = QHBoxLayout()
+        # self.start_prediction_btn = QPushButton()
+        # self.start_prediction_btn.setText("启动预测")
+        # hbox_layout.addWidget(self.start_prediction_btn)
+        # self.stop_prediction_btn = QPushButton()
+        # self.stop_prediction_btn.setText("停止预测")
+        # self.stop_prediction_btn.setDisabled(True)
+        # hbox_layout.addWidget(self.stop_prediction_btn)
+        # vbox_layout.addLayout(hbox_layout)
 
         left_widget.setLayout(vbox_layout)
 
@@ -113,10 +113,11 @@ class ModelPanel(QFrame):
 
         self.market_canvas = MarketCanvas(self, self.top_dock)
         vbox_layout.addWidget(self.market_canvas)
-        
+
     def bind_event(self):
-        self.start_prediction_btn.clicked.connect(self.on_start_predict)
-        self.stop_prediction_btn.clicked.connect(self.on_stop_predict)
+        pass
+        # self.start_prediction_btn.clicked.connect(self.on_start_predict)
+        # self.stop_prediction_btn.clicked.connect(self.on_stop_predict)
 
     def show_model_info(self):
         config = ModelFactory().get_config_dict(self.top_dock.id)
@@ -133,28 +134,29 @@ class ModelPanel(QFrame):
 
     def show_market(self):
         self.market_canvas.start_market()
-        
+
     # def refresh_kline(self):
     #     model = ModelFactory().get_model(self.top_dock.id)
     #     data = BinanceMarket().get_klines(f"{model.base_currency}{model.quote_currency}")
     #     self.figure_canvas.plot_data(data)
-    
+
     # def on_gpu_changed(self):
     #     model = ModelFactory().get_model(self.top_dock.id)
-        
+
     def on_start_predict(self):
         self.start_prediction_btn.setDisabled(True)
         self.stop_prediction_btn.setEnabled(True)
 
         interval = int(self.predict_interval_edit.text())
         AppEngine.event_engine.register_timer(self.predict, interval=interval)
-    
+
     def on_stop_predict(self):
-        self.start_prediction_btn.setEnabled(True)
-        self.stop_prediction_btn.setDisabled(True)
-        
+        pass
+        # self.start_prediction_btn.setEnabled(True)
+        # self.stop_prediction_btn.setDisabled(True)
+
         AppEngine.event_engine.unregister_timer(self.predict)
-        
+
     def predict(self):
         predict_price = ModelFactory().predict(self.top_dock.id, gpu=self.gpu_checkbox.checkState() == Qt.CheckState.Checked)
 
@@ -166,8 +168,7 @@ class ModelPanel(QFrame):
 
     def close(self):
         # self.app_engine.event_engine.unregister_timer(self.refresh_kline)
-        print("_______________")
-        self.on_stop_predict()
+        # self.on_stop_predict()
         self.market_canvas.stop_market()
         self.log_monitor.close()
         return super().close()

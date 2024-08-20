@@ -1,3 +1,5 @@
+from typing import Any, Sequence, Type, Dict
+
 from common import singleton
 from event import EventEngine
 from service import BaseService, LogService, EmailService
@@ -7,8 +9,8 @@ from service import BaseService, LogService, EmailService
 class AppEngineSingleton:
 
     def __init__(self):
-        self._services = {}
-        self._log_servic = None
+        self._services : Dict[str, BaseService] = {}
+        self._log_service:LogService = None
         self._email_service = None
         
     def start(self):

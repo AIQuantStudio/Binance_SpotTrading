@@ -6,7 +6,6 @@ from widget.asset_balance_table import AssetBalanceTable
 
 from widget.trade_history_table import TradeHistoryMonitor
 from widget import SelectAccountDialog
-
 from widget.trade_setting.trade_setting_interface import TradeSettingInterface
 from widget.trade_setting.empty_trade_setting_panel import EmptyTradeSettingPanel
 from widget.trade_setting.normal_trade_setting_panel import NormalTradeSettingPanel
@@ -19,7 +18,8 @@ from app_engine import AppEngine
 from account import AccountFactory
 from model import ModelFactory
 from trading import TradingFactory
-from event import Event, EVENT_ASSET_BALANCE
+from event import Event, EVENT_ASSET_BALANCE, EVENT_LOG
+from structure import LogStruct
 
 
 class TradePanel(QFrame):
@@ -157,6 +157,9 @@ class TradePanel(QFrame):
             self.clear_trade_panel_status()
 
     def on_click_start_trade(self):
+        self.start_trade_btn.setDisabled(True)
+        self.stop_trade_btn.setEnabled(True)
+        
         trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
         trade_setting.lock_all()
         setting_data = trade_setting.get_setting_data()
@@ -165,9 +168,12 @@ class TradePanel(QFrame):
         daemon.start()
 
     def on_click_stop_trade(self):
+        self.start_trade_btn.setEnabled(True)
+        self.stop_trade_btn.setDisabled(True)
+        
         trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
         trade_setting.unlock_all()
-
+        
         daemon = TradingFactory().get_daemon(self.top_dock.id)
         daemon.stop()
 
@@ -225,3 +231,7 @@ class TradePanel(QFrame):
     def close(self):
         self.asset_balance_table.close()
         return super().close()
+
+    def write_log(self, msg):
+        AppEngine.write_log(msg)
+        AppEngine.event_engine.put(event = Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.top_dock.id)

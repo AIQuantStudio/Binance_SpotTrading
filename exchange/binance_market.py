@@ -9,8 +9,6 @@ class BinanceMarket:
     def __init__(self):
         # self.symbol = pair
         self.binance_client = Client()
-    
-        
 
     def get_last_klines(self, symbol):
         """Kline/candlestick bars for a symbol. Klines are uniquely identified by their open time.
@@ -52,39 +50,25 @@ class BinanceMarket:
         :raises: BinanceRequestException, BinanceAPIException
 
         """
-        
-        
-        data = self.binance_client.get_klines(
-            symbol=symbol,
-            interval=Client.KLINE_INTERVAL_15MINUTE,
-            limit=200
-        )
+
+        data = self.binance_client.get_klines(symbol=symbol, interval=Client.KLINE_INTERVAL_15MINUTE, limit=200)
         # print(data)
         return data
 
-    def load_klines(self, symbol, start_datetime, end_datetime):
-        start_time = start_datetime.timestamp()
-        end_time = end_datetime.timestamp()
-        # last_time = (end_datetime-timedelta(minutes=15)).timestamp()
+    def load_klines(self, symbol, start_datetime: datetime, end_datetime: datetime, interval_delta: timedelta):
         result = []
-        while start_time > end_time:
-            data = self.binance_client.get_klines(
-                symbol=symbol,
-                interval=Client.KLINE_INTERVAL_15MINUTE,
-                startTime=start_time,
-                endTime=end_time
-            )
-            start_time = data[-1][0] + timedelta(minutes=15).microseconds
+        start = start_datetime
+        while start < end_datetime:
+            data = self.binance_client.get_klines(symbol=symbol, interval=Client.KLINE_INTERVAL_15MINUTE, limit=6, startTime=int(start.timestamp() * 1000), endTime=int(end_datetime.timestamp() * 1000))
+
+            start = datetime.fromtimestamp(data[-1][0] / 1000.0) + interval_delta
             result = result + data
-            
+
         return result
-            
+
     def __enter__(self):
         self.binance_client = Client()
-        return self.binance_client
-	
+        return self
 
-    def __exit__(self):
-        self.binance_client.close()
-
-        
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.binance_client.close_connection()

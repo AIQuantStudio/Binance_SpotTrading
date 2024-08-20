@@ -12,8 +12,10 @@ from service.base_service import BaseService
 
 class EmailService(BaseService):
 
+    name = "email"
+    
     def __init__(self, event_engine: EventEngine):
-        super().__init__("email")
+        super().__init__()
         
         self.event_engine = event_engine
     

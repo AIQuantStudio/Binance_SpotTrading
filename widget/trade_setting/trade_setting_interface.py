@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class TradeSettingInterface:
     def __init__(self):
         pass
@@ -8,5 +11,5 @@ class TradeSettingInterface:
     def unlock_all(self):
         pass
     
-    def get_setting_data(self):
+    def get_setting_data(self) -> Any:
         pass
