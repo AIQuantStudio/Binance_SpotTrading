@@ -94,3 +94,8 @@ class ModelFactory:
         dataloader = model.create_dataloader(df)
 
         return model.predict(dataloader)
+    
+    def predict(self, model_id, data:pd.DataFrame):
+        model = self._instance_models.get(model_id)
+        dataloader = model.create_dataloader(data)
+        return model.predict(dataloader)
