@@ -76,6 +76,8 @@ class ModelFactory:
         model = self._instance_models.get(model_id)
         if model is not None:
             return model.get_config()
+        
+    
 
     def cuda_is_available(self):
         return torch.cuda.is_available()

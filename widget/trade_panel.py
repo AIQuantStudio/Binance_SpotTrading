@@ -160,11 +160,16 @@ class TradePanel(QFrame):
         self.start_trade_btn.setDisabled(True)
         self.stop_trade_btn.setEnabled(True)
         
+        # 交易设置
         trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
         trade_setting.lock_all()
         setting_data = trade_setting.get_setting_data()
+        
+        # 模型参数
+        model_config = ModelFactory().get_config_dict(self.top_dock.id)
+        strategy = Strategy()
 
-        daemon = TradingFactory().create_daemon(self.top_dock.id, self.mode, setting_data)
+        daemon = TradingFactory().create_daemon(self.top_dock.id, self.mode, strategy, setting_data)
         daemon.start()
 
     def on_click_stop_trade(self):

@@ -8,10 +8,11 @@ from app_engine import AppEngine
 
 class TradingDaemon:
     
-    def __init__(self, model_id,  setting_mode, setting_data):
+    def __init__(self, model_id,  setting_mode, strategy, setting_data):
         super().__init__()
         
         self.model_id = model_id
+        self.strategy = strategy
         self.setting_mode = setting_mode
         self.setting_data = setting_data
         
@@ -24,7 +25,7 @@ class TradingDaemon:
         if self.setting_mode == TradeSettingMode.NORMAL:
             pass
         elif self.setting_mode == TradeSettingMode.TEST:
-            self.backtesting = BacktesterEngine(self.model_id, self.setting_data)
+            self.backtesting = BacktesterEngine(self.model_id, self.strategy, self.setting_data)
             # self.backtester.start()
             
             if self.thread is not None:

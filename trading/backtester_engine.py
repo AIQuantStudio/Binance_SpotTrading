@@ -12,8 +12,9 @@ from exchange import BinanceMarket
 
 class BacktesterEngine:
 
-    def __init__(self, model_id, setting_data):
+    def __init__(self, model_id, strategy, setting_data):
         self.model_id = model_id
+        self.strategy : BaseStrategy = strategy
 
         self.backtest_setting_data: TestSettingStruct = setting_data
         self._history_data = []
@@ -57,19 +58,6 @@ class BacktesterEngine:
 
         progress_delta = timedelta(hours=4)
         interval_delta = timedelta(minutes=15)
-        # if self._interval == Interval.MINUTE:
-        #     progress_delta = timedelta(hours=4)
-        #     interval_delta = timedelta(minutes=15)
-        # elif self._interval == Interval.HOUR:
-        #     progress_delta = timedelta(days=4)
-        #     interval_delta = timedelta(hours=1)
-        # elif self._interval == Interval.DAILY:
-        #     progress_delta = timedelta(days=60)
-        #     interval_delta = timedelta(days=1)
-
-        # if progress_delta is None or interval_delta is None:
-        #     self.write_log(f"K线周期设定错误 interval({self._interval})")
-        #     return
 
         total_delta = self.backtest_setting_data.end_datetime - self.backtest_setting_data.begin_datetime
         start = self.backtest_setting_data.begin_datetime
@@ -99,7 +87,7 @@ class BacktesterEngine:
 
         count = 0
         ix = 0
-        # 用历史数据预加载
+        # 预处理数据
         for ix, data in enumerate(self._history_data):
             if count >= self._preload_count:
                 break
@@ -111,7 +99,7 @@ class BacktesterEngine:
                 self._preload_callback(data)
             except Exception:
                 self.write_log("触发异常，回测终止")
-                self.write_log(traceback.format_exc())
+                # self.write_log(traceback.format_exc())
                 return
 
         self.strategy.inited = True
@@ -127,15 +115,32 @@ class BacktesterEngine:
                 self._new_bar(data)
             except Exception:
                 self.write_log("触发异常，回测终止")
-                self.write_log(traceback.format_exc())
+                # self.write_log(traceback.format_exc())
                 return
 
         self.write_log("历史数据回放结束")
 
+    def new_bar(self, bar: BarData):
+        self.bar = bar
+        self.datetime = bar.datetime
+
+        self.strategy.on_bar(bar)
+
+        self.update_daily_close(bar.close_price)
+        
     def write_log(self, msg):
         AppEngine.write_log(msg)
         AppEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.model_id)
 
+
+    def send_order(self, strategy: BaseStrategy, direction: Direction, offset: Offset, price: float, volume: float, stop: bool, lock: bool):
+        """"""
+        price = Utils.round_to(price, self._pricetick)
+        if stop:
+            vt_order_id = self.send_stop_order(direction, offset, price, volume)
+        else:
+            vt_order_id = self.send_limit_order(direction, offset, price, volume)
+        return [vt_order_id]
 
 @lru_cache(maxsize=999)
 def load_bar_data(symbol: str, start: datetime, end: datetime, interval_delta:timedelta):
