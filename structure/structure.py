@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from logging import INFO
 
+from structure.enumeration import Interval
+
 
 @dataclass
 class AssetBalanceData:
@@ -50,3 +52,18 @@ class LogStruct:
 
     def __post_init__(self):
         self.time = datetime.now()
+        
+
+@dataclass
+class BarStruct:
+    symbol: str
+    interval: Interval = None
+    
+    datetime: datetime
+    open_price: float = 0
+    high_price: float = 0
+    low_price: float = 0
+    close_price: float = 0
+    volume: float = 0
+
+

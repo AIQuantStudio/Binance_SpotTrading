@@ -40,6 +40,12 @@ class TestTradeSettingPanel(QFrame, TradeSettingInterface):
         self.trade_amount_edit = QLineEdit()
         self.trade_amount_edit.setValidator(double_validator)
         self.trade_amount_edit.setText("100.0")
+        
+        self.strategy_name_combobox = self.strategy_fact.get_all_exchanges()
+        self.strategy_name_combobox = QComboBox()
+        self.strategy_name_combobox.addItems([exchange.value for exchange in exchanges])
+        self.strategy_name_combobox.setItemDelegate(QStyledItemDelegate())
+
 
         grid = QGridLayout()
         grid.addWidget(QLabel("从启动时间开始预测"), 0, 0)

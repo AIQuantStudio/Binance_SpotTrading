@@ -120,7 +120,7 @@ class BacktesterEngine:
 
         self.write_log("历史数据回放结束")
 
-    def new_bar(self, bar: BarData):
+    def new_bar(self, bar: BarStruct):
         self.bar = bar
         self.datetime = bar.datetime
 

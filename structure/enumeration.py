@@ -15,7 +15,13 @@ class TradingDecision(Enum):
     BUY = 1
     SELL = 2
     
-    
+class Interval(Enum):
+    MINUTE = "1m"
+    M15 = "15m"
+    M30 = "30m"
+    HOUR = "1h"
+    DAILY = "1d"
+    WEEKLY = "1w"
     
     
     
@@ -84,12 +90,7 @@ class Exchange(Enum):
     OKEX = "OKEX"
 
 
-class Interval(Enum):
-    """"""
-    MINUTE = "1m"
-    HOUR = "1h"
-    DAILY = "d"
-    WEEKLY = "w"
+
 
 
 class AppEngineMode(Enum):
