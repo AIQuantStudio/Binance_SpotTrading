@@ -167,7 +167,7 @@ class TradePanel(QFrame):
         
         # 模型参数
         model_config = ModelFactory().get_config_dict(self.top_dock.id)
-        strategy = Strategy()
+        strategy = StrategyFactory(trade_setting.strategy_name)
 
         daemon = TradingFactory().create_daemon(self.top_dock.id, self.mode, strategy, setting_data)
         daemon.start()

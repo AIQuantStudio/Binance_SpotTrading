@@ -112,7 +112,7 @@ class BacktesterEngine:
         # 使用剩余的历史数据来运行回测
         for data in self._history_data[ix:]:
             try:
-                self._new_bar(data)
+                self.new_bar(data)
             except Exception:
                 self.write_log("触发异常，回测终止")
                 # self.write_log(traceback.format_exc())
