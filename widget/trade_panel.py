@@ -19,7 +19,8 @@ from account import AccountFactory
 from model import ModelFactory
 from trading import TradingFactory
 from event import Event, EVENT_ASSET_BALANCE, EVENT_LOG
-from structure import LogStruct
+from structure import LogStruct, TestSettingStruct
+from strategy import StrategyFactory
 
 
 class TradePanel(QFrame):
@@ -163,11 +164,11 @@ class TradePanel(QFrame):
         # 交易设置
         trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
         trade_setting.lock_all()
-        setting_data = trade_setting.get_setting_data()
+        setting_data : TestSettingStruct= trade_setting.get_setting_data()
         
         # 模型参数
         model_config = ModelFactory().get_config_dict(self.top_dock.id)
-        strategy = StrategyFactory(trade_setting.strategy_name)
+        strategy = StrategyFactory(setting_data.strategy_name)
 
         daemon = TradingFactory().create_daemon(self.top_dock.id, self.mode, strategy, setting_data)
         daemon.start()

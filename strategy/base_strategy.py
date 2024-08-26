@@ -35,8 +35,8 @@ class BaseStrategy(ABC):
     parameters = []
     variables = []
 
-    def __init__(self, app_engine: StrategyInterface,  vt_symbol: str, setting: dict):
-        self.app_engine = app_engine
+    def __init__(self, strategy_engine: StrategyInterface,  vt_symbol: str, setting: dict):
+        self.strategy_engine = strategy_engine
         self.vt_symbol = vt_symbol
 
         self.inited = False
@@ -189,14 +189,12 @@ class BaseStrategy(ABC):
 
     #         self.app_engine.preload_bar(count, callback)
 
-    def preload_bar(self, count: int,  callback: Callable[[BarData], None] = None, interval: Interval = Interval.MINUTE):
-        """
-        预加载历史K线数据
-        """
+    def preload_bar(self, count: int,  callback: Callable[[BarStruct], None] = None, interval: Interval):
+        """ 预加载历史K线数据 """
         if not callback:
             callback = self.on_bar
 
-        self.app_engine.preload_bar(count, callback, interval)
+        self.strategy_engine.preload_bar(count, callback, interval)
 
     def load_tick(self, days: int):
         """

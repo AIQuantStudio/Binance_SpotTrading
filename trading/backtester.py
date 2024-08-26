@@ -25,6 +25,9 @@ class Backtester:
     #     self._backtesting = BacktesterEngine(data)
         
     
+    def clear_data(self):
+        self._history_data.clear()
+        
     def load_history_data(self):
         self.write_log("开始加载历史数据")
 

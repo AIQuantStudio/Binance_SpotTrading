@@ -26,7 +26,6 @@ class TradingDaemon:
             pass
         elif self.setting_mode == TradeSettingMode.TEST:
             self.backtester = Backtester(self.model_id, self.strategy, self.setting_data)
-            # self.backtester.start()
             
             if self.thread is not None:
                 # self._write_log("已有任务在运行中，请等待完成")
@@ -46,6 +45,8 @@ class TradingDaemon:
             self.thread = None
             return
 
+        # self.backtester.calculate_statistics()
+        
         # self.result_df = self._backtesting.calculate_result()
         # self.result_statistics = self._backtesting.calculate_statistics(output=False)
 

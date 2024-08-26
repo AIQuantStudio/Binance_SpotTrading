@@ -30,3 +30,12 @@ class AccountSetting:
             "DB": "./test.db"
         },
     ]
+    
+@dataclass
+class StrategySetting:
+    Strategies = [
+        {
+            "Name": "Simple",
+            "Class": "SimpleStrategy"
+        },
+    ]

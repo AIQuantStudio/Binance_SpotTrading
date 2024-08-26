@@ -43,6 +43,7 @@ class TestSettingStruct:
     end_datetime: datetime
     refer_currency: str
     trade_amount: float
+    strategy_name: str
     
     
 @dataclass

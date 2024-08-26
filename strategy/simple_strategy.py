@@ -13,12 +13,9 @@ class AtrRsiStrategy(BaseStrategy):
     name = "AtrRsiStrategy"
     author = "用Python的交易员"
 
-    atr_length = 22
-    atr_ma_length = 10
-    rsi_length = 5
-    rsi_entry = 16
-    trailing_percent = 0.8
-    fixed_size = 1
+    refer_currency = 22
+    trade_amount = 10
+
 
     atr_value = 0
     atr_ma = 0
@@ -28,11 +25,10 @@ class AtrRsiStrategy(BaseStrategy):
     intra_trade_high = 0
     intra_trade_low = 0
 
-    parameters = ["atr_length", "atr_ma_length", "rsi_length", "rsi_entry", "trailing_percent", "fixed_size"]
+    parameters = ["refer_currency", "trade_amount"]
     variables = ["atr_value", "atr_ma", "rsi_value", "rsi_buy", "rsi_sell", "intra_trade_high", "intra_trade_low"]
 
     def __init__(self, engine: Any, vt_symbol: str, setting: Dict):
-        """"""
         super().__init__(engine, vt_symbol, setting)
 
         self.history_bar: OrderedDict[datetime, Dict] = {}

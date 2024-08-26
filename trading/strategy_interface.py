@@ -16,7 +16,7 @@ class StrategyInterface(ABC):
         self.mode = mode
 
     @Wrapper.virtual
-    def preload_bar(self, count: int, callback: Callable[[BarData], None], interval: Interval):
+    def preload_bar(self, count: int, callback: Callable[[BarStruct], None], interval: Interval):
         pass
 
     # @Wrapper.virtual
