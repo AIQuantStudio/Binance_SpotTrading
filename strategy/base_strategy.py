@@ -8,6 +8,10 @@ from harvester.common import Utils, Wrapper
 
 from .engine import StrategyEngine
 
+from app_engine import AppEngine
+from event import Event, EVENT_LOG
+from structure import LogStruct
+
 
 class BaseStrategy(ABC):
     """
@@ -31,7 +35,7 @@ class BaseStrategy(ABC):
     parameters = []
     variables = []
 
-    def __init__(self, app_engine: StrategyEngine,  vt_symbol: str, setting: dict):
+    def __init__(self, app_engine: StrategyInterface,  vt_symbol: str, setting: dict):
         self.app_engine = app_engine
         self.vt_symbol = vt_symbol
 
@@ -244,3 +248,7 @@ class BaseStrategy(ABC):
     #     返回当前服务状态(回测，实盘)
     #     """
     #     return self.app_engine.get_mode()
+
+    def write_log(self, msg):
+        AppEngine.write_log(msg)
+        AppEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.model_id)

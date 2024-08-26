@@ -6,18 +6,17 @@ from harvester.enumeration import Direction, Interval, Offset, AppEngineMode
 from harvester.structure import TickData, BarData
 from harvester.common import Wrapper
 
+from structure import Interval
 
-class StrategyEngine(ABC):
-    """"""
 
-    def __init__(self, main_engine: MainEngine, mode: AppEngineMode):
-        """"""
-        self.main_engine = main_engine
+class StrategyInterface(ABC):
+
+    def __init__(self, model_id, mode: TradeSettingMode):
+        # self.main_engine = main_engine
         self.mode = mode
 
     @Wrapper.virtual
-    def preload_bar(self, count: int, callback: Callable[[BarData], None], interval: Interval = Interval.MINUTE):
-        """"""
+    def preload_bar(self, count: int, callback: Callable[[BarData], None], interval: Interval):
         pass
 
     # @Wrapper.virtual

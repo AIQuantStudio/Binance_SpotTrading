@@ -31,8 +31,7 @@ from .optimization_setting import OptimizationSetting
 # creator.create("Individual", list, fitness=creator.FitnessMax)
 
 
-class BacktesterEngine(StrategyEngine):
-    """"""
+class StrategyBacktester(StrategyInterface):
 
     engine_mode = AppEngineMode.BACKTESTING
     gateway_name = "BACKTESTING"
@@ -89,6 +88,12 @@ class BacktesterEngine(StrategyEngine):
         self._result_df = None
         self._result_statistics = None
         self._result_values = None
+        
+    def preload_bar(self, count: int, callback: Callable[[BarData], None], interval: Interval):
+        """ 实现 StrategyInterface::preload_bar """
+        self._preload_count = count
+        self._pre_interval = interval
+        self._preload_callback = callback
 
     @property
     def mode(self):
@@ -827,11 +832,7 @@ class BacktesterEngine(StrategyEngine):
             self.strategy.pos += pos_change
             self.strategy.on_trade(trade)
 
-    def preload_bar(self, count: int, callback: Callable[[BarData], None], interval: Interval = Interval.MINUTE):
-        """ 实现 StrategyEngine::preload_bar """
-        self._preload_count = count
-        self._pre_interval = interval
-        self._preload_callback = callback
+    
 
     # def load_bar(self, vt_symbol: str, days: int, interval: Interval, callback: Callable, use_database: bool):
     #     """ 实现 StrategyEngine::load_bar """
