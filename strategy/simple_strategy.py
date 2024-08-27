@@ -2,9 +2,7 @@ from datetime import datetime
 from collections import OrderedDict
 from typing import Any, Dict
 
-from ..base import BaseStrategy
-from harvester.structure import TickData, BarData, TradeData, OrderData, StoporderData
-from harvester.common import BarGenerator, BarSerial
+from strategy.base_strategy import BaseStrategy
 
 from structure import BarStruct
 
@@ -30,13 +28,13 @@ class AtrRsiStrategy(BaseStrategy):
     parameters = ["refer_currency", "trade_amount"]
     variables = ["atr_value", "atr_ma", "rsi_value", "rsi_buy", "rsi_sell", "intra_trade_high", "intra_trade_low"]
 
-    def __init__(self, engine: Any, vt_symbol: str, setting: Dict):
-        super().__init__(engine, vt_symbol, setting)
+    def __init__(self):
+        super().__init__()
 
         self.history_bar: OrderedDict[datetime, BarStruct] = {}
         self.history_predict: OrderedDict[datetime, float] = {}
 
-        self.last_bar :BarData = None
+        self.last_bar :BarStruct = None
         self.last_predict_price:float = 0
         self.last_predict_datetime:datetime = None
         

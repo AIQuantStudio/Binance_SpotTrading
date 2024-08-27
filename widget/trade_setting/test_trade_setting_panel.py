@@ -12,10 +12,10 @@ from setting import StrategySetting
 
 class TestTradeSettingPanel(QFrame, TradeSettingInterface):
 
-    def __init__(self, parent_widget, top_dock):
+    def __init__(self, parent_widget, app_id):
         super().__init__(parent_widget)
 
-        self.top_dock = top_dock
+        self.app_id = app_id
 
         self.setLineWidth(2)
         self.setMidLineWidth(2)
@@ -33,7 +33,7 @@ class TestTradeSettingPanel(QFrame, TradeSettingInterface):
         self.end_datetime_edit.setDateTime(QDateTime(datetime(2024, 1, 2)))
 
         self.refer_currency_combobox = QComboBox()
-        self.refer_currency_combobox.addItems([currency for currency in ModelFactory().get_model_curreny(self.top_dock.id)])
+        self.refer_currency_combobox.addItems([currency for currency in ModelFactory().get_model_curreny(self.app_id)])
         self.refer_currency_combobox.setItemDelegate(QStyledItemDelegate())
 
         double_validator = QDoubleValidator()

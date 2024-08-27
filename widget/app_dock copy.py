@@ -2,13 +2,13 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-# from app_engine import AppEngine
+# from app_engine import MainEngine
 # from model import ModelFactory
 
 from widget.dock_frame import DockFrame
 
 
-class MainDock(QDockWidget):
+class AppDock(QDockWidget):
 
     def __init__(self, parent_widget, name, id):
         super().__init__(name, parent_widget)
@@ -25,7 +25,7 @@ class MainDock(QDockWidget):
         self.close_signal = signal
 
     def closeEvent(self, event: QCloseEvent) -> None:
-        """重写 MainDock::closeEvent"""
+        """重写 AppDock::closeEvent"""
         reply = QMessageBox.question(self, "关闭", "确认关闭？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
             self.dock_frame.close()

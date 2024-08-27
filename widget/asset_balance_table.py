@@ -5,7 +5,7 @@ from typing import Dict
 
 from structure import AssetBalanceData
 from event import Event, EVENT_ASSET_BALANCE
-from app_engine import AppEngine
+from main_engine import MainEngine
 
 from widget.asset_balance_cells.asset_balance_str_cell import AssetBalanceStrCell
 from widget.asset_balance_cells.asset_balance_float_cell import AssetBalanceFloatCell
@@ -23,10 +23,10 @@ class AssetBalanceTable(QTableWidget):
         "free": {"display": "可用", "type": AssetBalanceFloatCell,  "width_factor": 4},
     }
     
-    def __init__(self, parent_widget, top_dock):
+    def __init__(self, parent_widget, app_id):
         super().__init__(parent_widget)
         
-        self.top_dock = top_dock
+        self.app_id = app_id
 
         self.record_cells: Dict[str, dict] = {}
         self.record_tables: Dict[str, QTableWidget] = {}
@@ -36,7 +36,7 @@ class AssetBalanceTable(QTableWidget):
         # self.register_event()
         
         self.signal_refresh_asset_balance.connect(self.process_refresh_asset_balance_event)
-        AppEngine.event_engine.register(EVENT_ASSET_BALANCE, self.signal_refresh_asset_balance.emit)
+        MainEngine.event_engine.register(EVENT_ASSET_BALANCE, self.signal_refresh_asset_balance.emit)
     
     def event(self, event: QEvent) -> bool:
         """ 重写 QTableWidget::event 用于设定列宽 """
@@ -105,5 +105,5 @@ class AssetBalanceTable(QTableWidget):
             self.removeRow(row)
     
     def close(self):
-        AppEngine.event_engine.unregister(EVENT_ASSET_BALANCE, self.signal_refresh_asset_balance.emit)
+        MainEngine.event_engine.unregister(EVENT_ASSET_BALANCE, self.signal_refresh_asset_balance.emit)
         return super().close()

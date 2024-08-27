@@ -11,10 +11,10 @@ from setting import AccountSetting
 
 
 class SelectAccountDialog(QDialog):
-    def __init__(self, parent_widget, model_id):
+    def __init__(self, parent_widget, app_id):
         super().__init__(parent_widget)
         
-        self.model_id = model_id
+        self.app_id = app_id
         self.setWindowTitle("选择Binance账号")
         self.setFixedSize(300, 120 + 30*len(AccountSetting.Accounts))
 
@@ -72,7 +72,7 @@ class SelectAccountDialog(QDialog):
     def on_click_load_account(self, account_data):
         # ba = BianceTestAccountData(name=data["Name"], id=data["Account"], db=data["DB"])
 
-        success = AccountFactory().load_account(self.model_id, account_data)
+        success = AccountFactory().load_account(self.app_id, account_data)
         if not success:
             QMessageBox.warning(self, "警告", f"账户[{account_data['Name']}]加载失败！", QMessageBox.StandardButton.Ok)
             return

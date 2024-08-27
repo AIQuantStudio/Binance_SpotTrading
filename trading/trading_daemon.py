@@ -3,7 +3,7 @@ from threading import Thread
 from trading.backtester import Backtester
 from event import EVENT_MAKE_ORDER, EVENT_DEAL_ORDER
 from structure import TradeSettingMode
-from app_engine import AppEngine
+from main_engine import MainEngine
 
 
 class TradingDaemon:
@@ -58,8 +58,8 @@ class TradingDaemon:
             
     
     def stop(self):
-        # AppEngine.event_engine.unregister(self.process_make_order)
-        # AppEngine.event_engine.unregister(self.process_deal_order)
+        # MainEngine.event_engine.unregister(self.process_make_order)
+        # MainEngine.event_engine.unregister(self.process_deal_order)
         self.thread_alive = False
         # self.thread.join()
 

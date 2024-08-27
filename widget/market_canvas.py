@@ -8,16 +8,16 @@ from widget.market_figure import MarketFigure
 
 from model import ModelFactory
 from exchange import BinanceMarket
-from app_engine import AppEngine
+from main_engine import MainEngine
 
 
 class MarketCanvas(QFrame):
 
-    def __init__(self, parent_widget, top_dock):
+    def __init__(self, parent_widget, app_id):
         super().__init__(parent_widget)
         
-        self.top_dock = top_dock
-        self.symbol = ModelFactory().get_model_symbol(self.top_dock.id)
+        self.app_id = app_id
+        self.symbol = ModelFactory().get_model_symbol(self.app_id)
 
         self.setLineWidth(2)
         self.setMidLineWidth(2)
@@ -58,10 +58,10 @@ class MarketCanvas(QFrame):
         
 
     def start_market(self):
-        AppEngine.event_engine.register_timer(self.refresh_cline, interval=1)
+        MainEngine.event_engine.register_timer(self.refresh_cline, interval=1)
         
     def stop_market(self):
-        AppEngine.event_engine.unregister_timer(self.refresh_cline)
+        MainEngine.event_engine.unregister_timer(self.refresh_cline)
         
     def refresh_cline(self):
         data = BinanceMarket().get_last_klines(self.symbol)

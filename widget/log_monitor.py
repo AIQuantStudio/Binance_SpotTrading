@@ -2,7 +2,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from app_engine import AppEngine
+from main_engine import MainEngine
 from event import Event, EVENT_LOG
 from structure import LogStruct
 from widget.log_monitor_cells.log_msg_cell import LogMsgCell
@@ -17,10 +17,10 @@ class LogMonitor(QTableWidget):
         "msg": {"display": "信息", "type": LogMsgCell, "width_factor": 7},
     }
 
-    def __init__(self, parent_widget, top_dock):
+    def __init__(self, parent_widget, app_id):
         super().__init__(parent_widget)
 
-        self.top_dock = top_dock
+        self.app_id = app_id
         self._first_painted = False
 
         self.init_ui()
@@ -51,7 +51,7 @@ class LogMonitor(QTableWidget):
 
     def register_event(self):
         self.signal.connect(self.process_event)
-        AppEngine.event_engine.register(EVENT_LOG, self.signal.emit, suffix=self.top_dock.id)
+        MainEngine.event_engine.register(EVENT_LOG, self.signal.emit, suffix=self.app_id)
 
     def process_event(self, event: Event):
         log_data: LogStruct = event.data
@@ -66,6 +66,6 @@ class LogMonitor(QTableWidget):
 
     def close(self) -> bool:
         self.signal.disconnect(self.process_event)
-        AppEngine.event_engine.unregister(EVENT_LOG, self.signal.emit, suffix=self.top_dock.id)
+        MainEngine.event_engine.unregister(EVENT_LOG, self.signal.emit, suffix=self.app_id)
 
         return super().close()

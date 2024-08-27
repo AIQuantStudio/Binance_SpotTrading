@@ -1,4 +1,4 @@
-from typing import Any, Sequence, Type, Dict
+from typing import Dict
 
 from common import singleton
 from event import EventEngine
@@ -6,7 +6,7 @@ from service import BaseService, LogService, EmailService
 
 
 @singleton
-class AppEngineSingleton:
+class MainEngineSingleton:
 
     def __init__(self):
         self._services : Dict[str, BaseService] = {}
@@ -60,4 +60,4 @@ class AppEngineSingleton:
         self.log_service.write(msg)
         
 
-AppEngine = AppEngineSingleton()
+MainEngine = MainEngineSingleton()

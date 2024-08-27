@@ -2,7 +2,7 @@ from threading import Thread
 from datetime import date, datetime, timedelta
 from functools import lru_cache
 
-from app_engine import AppEngine
+from main_engine import MainEngine
 from model import ModelFactory
 from structure import TestSettingStruct, LogStruct, BarStruct
 from event import Event, EVENT_LOG
@@ -84,7 +84,7 @@ class Backtester:
                 break
 
             count += 1
-            self.datetime = bar_data.datetime
+            # self.datetime = bar_data.datetime
 
             try:
                 # self._preload_callback(bar_data)
@@ -118,7 +118,7 @@ class Backtester:
 
         self.strategy.on_bar(bar)
 
-        self.update_daily_close(bar.close_price)
+        # self.update_daily_close(bar.close_price)
 
     def resume(self):
         pass
@@ -130,8 +130,8 @@ class Backtester:
         pass
     
     def write_log(self, msg):
-        AppEngine.write_log(msg)
-        AppEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.model_id)
+        MainEngine.write_log(msg)
+        MainEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.model_id)
         
         
 @lru_cache(maxsize=999)

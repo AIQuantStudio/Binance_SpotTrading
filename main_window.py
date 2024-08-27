@@ -2,25 +2,25 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
-from app_engine import AppEngine
+from main_engine import MainEngine
 from config import Config
-from widget import MainDock, SelectModelDialog, AboutDialog
+from widget import AppDock, SelectModelDialog, AboutDialog
 from model import ModelFactory
 
 
 class MainWindow(QMainWindow):
 
-    signal_close_dock: pyqtSignal = pyqtSignal(MainDock)
+    signal_close_app: pyqtSignal = pyqtSignal(AppDock)
 
     def __init__(self, app_title):
         super().__init__()
 
-        self.dock_widgets: list[MainDock] = list()
+        self.app_docks: list[AppDock] = list()
 
         self.setWindowTitle(app_title)
         self.setup_ui()
 
-        self.signal_close_dock.connect(self.process_close_dock)
+        self.signal_close_app.connect(self.process_close_app)
 
     def setup_ui(self):
         self.resize(Config.get("main_window.width", 900), Config.get("main_window.height", 600))
@@ -57,27 +57,27 @@ class MainWindow(QMainWindow):
         if model_id != QDialog.DialogCode.Rejected:
             model_name = ModelFactory().get_model_name(model_id)
             model_symbol = ModelFactory().get_model_symbol(model_id)
-            main_dock = MainDock(self, f"{model_name} {model_symbol}", model_id)
-            main_dock.register_close_signal(self.signal_close_dock)
-            self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, main_dock, Qt.Orientation.Vertical)
-            self.dock_widgets.append(main_dock)
+            app_dock = AppDock(self, f"{model_name} {model_symbol}", model_id)
+            app_dock.register_close_signal(self.signal_close_app)
+            self.addDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, app_dock, Qt.Orientation.Vertical)
+            self.app_docks.append(app_dock)
 
     def on_click_about(self):
         dlg = AboutDialog(self)
         dlg.exec()
 
-    def process_close_dock(self, dock_widget: MainDock):
-        if dock_widget in self.dock_widgets:
-            self.dock_widgets.remove(dock_widget)
+    def process_close_app(self, app: AppDock):
+        if app in self.app_docks:
+            self.app_docks.remove(app)
 
     def closeEvent(self, event: QEvent) -> None:
-        """重写 QMainWindow::closeEvent"""
+        """ 重写 QMainWindow::closeEvent """
         reply = QMessageBox.question(self, "退出", "确认退出？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
-            for dock in self.dock_widgets:
-                dock.close()
-            self.dock_widgets = []
-            AppEngine.close()
+            for app in self.app_docks:
+                app.close()
+            self.app_docks = []
+            MainEngine.close()
             event.accept()
             QApplication.quit()
         else:

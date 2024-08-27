@@ -22,11 +22,11 @@ class PredictPriceTable(QTableWidget):
         "trend": {"display": "涨跌", "type": PredictPriceTrendCell,  "width_factor": 2},
     }
     
-    def __init__(self, parent_widget, top_dock):
+    def __init__(self, parent_widget, app_id):
         """"""
         super().__init__(parent_widget)
         
-        self.top_dock = top_dock
+        self.app_id = app_id
 
         self.record_cells: Dict[str, dict] = {} # 记录返回数据
         self.record_tables: Dict[str, QTableWidget] = {} # 记录表格

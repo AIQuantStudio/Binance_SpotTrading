@@ -3,7 +3,7 @@ from functools import lru_cache
 from datetime import date, datetime, timedelta
 import time
 
-from app_engine import AppEngine
+from main_engine import MainEngine
 from model import ModelFactory
 from structure import TestSettingStruct, LogStruct
 from event import Event, EVENT_LOG
@@ -129,8 +129,8 @@ class BacktesterEngine:
         self.update_daily_close(bar.close_price)
         
     def write_log(self, msg):
-        AppEngine.write_log(msg)
-        AppEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.model_id)
+        MainEngine.write_log(msg)
+        MainEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.model_id)
 
 
     def send_order(self, strategy: BaseStrategy, direction: Direction, offset: Offset, price: float, volume: float, stop: bool, lock: bool):

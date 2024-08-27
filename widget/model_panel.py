@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from config import Config
-from app_engine import AppEngine
+from main_engine import MainEngine
 from model import ModelFactory
 from event import Event, EVENT_PREDICT
 
@@ -148,14 +148,14 @@ class ModelPanel(QFrame):
         self.stop_prediction_btn.setEnabled(True)
 
         interval = int(self.predict_interval_edit.text())
-        AppEngine.event_engine.register_timer(self.predict, interval=interval)
+        MainEngine.event_engine.register_timer(self.predict, interval=interval)
 
     def on_stop_predict(self):
         pass
         # self.start_prediction_btn.setEnabled(True)
         # self.stop_prediction_btn.setDisabled(True)
 
-        AppEngine.event_engine.unregister_timer(self.predict)
+        MainEngine.event_engine.unregister_timer(self.predict)
 
     def predict(self):
         predict_price = ModelFactory().predict(self.top_dock.id, gpu=self.gpu_checkbox.checkState() == Qt.CheckState.Checked)

@@ -8,10 +8,10 @@ from widget.trade_setting.trade_setting_interface import TradeSettingInterface
 
 class EmptyTradeSettingPanel(QFrame, TradeSettingInterface):
 
-    def __init__(self, parent_widget, top_dock):
+    def __init__(self, parent_widget, app_id):
         QFrame.__init__(self, parent_widget)
         
-        self.top_dock = top_dock
+        self.app_id = app_id
 
         self.setLineWidth(2)
         self.setMidLineWidth(2)

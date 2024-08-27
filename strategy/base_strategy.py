@@ -4,7 +4,7 @@ from typing import Any, Callable
 
 
 
-from app_engine import AppEngine
+from main_engine import MainEngine
 from event import Event, EVENT_LOG
 from structure import LogStruct, BarStruct, Interval
 
@@ -31,9 +31,9 @@ class BaseStrategy(ABC):
     parameters = []
     variables = []
 
-    def __init__(self, strategy_engine: StrategyInterface,  vt_symbol: str, setting: dict):
-        self.strategy_engine = strategy_engine
-        self.vt_symbol = vt_symbol
+    def __init__(self):
+        # self.strategy_engine = strategy_engine
+        # self.vt_symbol = vt_symbol
 
         self.inited = False
         self.trading = False
@@ -45,7 +45,7 @@ class BaseStrategy(ABC):
         self.variables.insert(1, "trading")
         self.variables.insert(2, "pos")
 
-        self.update_parameters(setting)
+        # self.update_parameters(setting)
     
     @abstractmethod
     def on_init(self):
@@ -101,141 +101,141 @@ class BaseStrategy(ABC):
     
     
     
-    @Wrapper.virtual
+    # @Wrapper.virtual
     def on_start(self):
         """"""
         pass
 
-    @Wrapper.virtual
+    # @Wrapper.virtual
     def on_stop(self):
         """"""
         pass
 
-    @Wrapper.virtual
-    def on_tick(self, tick: TickData):
+    # # @Wrapper.virtual
+    # def on_tick(self, tick: TickData):
+    #     """"""
+    #     pass
+
+    # @Wrapper.virtual
+    def on_bar(self, bar: BarStruct):
         """"""
         pass
 
-    @Wrapper.virtual
-    def on_bar(self, bar: BarData):
-        """"""
-        pass
+    # # @Wrapper.virtual
+    # def on_trade(self, trade: TradeData):
+    #     """"""
+    #     pass
 
-    @Wrapper.virtual
-    def on_trade(self, trade: TradeData):
-        """"""
-        pass
+    # # @Wrapper.virtual
+    # def on_order(self, order: OrderData):
+    #     """"""
+    #     pass
 
-    @Wrapper.virtual
-    def on_order(self, order: OrderData):
-        """"""
-        pass
+    # # @Wrapper.virtual
+    # def on_stoporder(self, stop_order: StoporderData):
+    #     """"""
+    #     pass
 
-    @Wrapper.virtual
-    def on_stoporder(self, stop_order: StoporderData):
-        """"""
-        pass
-
-    def buy(self, price: float, volume: float, stop: bool = False, lock: bool = False):
-        """
-        买单或多单开单
-        """
-        return self.send_order(Direction.BUY, Offset.OPEN, price, volume, stop, lock)
-
-    def sell(self, price: float, volume: float, stop: bool = False, lock: bool = False):
-        """
-        卖单或多单平仓
-        """
-        return self.send_order(Direction.SELL, Offset.CLOSE, price, volume, stop, lock)
-
-    def short(self, price: float, volume: float, stop: bool = False, lock: bool = False):
-        """
-        空单开仓
-        """
-        return self.send_order(Direction.SELL, Offset.OPEN, price, volume, stop, lock)
-
-    def cover(self, price: float, volume: float, stop: bool = False, lock: bool = False):
-        """
-        空单平仓
-        """
-        return self.send_order(Direction.BUY, Offset.CLOSE, price, volume, stop, lock)
-
-    def send_order(self, direction: Direction, offset: Offset, price: float, volume: float, stop: bool = False, lock: bool = False):
-        """"""
-        if self.trading:
-            vt_orderids = self.app_engine.send_order(direction, offset, price, volume, stop, lock)
-            return vt_orderids
-        else:
-            return []
-
-    def cancel_order(self, vt_order_id: str):
-        """"""
-        if self.trading:
-            self.app_engine.cancel_order(vt_order_id)
-
-    def cancel_all(self):
-        """"""
-        if self.trading:
-            self.app_engine.cancel_all()
-
-    def write_log(self, msg: str):
-        """"""
-        self.app_engine.write_log(msg)
-
-    # def preload_backtest_bar(self, count: int, callback: Callable[[TickData], None] = None):
+    # def buy(self, price: float, volume: float, stop: bool = False, lock: bool = False):
     #     """
-    #     预加载历史K线数据
+    #     买单或多单开单
     #     """
-    #     if self.app_engine.mode == AppEngineMode.BACKTESTING:
-    #         if not callback:
-    #             callback = self.on_bar
+    #     return self.send_order(Direction.BUY, Offset.OPEN, price, volume, stop, lock)
 
-    #         self.app_engine.preload_bar(count, callback)
+    # def sell(self, price: float, volume: float, stop: bool = False, lock: bool = False):
+    #     """
+    #     卖单或多单平仓
+    #     """
+    #     return self.send_order(Direction.SELL, Offset.CLOSE, price, volume, stop, lock)
 
-    def preload_bar(self, count: int,  callback: Callable[[BarStruct], None] = None, interval=Interval.MINUTE):
-        """ 预加载历史K线数据 """
-        if not callback:
-            callback = self.on_bar
+    # def short(self, price: float, volume: float, stop: bool = False, lock: bool = False):
+    #     """
+    #     空单开仓
+    #     """
+    #     return self.send_order(Direction.SELL, Offset.OPEN, price, volume, stop, lock)
 
-        self.strategy_engine.preload_bar(count, callback, interval)
+    # def cover(self, price: float, volume: float, stop: bool = False, lock: bool = False):
+    #     """
+    #     空单平仓
+    #     """
+    #     return self.send_order(Direction.BUY, Offset.CLOSE, price, volume, stop, lock)
 
-    def load_tick(self, days: int):
-        """
-        为初始化策略加载历史切片数据
-        """
-        self.app_engine.load_tick(days, self.on_tick)
+    # def send_order(self, direction: Direction, offset: Offset, price: float, volume: float, stop: bool = False, lock: bool = False):
+    #     """"""
+    #     if self.trading:
+    #         vt_orderids = self.app_engine.send_order(direction, offset, price, volume, stop, lock)
+    #         return vt_orderids
+    #     else:
+    #         return []
 
-    def load_bar(self, days: int, interval: Interval = Interval.MINUTE, callback: Callable[[BarData], None] = None, use_database: bool = False):
-        """
-        为初始化策略加载历史K线数据
-        """
-        if not callback:
-            callback = self.on_bar
+    # def cancel_order(self, vt_order_id: str):
+    #     """"""
+    #     if self.trading:
+    #         self.app_engine.cancel_order(vt_order_id)
 
-        self.app_engine.load_bar(days, interval, callback, use_database)
+    # def cancel_all(self):
+    #     """"""
+    #     if self.trading:
+    #         self.app_engine.cancel_all()
 
-    def get_pricetick(self):
-        """
-        返回合约的价格切片
-        """
-        return self.app_engine.get_pricetick()
+    # def write_log(self, msg: str):
+    #     """"""
+    #     self.app_engine.write_log(msg)
 
-    def send_email(self, msg):
-        """
-        发送邮件
-        """
-        if self.inited:
-            self.app_engine.send_email(msg)
+    # # def preload_backtest_bar(self, count: int, callback: Callable[[TickData], None] = None):
+    # #     """
+    # #     预加载历史K线数据
+    # #     """
+    # #     if self.app_engine.mode == AppEngineMode.BACKTESTING:
+    # #         if not callback:
+    # #             callback = self.on_bar
 
-    def update_strategy_status(self):
-        """"""
-        if self.inited:
-            if self.app_engine.mode == AppEngineMode.TRADER:
-                event = {
-                    "type": "update_trading_controller",
-                    "data": self.app_engine.name,
-                }
-                self.app_engine.put_strategy_event(event)
+    # #         self.app_engine.preload_bar(count, callback)
+
+    # def preload_bar(self, count: int,  callback: Callable[[BarStruct], None] = None, interval=Interval.MINUTE):
+    #     """ 预加载历史K线数据 """
+    #     if not callback:
+    #         callback = self.on_bar
+
+    #     self.strategy_engine.preload_bar(count, callback, interval)
+
+    # def load_tick(self, days: int):
+    #     """
+    #     为初始化策略加载历史切片数据
+    #     """
+    #     self.app_engine.load_tick(days, self.on_tick)
+
+    # def load_bar(self, days: int, interval: Interval = Interval.MINUTE, callback: Callable[[BarData], None] = None, use_database: bool = False):
+    #     """
+    #     为初始化策略加载历史K线数据
+    #     """
+    #     if not callback:
+    #         callback = self.on_bar
+
+    #     self.app_engine.load_bar(days, interval, callback, use_database)
+
+    # def get_pricetick(self):
+    #     """
+    #     返回合约的价格切片
+    #     """
+    #     return self.app_engine.get_pricetick()
+
+    # def send_email(self, msg):
+    #     """
+    #     发送邮件
+    #     """
+    #     if self.inited:
+    #         self.app_engine.send_email(msg)
+
+    # def update_strategy_status(self):
+    #     """"""
+    #     if self.inited:
+    #         if self.app_engine.mode == AppEngineMode.TRADER:
+    #             event = {
+    #                 "type": "update_trading_controller",
+    #                 "data": self.app_engine.name,
+    #             }
+    #             self.app_engine.put_strategy_event(event)
 
     # def sync_data(self):
     #     """
@@ -251,5 +251,5 @@ class BaseStrategy(ABC):
     #     return self.app_engine.get_mode()
 
     def write_log(self, msg):
-        AppEngine.write_log(msg)
-        AppEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.model_id)
+        MainEngine.write_log(msg)
+        MainEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.model_id)

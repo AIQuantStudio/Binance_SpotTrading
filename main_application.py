@@ -1,7 +1,7 @@
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
-from app_engine import AppEngine
+from main_engine import MainEngine
 import sys
 import traceback
 import types
@@ -16,13 +16,13 @@ def create_application(app_name):
     sys.excepthook = excepthook
     
     Config.init_config()
-    AppEngine.start()
+    MainEngine.start()
 
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(True)
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt6())
     app.setFont(QFont(Config.get("font.family"), Config.get("font.size")))
-    app.setWindowIcon(QIcon(("app.ico")))
+    app.setWindowIcon(QIcon(("logo.ico")))
     app.setApplicationDisplayName(app_name)
     if "Windows" in platform.uname():
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_name)

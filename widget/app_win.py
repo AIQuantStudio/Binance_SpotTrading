@@ -2,56 +2,124 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
+from main_engine import MainEngine
+from model import ModelFactory
+from account import AccountFactory
+from trading import TradingFactory
+from strategy import StrategyFactory
+# from widget.model_panel import ModelPanel
+# from widget.trade_panel import TradePanel
+from widget.log_monitor import LogMonitor
+from widget.market_canvas import MarketCanvas
 from widget.asset_balance_table import AssetBalanceTable
-
 from widget.trade_history_table import TradeHistoryMonitor
-from widget import SelectAccountDialog
+from widget.select_account_dialog import SelectAccountDialog
 from widget.trade_setting.trade_setting_interface import TradeSettingInterface
 from widget.trade_setting.empty_trade_setting_panel import EmptyTradeSettingPanel
 from widget.trade_setting.normal_trade_setting_panel import NormalTradeSettingPanel
 from widget.trade_setting.test_trade_setting_panel import TestTradeSettingPanel
-
-from structure import TradeSettingMode, AssetBalanceData
-
-# from exchange import BinanceFactory
-from main_engine import MainEngine
-from account import AccountFactory
-from model import ModelFactory
-from trading import TradingFactory
+from structure import TradeSettingMode, AssetBalanceData, LogStruct, TestSettingStruct
 from event import Event, EVENT_ASSET_BALANCE, EVENT_LOG
-from structure import LogStruct, TestSettingStruct
-from strategy import StrategyFactory
+# from exchange.binance_market import BinanceMarket
 
+class AppWin(QFrame):
 
-class TradePanel(QFrame):
-
-    def __init__(self, parent_widget, top_dock):
+    def __init__(self, parent_widget, app_id):
         super().__init__(parent_widget)
 
-        self.top_dock = top_dock
+        self.app_id = app_id
         self.mode = TradeSettingMode.EMPTY
-
+        
         self.setup_ui()
         self.bind_event()
+        
+        self.show_model_info()
+        self.show_market()
 
     def setup_ui(self):
-        main_hbox_layout = QHBoxLayout()
-        self.setLayout(main_hbox_layout)
+        self.setLineWidth(1)
+        self.setMidLineWidth(1)
+        self.setFrameStyle(QFrame.Shape.Box | QFrame.Shadow.Sunken)
 
-        self.main_left_widget = QWidget()
-        main_hbox_layout.addWidget(self.main_left_widget, stretch=3)
+        vbox_layout = QVBoxLayout()
+        vbox_layout.setContentsMargins(5, 0, 0, 0)
+        self.setLayout(vbox_layout)
 
-        self.main_middle_widget = QWidget()
-        main_hbox_layout.addWidget(self.main_middle_widget, stretch=3)
+        # self.model_panel = ModelPanel(self, self.top_dock)
+        # vbox_layout.addWidget(self.model_panel, stretch=6)
+        self.setup_ui_upper_half(vbox_layout)
 
-        self.main_right_widget = QWidget()
-        main_hbox_layout.addWidget(self.main_right_widget, stretch=5)
+        self.line = QFrame(self)
+        self.line.setGeometry(QRect(0, 120, 341, 20))
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
+        self.line.setLineWidth(5)
+        self.line.setFrameShape(QFrame.Shape.HLine)
+        vbox_layout.addWidget(self.line)
 
-        self.setup_left_area_ui(self.main_left_widget)
-        self.setup_middle_area_ui(self.main_middle_widget)
-        self.setup_right_area_ui(self.main_right_widget)
+        # self.trade_panel = TradePanel(self, self.top_dock)
+        # vbox_layout.addWidget(self.trade_panel, stretch=4)
+        self.setup_ui_lower_half(vbox_layout)
 
-    def setup_left_area_ui(self, left_widget: QWidget):
+    def setup_ui_upper_half(self, layout: QVBoxLayout):
+        hbox_layout = QHBoxLayout()
+        layout.addLayout(hbox_layout, stretch=6)
+        
+        left_widget = QWidget()
+        hbox_layout.addWidget(left_widget, stretch=3)
+
+        right_widget = QWidget()
+        hbox_layout.addWidget(right_widget, stretch=10)
+
+        self.setup_ui_upper_half_left_area(left_widget)
+        self.setup_ui_upper_half_right_area(right_widget)
+        
+    def setup_ui_upper_half_left_area(self, left_widget: QWidget):
+        vbox_layout = QVBoxLayout()
+
+        config_info_label = QLabel("配置信息")
+        vbox_layout.addWidget(config_info_label)
+
+        self.config_info_textbrowser = QTextBrowser()
+        self.config_info_textbrowser.setFont(QFont("Courier New", 11))
+        self.config_info_textbrowser.setMaximumHeight(200)
+        vbox_layout.addWidget(self.config_info_textbrowser)
+
+        vertical_sep_line = QFrame(left_widget)
+        vertical_sep_line.setLineWidth(8)
+        vertical_sep_line.setFrameShape(QFrame.Shape.HLine)
+        vertical_sep_line.setFrameShadow(QFrame.Shadow.Sunken)
+        vbox_layout.addWidget(vertical_sep_line)
+
+        self.log_monitor = LogMonitor(self, self.app_id)
+        vbox_layout.addWidget(self.log_monitor)
+
+        left_widget.setLayout(vbox_layout)
+
+    def setup_ui_upper_half_right_area(self, right_widget: QWidget):
+        vbox_layout = QVBoxLayout()
+        right_widget.setLayout(vbox_layout)
+
+        self.market_canvas = MarketCanvas(self, self.app_id)
+        vbox_layout.addWidget(self.market_canvas)
+
+    def setup_ui_lower_half(self, layout: QVBoxLayout):
+        hbox_layout = QHBoxLayout()
+        layout.addLayout(hbox_layout, stretch=4)
+
+        left_widget = QWidget()
+        hbox_layout.addWidget(left_widget, stretch=3)
+
+        middle_widget = QWidget()
+        hbox_layout.addWidget(middle_widget, stretch=3)
+
+        right_widget = QWidget()
+        hbox_layout.addWidget(right_widget, stretch=5)
+
+        self.setup_ui_lower_half_left_area(left_widget)
+        self.setup_ui_lower_half_middle_area(middle_widget)
+        self.setup_ui_lower_half_right_area(right_widget)
+    
+    def setup_ui_lower_half_left_area(self, left_widget: QWidget):
         vbox_layout = QVBoxLayout()
         left_widget.setLayout(vbox_layout)
 
@@ -72,7 +140,7 @@ class TradePanel(QFrame):
         self.account_label.setText("")
         hbox_layout.addWidget(self.account_label, stretch=6)
 
-        self.asset_balance_table = AssetBalanceTable(self, self.top_dock)
+        self.asset_balance_table = AssetBalanceTable(self, self.app_id)
         vbox_layout.addWidget(self.asset_balance_table)
 
         self.show_all_balance_checkbox = QCheckBox()
@@ -80,16 +148,16 @@ class TradePanel(QFrame):
         self.show_all_balance_checkbox.setCheckState(Qt.CheckState.Checked)
         self.show_all_balance_checkbox.setDisabled(True)
         vbox_layout.addWidget(self.show_all_balance_checkbox)
-
-    def setup_middle_area_ui(self, middle_widget: QWidget):
+    
+    def setup_ui_lower_half_middle_area(self, middle_widget: QWidget):
         vbox_layout = QVBoxLayout()
         middle_widget.setLayout(vbox_layout)
 
         self.stacked_setting_panel = QStackedWidget(middle_widget)
 
-        self.stacked_setting_panel.addWidget(EmptyTradeSettingPanel(self, self.top_dock))
-        self.stacked_setting_panel.addWidget(NormalTradeSettingPanel(self, self.top_dock))
-        self.stacked_setting_panel.addWidget(TestTradeSettingPanel(self, self.top_dock))
+        self.stacked_setting_panel.addWidget(EmptyTradeSettingPanel(self, self.app_id))
+        self.stacked_setting_panel.addWidget(NormalTradeSettingPanel(self, self.app_id))
+        self.stacked_setting_panel.addWidget(TestTradeSettingPanel(self, self.app_id))
 
         self.trade_setting_panel = self.switch_trade_setting_panel(self.mode)
         vbox_layout.addWidget(self.stacked_setting_panel)
@@ -105,26 +173,12 @@ class TradePanel(QFrame):
         hbox_layout.addWidget(self.stop_trade_btn)
         vbox_layout.addLayout(hbox_layout)
 
-    def setup_right_area_ui(self, right_widget: QWidget):
+    def setup_ui_lower_half_right_area(self, right_widget: QWidget):
         vbox_layout = QVBoxLayout()
         right_widget.setLayout(vbox_layout)
 
-        self.trade_history_monitor = TradeHistoryMonitor(self, self.top_dock)
+        self.trade_history_monitor = TradeHistoryMonitor(self, self.app_id)
         vbox_layout.addWidget(self.trade_history_monitor)
-
-        # widget_control_bar = QWidget()
-        # vbox_layout.addWidget(widget_control_bar, stretch=1)
-        # h_layout = QHBoxLayout()
-        # widget_control_bar.setLayout(h_layout)
-        # self.btn_refresh = QPushButton()
-        # self.btn_refresh.setText("刷新")
-        # h_layout.addWidget(self.btn_refresh, 1)
-
-        # self.button_sid = QPushButton()
-        # self.button_sid.setText("获取Sid")
-        # h_layout.addWidget(self.button_sid, 1)
-
-        # vbox_layout.addLayout(h_layout)
 
         right_widget.setLayout(vbox_layout)
 
@@ -135,16 +189,14 @@ class TradePanel(QFrame):
         self.start_trade_btn.clicked.connect(self.on_click_start_trade)
         self.stop_trade_btn.clicked.connect(self.on_click_stop_trade)
 
-        # MainEngine.event_engine.register(EVENT_TRADE_RECORD, self.event_trade_record)
-
     def on_click_select_account(self):
-        ret = SelectAccountDialog(self, self.top_dock.id).exec()
+        ret = SelectAccountDialog(self, self.app_id).exec()
         if ret == QDialog.DialogCode.Accepted:
             self.load_trade_panel_status()
             self.refresh_asset_balance()
-
+            
     def on_click_remove_account(self):
-        rule = TradeFactory().get_trade_rule(self.top_dock.id)
+        rule = TradeFactory().get_trade_rule(self.app_id)
         if rule is None:
             self.clear_trade_panel_status()
             return
@@ -167,10 +219,10 @@ class TradePanel(QFrame):
         setting_data : TestSettingStruct= trade_setting.get_setting_data()
         
         # 模型参数
-        model_config = ModelFactory().get_config_dict(self.top_dock.id)
+        model_config = ModelFactory().get_config_dict(self.app_id)
         strategy = StrategyFactory(setting_data.strategy_name)
 
-        daemon = TradingFactory().create_daemon(self.top_dock.id, self.mode, strategy, setting_data)
+        daemon = TradingFactory().create_daemon(self.app_id, self.mode, strategy, setting_data)
         daemon.start()
 
     def on_click_stop_trade(self):
@@ -180,13 +232,13 @@ class TradePanel(QFrame):
         trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
         trade_setting.unlock_all()
         
-        daemon = TradingFactory().get_daemon(self.top_dock.id)
+        daemon = TradingFactory().get_daemon(self.app_id)
         daemon.stop()
 
     def refresh_asset_balance(self):
         show_all = self.show_all_balance_checkbox.checkState() == Qt.CheckState.Checked
-        balances = AccountFactory().get_asset_balance(self.top_dock.id)
-        currencies = ModelFactory().get_model_curreny(self.top_dock.id)
+        balances = AccountFactory().get_asset_balance(self.app_id)
+        currencies = ModelFactory().get_model_curreny(self.app_id)
         self.asset_balance_table.clear_contents()
         for balance in balances:
             if show_all == False:
@@ -197,14 +249,14 @@ class TradePanel(QFrame):
             MainEngine.event_engine.put(Event(EVENT_ASSET_BALANCE, account_data))
 
     def load_trade_panel_status(self):
-        self.account_label.setText(AccountFactory().get_name(self.top_dock.id))
+        self.account_label.setText(AccountFactory().get_name(self.app_id))
         self.show_all_balance_checkbox.setEnabled(True)
         self.start_trade_btn.setEnabled(True)
         self.stop_trade_btn.setEnabled(False)
         self.remove_account_btn.setVisible(True)
         self.select_account_btn.setVisible(False)
 
-        if AccountFactory().is_test(self.top_dock.id):
+        if AccountFactory().is_test(self.app_id):
             self.switch_trade_setting_panel(TradeSettingMode.TEST)
         else:
             self.switch_trade_setting_panel(TradeSettingMode.NORMAL)
@@ -231,13 +283,32 @@ class TradePanel(QFrame):
         elif self.mode == TradeSettingMode.TEST:
             self.stacked_setting_panel.setCurrentIndex(2)
 
-    def event_trade_record(self, data):
-        trade_data = data
 
-    def close(self):
+    def show_model_info(self):
+        config = ModelFactory().get_config_dict(self.app_id)
+        if config is not None:
+            s = ""
+            max_len = 0
+            for key in config.keys():
+                if len(key) > max_len:
+                    max_len = len(key)
+            for key, value in config.items():
+                s = s + f"{key:<{max_len+1}}: {value}\n"
+
+            self.config_info_textbrowser.setText(s)
+            
+    def show_market(self):
+        self.market_canvas.start_market()
+
+    def close(self) -> bool:
+        self.market_canvas.stop_market()
+        self.log_monitor.close()
+        # self.model_panel.close()
+        
         self.asset_balance_table.close()
+        # self.trade_panel.close()
         return super().close()
-
+    
     def write_log(self, msg):
         MainEngine.write_log(msg)
-        MainEngine.event_engine.put(event = Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.top_dock.id)
+        MainEngine.event_engine.put(event = Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.app_id)
