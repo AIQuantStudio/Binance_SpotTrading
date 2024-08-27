@@ -1,6 +1,6 @@
 from PyQt6.QtCore import *
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime as dt
 from logging import INFO
 
 from structure.enumeration import Interval
@@ -39,8 +39,8 @@ class BianceTestAccountData:
 class TestSettingStruct:
     
     predict_at_first_time: bool
-    begin_datetime: datetime
-    end_datetime: datetime
+    begin_datetime: dt
+    end_datetime: dt
     refer_currency: str
     trade_amount: float
     strategy_name: str
@@ -52,7 +52,7 @@ class LogStruct:
     level: int = INFO
 
     def __post_init__(self):
-        self.time = datetime.now()
+        self.time = dt.now()
         
 
 @dataclass
@@ -60,7 +60,7 @@ class BarStruct:
     symbol: str
     interval: Interval = None
     
-    datetime: datetime
+    datetime: dt = None
     open_price: float = 0
     high_price: float = 0
     low_price: float = 0

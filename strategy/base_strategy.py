@@ -2,15 +2,11 @@ from abc import ABC, abstractmethod
 from copy import copy
 from typing import Any, Callable
 
-from harvester.enumeration import Interval, Direction, Offset, AppEngineMode
-from harvester.structure import BarData, TickData, OrderData, TradeData, StoporderData
-from harvester.common import Utils, Wrapper
 
-from .engine import StrategyEngine
 
 from app_engine import AppEngine
 from event import Event, EVENT_LOG
-from structure import LogStruct
+from structure import LogStruct, BarStruct, Interval
 
 
 class BaseStrategy(ABC):
@@ -55,6 +51,10 @@ class BaseStrategy(ABC):
     def on_init(self):
         pass
     
+    @abstractmethod
+    def preload(self):
+        pass
+    
     
     def update_parameters(self, setting: dict):
         """"""
@@ -97,7 +97,10 @@ class BaseStrategy(ABC):
         return strategy_data
 
     
-
+    
+    
+    
+    
     @Wrapper.virtual
     def on_start(self):
         """"""
@@ -189,7 +192,7 @@ class BaseStrategy(ABC):
 
     #         self.app_engine.preload_bar(count, callback)
 
-    def preload_bar(self, count: int,  callback: Callable[[BarStruct], None] = None, interval: Interval):
+    def preload_bar(self, count: int,  callback: Callable[[BarStruct], None] = None, interval=Interval.MINUTE):
         """ 预加载历史K线数据 """
         if not callback:
             callback = self.on_bar

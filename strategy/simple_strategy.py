@@ -6,6 +6,8 @@ from ..base import BaseStrategy
 from harvester.structure import TickData, BarData, TradeData, OrderData, StoporderData
 from harvester.common import BarGenerator, BarSerial
 
+from structure import BarStruct
+
 
 class AtrRsiStrategy(BaseStrategy):
     """"""
@@ -31,7 +33,7 @@ class AtrRsiStrategy(BaseStrategy):
     def __init__(self, engine: Any, vt_symbol: str, setting: Dict):
         super().__init__(engine, vt_symbol, setting)
 
-        self.history_bar: OrderedDict[datetime, Dict] = {}
+        self.history_bar: OrderedDict[datetime, BarStruct] = {}
         self.history_predict: OrderedDict[datetime, float] = {}
 
         self.last_bar :BarData = None
@@ -51,6 +53,10 @@ class AtrRsiStrategy(BaseStrategy):
 
         self.preload_bar(10)
         # self.load_bar(10)
+        
+    def preload(self, bar: BarStruct):
+        """重写 BaseStrategy::preload"""
+        self.history_bar[bar.datetime] = bar
 
     def on_start(self):
         """重写 BaseStrategy::on_start"""

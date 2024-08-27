@@ -1,19 +1,25 @@
 from threading import Thread
 from datetime import date, datetime, timedelta
+from functools import lru_cache
 
-from trading.backtester_engine import BacktesterEngine
-from structure import BacktestSettingStruct
+from app_engine import AppEngine
+from model import ModelFactory
+from structure import TestSettingStruct, LogStruct, BarStruct
+from event import Event, EVENT_LOG
+from exchange import BinanceMarket
+from strategy import BaseStrategy
 
 
 class Backtester:
     
-    def __init__(self, model_id, strategy, setting_data):
+    def __init__(self, model_id, strategy:BaseStrategy, setting_data:TestSettingStruct):
         self.model_id = model_id
         self.strategy : BaseStrategy = strategy
 
         self.backtest_setting_data: TestSettingStruct = setting_data
         self._history_data = []
         
+        self._preload_count = 32
         
         # self.model_id = model_id
         # self._backtesting: BacktesterEngine = BacktesterEngine(self.model_id)
@@ -73,15 +79,16 @@ class Backtester:
         count = 0
         ix = 0
         # 预处理数据
-        for ix, data in enumerate(self._history_data):
+        for ix, bar_data in enumerate(self._history_data):
             if count >= self._preload_count:
                 break
 
             count += 1
-            self.datetime = data.datetime
+            self.datetime = bar_data.datetime
 
             try:
-                self._preload_callback(data)
+                # self._preload_callback(bar_data)
+                self.strategy.preload(bar_data)
             except Exception:
                 self.write_log("触发异常，回测终止")
                 # self.write_log(traceback.format_exc())
@@ -121,3 +128,15 @@ class Backtester:
     
     def close(self):
         pass
+    
+    def write_log(self, msg):
+        AppEngine.write_log(msg)
+        AppEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.model_id)
+        
+        
+@lru_cache(maxsize=999)
+def load_bar_data(symbol: str, start: datetime, end: datetime, interval_delta:timedelta):
+    with BinanceMarket() as market:
+        data = market.load_klines(symbol, start, end, interval_delta)
+
+    return data, data[-1][0]
