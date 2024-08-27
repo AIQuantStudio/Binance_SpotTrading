@@ -1,1 +1,2 @@
 from trading.trading_factory import TradingFactory
+from trading.trading_daemon import TradingDaemon

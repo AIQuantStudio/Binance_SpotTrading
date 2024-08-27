@@ -58,9 +58,10 @@ class TradingDaemon:
             
     
     def stop(self):
+        pass
         # MainEngine.event_engine.unregister(self.process_make_order)
         # MainEngine.event_engine.unregister(self.process_deal_order)
-        self.thread_alive = False
+        # self.thread_alive = False
         # self.thread.join()
 
     def resume(self):
@@ -74,3 +75,8 @@ class TradingDaemon:
     
     def process_deal_order(self):
         pass
+    
+    @property
+    def is_running(self):
+        return self.thread is not None and self.thread.is_alive()
+            

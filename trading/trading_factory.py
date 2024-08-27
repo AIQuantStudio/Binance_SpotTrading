@@ -20,7 +20,7 @@ class TradingFactory:
         daemon.close()
         
     def get_daemon(self, model_id):
-        return self._map_model_id_to_trading_daemon.get(model_id)
+        return self._map_model_id_to_trading_daemon.get(model_id, None)
         
     
         

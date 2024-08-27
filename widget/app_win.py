@@ -5,10 +5,8 @@ from PyQt6.QtGui import *
 from main_engine import MainEngine
 from model import ModelFactory
 from account import AccountFactory
-from trading import TradingFactory
+from trading import TradingFactory, TradingDaemon
 from strategy import StrategyFactory
-# from widget.model_panel import ModelPanel
-# from widget.trade_panel import TradePanel
 from widget.log_monitor import LogMonitor
 from widget.market_canvas import MarketCanvas
 from widget.asset_balance_table import AssetBalanceTable
@@ -20,7 +18,7 @@ from widget.trade_setting.normal_trade_setting_panel import NormalTradeSettingPa
 from widget.trade_setting.test_trade_setting_panel import TestTradeSettingPanel
 from structure import TradeSettingMode, AssetBalanceData, LogStruct, TestSettingStruct
 from event import Event, EVENT_ASSET_BALANCE, EVENT_LOG
-# from exchange.binance_market import BinanceMarket
+
 
 class AppWin(QFrame):
 
@@ -29,10 +27,10 @@ class AppWin(QFrame):
 
         self.app_id = app_id
         self.mode = TradeSettingMode.EMPTY
-        
+
         self.setup_ui()
         self.bind_event()
-        
+
         self.show_model_info()
         self.show_market()
 
@@ -45,8 +43,6 @@ class AppWin(QFrame):
         vbox_layout.setContentsMargins(5, 0, 0, 0)
         self.setLayout(vbox_layout)
 
-        # self.model_panel = ModelPanel(self, self.top_dock)
-        # vbox_layout.addWidget(self.model_panel, stretch=6)
         self.setup_ui_upper_half(vbox_layout)
 
         self.line = QFrame(self)
@@ -56,14 +52,12 @@ class AppWin(QFrame):
         self.line.setFrameShape(QFrame.Shape.HLine)
         vbox_layout.addWidget(self.line)
 
-        # self.trade_panel = TradePanel(self, self.top_dock)
-        # vbox_layout.addWidget(self.trade_panel, stretch=4)
         self.setup_ui_lower_half(vbox_layout)
 
     def setup_ui_upper_half(self, layout: QVBoxLayout):
         hbox_layout = QHBoxLayout()
         layout.addLayout(hbox_layout, stretch=6)
-        
+
         left_widget = QWidget()
         hbox_layout.addWidget(left_widget, stretch=3)
 
@@ -72,7 +66,7 @@ class AppWin(QFrame):
 
         self.setup_ui_upper_half_left_area(left_widget)
         self.setup_ui_upper_half_right_area(right_widget)
-        
+
     def setup_ui_upper_half_left_area(self, left_widget: QWidget):
         vbox_layout = QVBoxLayout()
 
@@ -118,7 +112,7 @@ class AppWin(QFrame):
         self.setup_ui_lower_half_left_area(left_widget)
         self.setup_ui_lower_half_middle_area(middle_widget)
         self.setup_ui_lower_half_right_area(right_widget)
-    
+
     def setup_ui_lower_half_left_area(self, left_widget: QWidget):
         vbox_layout = QVBoxLayout()
         left_widget.setLayout(vbox_layout)
@@ -148,7 +142,7 @@ class AppWin(QFrame):
         self.show_all_balance_checkbox.setCheckState(Qt.CheckState.Checked)
         self.show_all_balance_checkbox.setDisabled(True)
         vbox_layout.addWidget(self.show_all_balance_checkbox)
-    
+
     def setup_ui_lower_half_middle_area(self, middle_widget: QWidget):
         vbox_layout = QVBoxLayout()
         middle_widget.setLayout(vbox_layout)
@@ -194,14 +188,10 @@ class AppWin(QFrame):
         if ret == QDialog.DialogCode.Accepted:
             self.load_trade_panel_status()
             self.refresh_asset_balance()
-            
-    def on_click_remove_account(self):
-        rule = TradeFactory().get_trade_rule(self.app_id)
-        if rule is None:
-            self.clear_trade_panel_status()
-            return
 
-        if rule.is_running:
+    def on_click_remove_account(self):
+        daemon : TradingDaemon = TradingFactory().get_daemon(self.app_id)
+        if daemon is not None and daemon.is_running:
             QMessageBox.warning(self, "警告", f"账号正在交易运行，请先停止！", QMessageBox.StandardButton.Ok)
             return
 
@@ -212,12 +202,12 @@ class AppWin(QFrame):
     def on_click_start_trade(self):
         self.start_trade_btn.setDisabled(True)
         self.stop_trade_btn.setEnabled(True)
-        
+
         # 交易设置
         trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
         trade_setting.lock_all()
-        setting_data : TestSettingStruct= trade_setting.get_setting_data()
-        
+        setting_data: TestSettingStruct = trade_setting.get_setting_data()
+
         # 模型参数
         model_config = ModelFactory().get_config_dict(self.app_id)
         strategy = StrategyFactory(setting_data.strategy_name)
@@ -228,10 +218,10 @@ class AppWin(QFrame):
     def on_click_stop_trade(self):
         self.start_trade_btn.setEnabled(True)
         self.stop_trade_btn.setDisabled(True)
-        
+
         trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
         trade_setting.unlock_all()
-        
+
         daemon = TradingFactory().get_daemon(self.app_id)
         daemon.stop()
 
@@ -283,7 +273,6 @@ class AppWin(QFrame):
         elif self.mode == TradeSettingMode.TEST:
             self.stacked_setting_panel.setCurrentIndex(2)
 
-
     def show_model_info(self):
         config = ModelFactory().get_config_dict(self.app_id)
         if config is not None:
@@ -296,7 +285,7 @@ class AppWin(QFrame):
                 s = s + f"{key:<{max_len+1}}: {value}\n"
 
             self.config_info_textbrowser.setText(s)
-            
+
     def show_market(self):
         self.market_canvas.start_market()
 
@@ -304,11 +293,11 @@ class AppWin(QFrame):
         self.market_canvas.stop_market()
         self.log_monitor.close()
         # self.model_panel.close()
-        
+
         self.asset_balance_table.close()
         # self.trade_panel.close()
         return super().close()
-    
+
     def write_log(self, msg):
         MainEngine.write_log(msg)
-        MainEngine.event_engine.put(event = Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.app_id)
+        MainEngine.event_engine.put(event=Event(EVENT_LOG, LogStruct(msg=msg)), suffix=self.app_id)
