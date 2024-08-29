@@ -16,7 +16,7 @@ from widget.trade_setting.trade_setting_interface import TradeSettingInterface
 from widget.trade_setting.empty_trade_setting_panel import EmptyTradeSettingPanel
 from widget.trade_setting.normal_trade_setting_panel import NormalTradeSettingPanel
 from widget.trade_setting.test_trade_setting_panel import TestTradeSettingPanel
-from structure import TradeSettingMode, AssetBalanceData, LogStruct, TestSettingStruct
+from structure import TradeMode, AssetBalanceData, LogStruct, TradeSettingStruct
 from event import Event, EVENT_ASSET_BALANCE, EVENT_LOG
 
 
@@ -26,7 +26,7 @@ class AppWin(QFrame):
         super().__init__(parent_widget)
 
         self.app_id = app_id
-        self.mode = TradeSettingMode.EMPTY
+        self.mode = TradeMode.EMPTY
 
         self.setup_ui()
         self.bind_event()
@@ -206,7 +206,7 @@ class AppWin(QFrame):
         # 交易设置
         trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
         trade_setting.lock_all()
-        setting_data: TestSettingStruct = trade_setting.get_setting_data()
+        setting_data: TradeSettingStruct = trade_setting.get_setting_data()
 
         # 模型参数
         model_config = ModelFactory().get_config_dict(self.app_id)
@@ -247,9 +247,9 @@ class AppWin(QFrame):
         self.select_account_btn.setVisible(False)
 
         if AccountFactory().is_test(self.app_id):
-            self.switch_trade_setting_panel(TradeSettingMode.TEST)
+            self.switch_trade_setting_panel(TradeMode.BACKTEST)
         else:
-            self.switch_trade_setting_panel(TradeSettingMode.NORMAL)
+            self.switch_trade_setting_panel(TradeMode.NORMAL)
 
     def clear_trade_panel_status(self):
         self.account_label.setText("")
@@ -260,17 +260,17 @@ class AppWin(QFrame):
         self.select_account_btn.setVisible(True)
 
         self.asset_balance_table.clear_contents()
-        self.switch_trade_setting_panel(TradeSettingMode.EMPTY)
+        self.switch_trade_setting_panel(TradeMode.EMPTY)
 
     def switch_trade_setting_panel(self, mode):
         self.mode = mode
-        if self.mode == TradeSettingMode.EMPTY:
+        if self.mode == TradeMode.EMPTY:
             self.stacked_setting_panel.setCurrentIndex(0)
 
-        elif self.mode == TradeSettingMode.NORMAL:
+        elif self.mode == TradeMode.NORMAL:
             self.stacked_setting_panel.setCurrentIndex(1)
 
-        elif self.mode == TradeSettingMode.TEST:
+        elif self.mode == TradeMode.BACKTEST:
             self.stacked_setting_panel.setCurrentIndex(2)
 
     def show_model_info(self):

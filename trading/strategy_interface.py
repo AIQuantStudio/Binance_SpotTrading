@@ -11,7 +11,7 @@ from structure import Interval
 
 class StrategyInterface(ABC):
 
-    def __init__(self, model_id, mode: TradeSettingMode):
+    def __init__(self, model_id, mode: TradeMode):
         # self.main_engine = main_engine
         self.mode = mode
 

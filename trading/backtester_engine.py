@@ -5,7 +5,7 @@ import time
 
 from main_engine import MainEngine
 from model import ModelFactory
-from structure import TestSettingStruct, LogStruct
+from structure import TradeSettingStruct, LogStruct
 from event import Event, EVENT_LOG
 from exchange import BinanceMarket
 
@@ -16,7 +16,7 @@ class BacktesterEngine:
         self.model_id = model_id
         self.strategy : BaseStrategy = strategy
 
-        self.backtest_setting_data: TestSettingStruct = setting_data
+        self.backtest_setting_data: TradeSettingStruct = setting_data
         self._history_data = []
 
     def clear_data(self):

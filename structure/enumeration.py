@@ -4,10 +4,10 @@ from enum import Enum
 class EmptyEnum(Enum):
     NONE = ""
 
-class TradeSettingMode(Enum):
+class TradeMode(Enum):
     EMPTY = 0
     NORMAL = 1
-    TEST = 2
+    BACKTEST = 2
     
 
 class TradingDecision(Enum):

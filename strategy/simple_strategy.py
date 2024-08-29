@@ -7,29 +7,10 @@ from strategy.base_strategy import BaseStrategy
 from structure import BarStruct
 
 
-class AtrRsiStrategy(BaseStrategy):
-    """"""
+class SimpleStrategy(BaseStrategy):
 
-    name = "AtrRsiStrategy"
-    author = "用Python的交易员"
-
-    refer_currency = 22
-    trade_amount = 10
-
-
-    atr_value = 0
-    atr_ma = 0
-    rsi_value = 0
-    rsi_buy = 0
-    rsi_sell = 0
-    intra_trade_high = 0
-    intra_trade_low = 0
-
-    parameters = ["refer_currency", "trade_amount"]
-    variables = ["atr_value", "atr_ma", "rsi_value", "rsi_buy", "rsi_sell", "intra_trade_high", "intra_trade_low"]
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, app_id):
+        super().__init__(app_id)
 
         self.history_bar: OrderedDict[datetime, BarStruct] = {}
         self.history_predict: OrderedDict[datetime, float] = {}
@@ -43,7 +24,7 @@ class AtrRsiStrategy(BaseStrategy):
         self.bar_serial = BarSerial()
 
     def on_init(self):
-        """重写 BaseStrategy::on_init"""
+        """ 重写 BaseStrategy::on_init """
         self.write_log("策略初始化")
 
         self.rsi_buy = 50 + self.rsi_entry
@@ -53,22 +34,18 @@ class AtrRsiStrategy(BaseStrategy):
         # self.load_bar(10)
         
     def preload(self, bar: BarStruct):
-        """重写 BaseStrategy::preload"""
+        """ 重写 BaseStrategy::preload """
         self.history_bar[bar.datetime] = bar
 
     def on_start(self):
-        """重写 BaseStrategy::on_start"""
+        """ 重写 BaseStrategy::on_start """
         self.write_log("策略启动")
 
     def on_stop(self):
-        """重写 BaseStrategy::on_stop"""
+        """ 重写 BaseStrategy::on_stop """
         self.write_log("策略停止")
-
-    def on_tick(self, tick: TickData):
-        """重写 BaseStrategy::on_tick"""
-        self.bar_gen.update_tick(tick)
-
-    def on_bar(self, bar: BarData):
+        
+    def on_bar(self, bar: BarStruct):
         """ 重写 BaseStrategy::on_bar """
         self.last_bar = bar
 
@@ -120,15 +97,3 @@ class AtrRsiStrategy(BaseStrategy):
             self.cover(short_stop, abs(self.pos), stop=True)
 
         self.put_event()
-
-    def on_trade(self, trade: TradeData):
-        """重写 BaseStrategy::on_trade"""
-        self.put_event()
-
-    def on_order(self, order: OrderData):
-        """重写 BaseStrategy::on_order"""
-        pass
-
-    def on_stoporder(self, stop_order: StoporderData):
-        """重写 BaseStrategy::on_stoporder"""
-        pass

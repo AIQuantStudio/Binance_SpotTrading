@@ -1,6 +1,6 @@
 from common import singleton
 
-# from structure import TradeSettingMode
+# from structure import TradeMode
 from trading.trading_daemon import TradingDaemon
  
  
@@ -10,8 +10,8 @@ class TradingFactory:
     def __init__(self):
         self._map_model_id_to_trading_daemon = {}
     
-    def create_daemon(self, model_id,  setting_mode, strategy, setting_data):
-        daemon = TradingDaemon(model_id, setting_mode, strategy, setting_data)
+    def create_daemon(self, model_id,  trade_mode, strategy, setting_data):
+        daemon = TradingDaemon(model_id, trade_mode, strategy, setting_data)
         self._map_model_id_to_trading_daemon[model_id] = daemon
         return daemon
     

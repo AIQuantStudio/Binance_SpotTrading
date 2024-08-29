@@ -2,18 +2,18 @@ from threading import Thread
 
 from trading.backtester import Backtester
 from event import EVENT_MAKE_ORDER, EVENT_DEAL_ORDER
-from structure import TradeSettingMode
+from structure import TradeMode
 from main_engine import MainEngine
 
 
 class TradingDaemon:
     
-    def __init__(self, model_id,  setting_mode, strategy, setting_data):
+    def __init__(self, model_id,  trade_mode, strategy, setting_data):
         super().__init__()
         
         self.model_id = model_id
         self.strategy = strategy
-        self.setting_mode = setting_mode
+        self.trade_mode = trade_mode
         self.setting_data = setting_data
         
         self.backtester = None
@@ -22,9 +22,9 @@ class TradingDaemon:
         # self.thread = threading.Thread(target=self.run, daemon=True)
         
     def start(self):  
-        if self.setting_mode == TradeSettingMode.NORMAL:
+        if self.trade_mode == TradeMode.NORMAL:
             pass
-        elif self.setting_mode == TradeSettingMode.TEST:
+        elif self.trade_mode == TradeMode.BACKTEST:
             self.backtester = Backtester(self.model_id, self.strategy, self.setting_data)
             
             if self.thread is not None:

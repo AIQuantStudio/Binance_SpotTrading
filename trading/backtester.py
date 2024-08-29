@@ -4,7 +4,7 @@ from functools import lru_cache
 
 from main_engine import MainEngine
 from model import ModelFactory
-from structure import TestSettingStruct, LogStruct, BarStruct
+from structure import TradeSettingStruct, LogStruct, BarStruct
 from event import Event, EVENT_LOG
 from exchange import BinanceMarket
 from strategy import BaseStrategy
@@ -12,11 +12,11 @@ from strategy import BaseStrategy
 
 class Backtester:
     
-    def __init__(self, model_id, strategy:BaseStrategy, setting_data:TestSettingStruct):
+    def __init__(self, model_id, strategy:BaseStrategy, setting_data:TradeSettingStruct):
         self.model_id = model_id
         self.strategy : BaseStrategy = strategy
 
-        self.backtest_setting_data: TestSettingStruct = setting_data
+        self.backtest_setting_data: TradeSettingStruct = setting_data
         self._history_data = []
         
         self._preload_count = 32

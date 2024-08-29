@@ -6,12 +6,12 @@ from setting import StrategySetting
 class StrategyFactory:
 
     def __init__(self):
-        self._map_model_id_to_strategy = {}
+        self._map_app_id_to_strategy = {}
         
-    def create_strategy(self, model_id, strategy_name):
+    def create_strategy(self, app_id, strategy_name):
         for strategy in StrategySetting.Strategies:
             if strategy["Name"] == strategy_name:
                 cls = strategy["Class"]
-                strategy_obj = eval(cls)()
-                self._map_model_id_to_strategy[model_id] = strategy_obj
+                strategy_obj = eval(cls)(app_id)
+                self._map_app_id_to_strategy[app_id] = strategy_obj
                 break

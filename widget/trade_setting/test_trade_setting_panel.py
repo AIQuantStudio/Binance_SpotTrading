@@ -6,7 +6,7 @@ from datetime import datetime
 
 from widget.trade_setting.trade_setting_interface import TradeSettingInterface
 from model import ModelFactory
-from structure import TestSettingStruct
+from structure import TradeSettingStruct, TradeMode
 from setting import StrategySetting
 
 
@@ -87,6 +87,4 @@ class TestTradeSettingPanel(QFrame, TradeSettingInterface):
         trade_amount = float(self.trade_amount_edit.text())
         strategy_name = self.strategy_name_combobox.currentText()
 
-        test_setting_data = TestSettingStruct(predict_at_first_time=predict_at_first_time, begin_datetime=begin_datetime, end_datetime=end_datetime, refer_currency=refer_currency, trade_amount=trade_amount, strategy_name=strategy_name)
-
-        return test_setting_data
+        return TradeSettingStruct(mode=TradeMode.BACKTEST ,predict_at_first_time=predict_at_first_time, begin_datetime=begin_datetime, end_datetime=end_datetime, refer_currency=refer_currency, trade_amount=trade_amount, strategy_name=strategy_name)
