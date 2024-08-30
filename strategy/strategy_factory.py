@@ -1,6 +1,8 @@
 from common import singleton
 
 from setting import StrategySetting
+from strategy.simple_strategy import SimpleStrategy
+
 
 @singleton
 class StrategyFactory:

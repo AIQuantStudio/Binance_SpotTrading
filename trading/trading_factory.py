@@ -2,6 +2,7 @@ from common import singleton
 
 # from structure import TradeMode
 from trading.trading_daemon import TradingDaemon
+
  
  
 @singleton

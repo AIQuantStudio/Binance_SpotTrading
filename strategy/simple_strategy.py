@@ -20,8 +20,8 @@ class SimpleStrategy(BaseStrategy):
         self.last_predict_datetime:datetime = None
         
         
-        self.bar_gen = BarGenerator(self.on_bar)
-        self.bar_serial = BarSerial()
+        # self.bar_gen = BarGenerator(self.on_bar)
+        # self.bar_serial = BarSerial()
 
     def on_init(self):
         """ 重写 BaseStrategy::on_init """

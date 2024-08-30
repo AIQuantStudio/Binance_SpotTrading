@@ -210,7 +210,7 @@ class AppWin(QFrame):
 
         # 模型参数
         model_config = ModelFactory().get_config_dict(self.app_id)
-        strategy = StrategyFactory(setting_data.strategy_name)
+        strategy = StrategyFactory().create_strategy(self.app_id, setting_data.strategy_name)
 
         daemon = TradingFactory().create_daemon(self.app_id, self.mode, strategy, setting_data)
         daemon.start()
