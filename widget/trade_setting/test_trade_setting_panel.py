@@ -87,4 +87,4 @@ class TestTradeSettingPanel(QFrame, TradeSettingInterface):
         trade_amount = float(self.trade_amount_edit.text())
         strategy_name = self.strategy_name_combobox.currentText()
 
-        return TradeSettingStruct(mode=TradeMode.BACKTEST ,predict_at_first_time=predict_at_first_time, begin_datetime=begin_datetime, end_datetime=end_datetime, refer_currency=refer_currency, trade_amount=trade_amount, strategy_name=strategy_name)
+        return TradeSettingStruct(mode=TradeMode.BACKTESTER ,predict_at_first_time=predict_at_first_time, begin_datetime=begin_datetime, end_datetime=end_datetime, refer_currency=refer_currency, trade_amount=trade_amount, strategy_name=strategy_name)

@@ -9,8 +9,8 @@ from structure import BarStruct
 
 class SimpleStrategy(BaseStrategy):
 
-    def __init__(self, app_id):
-        super().__init__(app_id)
+    def __init__(self, app_id, symbol, interval):
+        super().__init__(app_id, symbol, interval)
 
         self.history_bar: OrderedDict[datetime, BarStruct] = {}
         self.history_predict: OrderedDict[datetime, float] = {}
@@ -27,10 +27,10 @@ class SimpleStrategy(BaseStrategy):
         """ 重写 BaseStrategy::on_init """
         self.write_log("策略初始化")
 
-        self.rsi_buy = 50 + self.rsi_entry
-        self.rsi_sell = 50 - self.rsi_entry
+        # self.rsi_buy = 50 + self.rsi_entry
+        # self.rsi_sell = 50 - self.rsi_entry
 
-        self.preload_bar(10)
+        # self.preload_bar(10)
         # self.load_bar(10)
         
     def preload(self, bar: BarStruct):

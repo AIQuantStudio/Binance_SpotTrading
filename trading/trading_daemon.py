@@ -22,9 +22,9 @@ class TradingDaemon:
         # self.thread = threading.Thread(target=self.run, daemon=True)
         
     def start(self):  
-        if self.trade_mode == TradeMode.NORMAL:
+        if self.trade_mode == TradeMode.TRADER:
             pass
-        elif self.trade_mode == TradeMode.BACKTEST:
+        elif self.trade_mode == TradeMode.BACKTESTER:
             self.backtester = Backtester(self.model_id, self.strategy, self.setting_data)
             
             if self.thread is not None:
@@ -38,12 +38,13 @@ class TradingDaemon:
         self.backtester.clear_data()
         self.backtester.load_history_data()
 
-        try:
-            self.backtester.run_strategy()
-        except Exception:
-            # self._write_log(f"策略回测失败，触发异常：\n{traceback.format_exc()}")
-            self.thread = None
-            return
+        self.backtester.run_strategy()
+        # try:
+        #     self.backtester.run_strategy()
+        # except Exception:
+        #     # self._write_log(f"策略回测失败，触发异常：\n{traceback.format_exc()}")
+        #     self.thread = None
+        #     return
 
         # self.backtester.calculate_statistics()
         

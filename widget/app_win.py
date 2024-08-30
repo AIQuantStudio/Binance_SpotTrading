@@ -16,7 +16,7 @@ from widget.trade_setting.trade_setting_interface import TradeSettingInterface
 from widget.trade_setting.empty_trade_setting_panel import EmptyTradeSettingPanel
 from widget.trade_setting.normal_trade_setting_panel import NormalTradeSettingPanel
 from widget.trade_setting.test_trade_setting_panel import TestTradeSettingPanel
-from structure import TradeMode, AssetBalanceData, LogStruct, TradeSettingStruct
+from structure import TradeMode, AssetBalanceData, LogStruct, TradeSettingStruct, Interval
 from event import Event, EVENT_ASSET_BALANCE, EVENT_LOG
 
 
@@ -209,8 +209,9 @@ class AppWin(QFrame):
         setting_data: TradeSettingStruct = trade_setting.get_setting_data()
 
         # 模型参数
+        symbol = ModelFactory().get_model_symbol(self.app_id)
         model_config = ModelFactory().get_config_dict(self.app_id)
-        strategy = StrategyFactory().create_strategy(self.app_id, setting_data.strategy_name)
+        strategy = StrategyFactory().create_strategy(self.app_id, setting_data.strategy_name, symbol, Interval.M15)
 
         daemon = TradingFactory().create_daemon(self.app_id, self.mode, strategy, setting_data)
         daemon.start()
@@ -247,9 +248,9 @@ class AppWin(QFrame):
         self.select_account_btn.setVisible(False)
 
         if AccountFactory().is_test(self.app_id):
-            self.switch_trade_setting_panel(TradeMode.BACKTEST)
+            self.switch_trade_setting_panel(TradeMode.BACKTESTER)
         else:
-            self.switch_trade_setting_panel(TradeMode.NORMAL)
+            self.switch_trade_setting_panel(TradeMode.TRADER)
 
     def clear_trade_panel_status(self):
         self.account_label.setText("")
@@ -267,10 +268,10 @@ class AppWin(QFrame):
         if self.mode == TradeMode.EMPTY:
             self.stacked_setting_panel.setCurrentIndex(0)
 
-        elif self.mode == TradeMode.NORMAL:
+        elif self.mode == TradeMode.TRADER:
             self.stacked_setting_panel.setCurrentIndex(1)
 
-        elif self.mode == TradeMode.BACKTEST:
+        elif self.mode == TradeMode.BACKTESTER:
             self.stacked_setting_panel.setCurrentIndex(2)
 
     def show_model_info(self):

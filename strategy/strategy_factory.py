@@ -2,6 +2,7 @@ from common import singleton
 
 from setting import StrategySetting
 from strategy.simple_strategy import SimpleStrategy
+from structure import Interval
 
 
 @singleton
@@ -10,10 +11,13 @@ class StrategyFactory:
     def __init__(self):
         self._map_app_id_to_strategy = {}
         
-    def create_strategy(self, app_id, strategy_name):
+    def create_strategy(self, app_id, strategy_name, symbol, interval:Interval):
         for strategy in StrategySetting.Strategies:
             if strategy["Name"] == strategy_name:
                 cls = strategy["Class"]
-                strategy_obj = eval(cls)(app_id)
+                strategy_obj = eval(cls)(app_id, symbol, interval)
                 self._map_app_id_to_strategy[app_id] = strategy_obj
-                break
+                return strategy_obj
+            
+    def get_strategy(self, app_id):
+        return self._map_app_id_to_strategy.get(app_id)

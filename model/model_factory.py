@@ -8,6 +8,7 @@ from model.base_model import BaseModel
 from model.lstm_v1.lstmv1 import LstmV1
 from exchange.binance_canvas import BinanceCanvas
 from exchange.binance_market import BinanceMarket
+from structure import BarStruct
 
 
 @singleton
@@ -97,7 +98,10 @@ class ModelFactory:
 
         return model.predict(dataloader)
     
-    def predict(self, model_id, data:pd.DataFrame):
+    def predict(self, model_id, data:list[BarStruct]):
+        
+        for bar in data:
+            
         model = self._instance_models.get(model_id)
         dataloader = model.create_dataloader(data)
         return model.predict(dataloader)

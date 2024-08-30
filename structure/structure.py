@@ -45,7 +45,7 @@ class TradeSettingStruct:
     strategy_name: str
     
     def __post_init__(self):
-        if self.mode == TradeMode.BACKTEST:
+        if self.mode == TradeMode.BACKTESTER:
             pass
 
 
@@ -69,3 +69,4 @@ class BarStruct:
     low_price: float = 0
     close_price: float = 0
     volume: float = 0
+    trades: int = 0

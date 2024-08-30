@@ -6,8 +6,8 @@ class EmptyEnum(Enum):
 
 class TradeMode(Enum):
     EMPTY = 0
-    NORMAL = 1
-    BACKTEST = 2
+    TRADER = 1
+    BACKTESTER = 2
     
 
 class TradingDecision(Enum):

@@ -11,15 +11,17 @@ from structure import LogStruct, BarStruct, Interval
 
 class BaseStrategy(ABC): 
 
-    def __init__(self, app_id):
+    def __init__(self, app_id, symbol, interval):
         self.app_id = app_id
+        self.symbol = symbol
+        self.interval = interval
     
     @abstractmethod
     def on_init(self):
         pass
     
     @abstractmethod
-    def preload(self):
+    def preload(self, bar: BarStruct):
         pass
     
     @abstractmethod

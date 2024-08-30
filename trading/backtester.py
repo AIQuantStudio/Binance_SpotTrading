@@ -8,6 +8,7 @@ from structure import TradeSettingStruct, LogStruct, BarStruct
 from event import Event, EVENT_LOG
 from exchange import BinanceMarket
 from strategy import BaseStrategy
+from common import Utils
 
 
 class Backtester:
@@ -74,37 +75,44 @@ class Backtester:
 
 
     def run_strategy(self):
+        print(self.strategy)
+        print("=====================")
         self.strategy.on_init()
 
         count = 0
         ix = 0
         # 预处理数据
+        print(len(self._history_data))
+        print(self._preload_count)
         for ix, bar_data in enumerate(self._history_data):
             if count >= self._preload_count:
                 break
-
+            
             count += 1
             # self.datetime = bar_data.datetime
 
             try:
+                bar = Utils.data_to_bar(self.strategy.symbol, self.strategy.interval, bar_data)
                 # self._preload_callback(bar_data)
-                self.strategy.preload(bar_data)
+                self.strategy.preload(bar)
             except Exception:
                 self.write_log("触发异常，回测终止")
                 # self.write_log(traceback.format_exc())
                 return
 
-        self.strategy.inited = True
+        # self.strategy.inited = True
         self.write_log("策略初始化完成")
 
         self.strategy.on_start()
-        self.strategy.trading = True
+        # self.strategy.trading = True
         self.write_log("开始回放历史数据")
 
         # 使用剩余的历史数据来运行回测
         for data in self._history_data[ix:]:
             try:
-                self.new_bar(data)
+                bar = Utils.data_to_bar(self.strategy.symbol, self.strategy.interval, data)
+                print(bar)
+                self.new_bar(bar)
             except Exception:
                 self.write_log("触发异常，回测终止")
                 # self.write_log(traceback.format_exc())
