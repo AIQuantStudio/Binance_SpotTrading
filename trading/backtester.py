@@ -1,6 +1,7 @@
 from threading import Thread
 from datetime import date, datetime, timedelta
 from functools import lru_cache
+import time
 
 from main_engine import MainEngine
 from model import ModelFactory
@@ -111,8 +112,10 @@ class Backtester:
         for data in self._history_data[ix:]:
             try:
                 bar = Utils.data_to_bar(self.strategy.symbol, self.strategy.interval, data)
-                print(bar)
+                # print(bar)
                 self.new_bar(bar)
+                time.sleep(2)
+                # break
             except Exception:
                 self.write_log("触发异常，回测终止")
                 # self.write_log(traceback.format_exc())

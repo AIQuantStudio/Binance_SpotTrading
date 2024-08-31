@@ -3,6 +3,7 @@ from collections import OrderedDict
 from typing import Any, Dict
 
 from strategy.base_strategy import BaseStrategy
+from model import ModelFactory
 
 from structure import BarStruct
 
@@ -48,52 +49,67 @@ class SimpleStrategy(BaseStrategy):
     def on_bar(self, bar: BarStruct):
         """ 重写 BaseStrategy::on_bar """
         self.last_bar = bar
-
+        print("*************************")
         # 根据最近的历史Bar来预测价格
-        cur_predict_price, cur_predict_datetime = ...
+        data = self.history_bar.values()
+        data = list(data)
+        data.append(bar)
+        # print(data)
+        # cur_predict_price, cur_predict_datetime = ModelFactory().predict(self.app_id, data)
+        cur_predict_price = ModelFactory().predict(self.app_id, data)
+        print(cur_predict_price)
         
-        if cur_predict_price > self.last_close_price:
-            self.buy(bar.close_price, self.fixed_size)
-        elif cur_predict_price > self.last_close_price:
-            self.sell(bar.close_price, self.fixed_size)
+        # if cur_predict_price > self.last_bar.close_price:
+        #     self.buy(bar.close_price, self.fixed_size)
+        # elif cur_predict_price > self.last_bar.close_price:
+        #     self.sell(bar.close_price, self.fixed_size)
         
         
         
         
-        self.cancel_all()
+        # self.cancel_all()
 
-        bs = self.bar_serial
-        bs.update_bar(bar)
-        if not bs.inited:
-            return
+        # bs = self.bar_serial
+        # bs.update_bar(bar)
+        # if not bs.inited:
+        #     return
 
-        atr_array = bs.atr(self.atr_length, array=True)
-        self.atr_value = atr_array[-1]
-        self.atr_ma = atr_array[-self.atr_ma_length :].mean()
-        self.rsi_value = bs.rsi(self.rsi_length)
+        # atr_array = bs.atr(self.atr_length, array=True)
+        # self.atr_value = atr_array[-1]
+        # self.atr_ma = atr_array[-self.atr_ma_length :].mean()
+        # self.rsi_value = bs.rsi(self.rsi_length)
 
-        if self.pos == 0:
-            self.intra_trade_high = bar.high_price
-            self.intra_trade_low = bar.low_price
+        # if self.pos == 0:
+        #     self.intra_trade_high = bar.high_price
+        #     self.intra_trade_low = bar.low_price
 
-            if self.atr_value > self.atr_ma:
-                if self.rsi_value > self.rsi_buy:
-                    self.buy(bar.close_price + 5, self.fixed_size)
-                elif self.rsi_value < self.rsi_sell:
-                    self.short(bar.close_price - 5, self.fixed_size)
+        #     if self.atr_value > self.atr_ma:
+        #         if self.rsi_value > self.rsi_buy:
+        #             self.buy(bar.close_price + 5, self.fixed_size)
+        #         elif self.rsi_value < self.rsi_sell:
+        #             self.short(bar.close_price - 5, self.fixed_size)
 
-        elif self.pos > 0:
-            self.intra_trade_high = max(self.intra_trade_high, bar.high_price)
-            self.intra_trade_low = bar.low_price
+        # elif self.pos > 0:
+        #     self.intra_trade_high = max(self.intra_trade_high, bar.high_price)
+        #     self.intra_trade_low = bar.low_price
 
-            long_stop = self.intra_trade_high * (1 - self.trailing_percent / 100)
-            self.sell(long_stop, abs(self.pos), stop=True)
+        #     long_stop = self.intra_trade_high * (1 - self.trailing_percent / 100)
+        #     self.sell(long_stop, abs(self.pos), stop=True)
 
-        elif self.pos < 0:
-            self.intra_trade_high = bar.high_price
-            self.intra_trade_low = min(self.intra_trade_low, bar.low_price)
+        # elif self.pos < 0:
+        #     self.intra_trade_high = bar.high_price
+        #     self.intra_trade_low = min(self.intra_trade_low, bar.low_price)
 
-            short_stop = self.intra_trade_low * (1 + self.trailing_percent / 100)
-            self.cover(short_stop, abs(self.pos), stop=True)
+        #     short_stop = self.intra_trade_low * (1 + self.trailing_percent / 100)
+        #     self.cover(short_stop, abs(self.pos), stop=True)
 
-        self.put_event()
+        # self.put_event()
+        self.history_bar[bar.datetime] = bar
+        
+        
+    # def send_order(self, direction: Direction, offset: Offset, price: float, volume: float, stop: bool = False, lock: bool = False):
+    #     if self.trading:
+    #         vt_orderids = self.app_engine.send_order(direction, offset, price, volume, stop, lock)
+    #         return vt_orderids
+    #     else:
+    #         return []

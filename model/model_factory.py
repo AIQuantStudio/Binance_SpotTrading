@@ -83,25 +83,41 @@ class ModelFactory:
     def cuda_is_available(self):
         return torch.cuda.is_available()
 
-    def predict(self, model_id, gpu=False):
-        model = self._instance_models.get(model_id)
-        model.set_device("cuda" if gpu else "cpu")
-        model.to(model.device)
+    # def predict(self, model_id, gpu=False):
+    #     model = self._instance_models.get(model_id)
+    #     model.set_device("cuda" if gpu else "cpu")
+    #     model.to(model.device)
 
-        data = BinanceMarket().get_last_klines(self.get_model_symbol(model_id))
-        df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "Trades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
-        df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
-        df.set_index("datetime", inplace=True)
-        df = df.drop(df.index[-1])
+    #     data = BinanceMarket().get_last_klines(self.get_model_symbol(model_id))
+    #     df = pd.DataFrame(data, columns=["datetime", "Open", "High", "Low", "Close", "Volume", "CloseTime", "QuoteVolume", "Trades", "BuyBaseVolume", "BuyQuoteVolume", "Ignored"], dtype=float)
+    #     df["datetime"] = pd.to_datetime(df["datetime"] / 1000.0, unit="s")
+    #     df.set_index("datetime", inplace=True)
+    #     df = df.drop(df.index[-1])
 
-        dataloader = model.create_dataloader(df)
+    #     dataloader = model.create_dataloader(df)
 
-        return model.predict(dataloader)
+    #     return model.predict(dataloader)
     
     def predict(self, model_id, data:list[BarStruct]):
-        
+        data_array = []
         for bar in data:
+            data_bar = []
+            timestamp = bar.datetime.timestamp()
+            close = bar.close_price
+            volume = bar.volume
+            trades = bar.trades
             
+            data_bar.append(timestamp)
+            data_bar.append(close)
+            data_bar.append(volume)
+            data_bar.append(trades)
+            
+            data_array.append(data_bar)
+            
+        df = pd.DataFrame(data_array, columns=["datetime", "Close", "Volume", "Trades"], dtype=float)
+        df["datetime"] = pd.to_datetime(df["datetime"], unit="s")
+        df.set_index("datetime", inplace=True)
+        
         model = self._instance_models.get(model_id)
-        dataloader = model.create_dataloader(data)
-        return model.predict(dataloader)
+        dataloader = model.create_dataloader(df)
+        return model.predict(dataloader)[0][0]
