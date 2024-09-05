@@ -59,10 +59,10 @@ class SimpleStrategy(BaseStrategy):
         cur_predict_price = ModelFactory().predict(self.app_id, data)
         print(cur_predict_price)
         
-        # if cur_predict_price > self.last_bar.close_price:
-        #     self.buy(bar.close_price, self.fixed_size)
-        # elif cur_predict_price > self.last_bar.close_price:
-        #     self.sell(bar.close_price, self.fixed_size)
+        if cur_predict_price > self.last_bar.close_price:
+            self.buy(bar.close_price, self.fixed_size, )
+        elif cur_predict_price > self.last_bar.close_price:
+            self.sell(bar.close_price, self.fixed_size)
         
         
         

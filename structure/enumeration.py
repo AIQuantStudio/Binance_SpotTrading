@@ -17,6 +17,7 @@ class TradingDecision(Enum):
     
 class Interval(Enum):
     MINUTE = "1m"
+    M5 = "5m"
     M15 = "15m"
     M30 = "30m"
     HOUR = "1h"

@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+from common import Utils
+
+
 class BaseModel(ABC):
 
     def __init__(self, name, id):
@@ -7,6 +10,7 @@ class BaseModel(ABC):
         self._id = id
         self._base_currency = ""
         self._quote_currency = ""
+        self._interval = ""
         self._dataloader = None
         self._device = "cpu"
     
@@ -33,6 +37,15 @@ class BaseModel(ABC):
     @property
     def quote_currency(self):
         return self._quote_currency.upper()
+    
+    @property
+    def interval(self):
+        if self.__interval is not None:
+            return self.__interval
+        
+        if self._interval is not None and self._interval != "":
+            self.__interval = Utils.convert_interval(self._interval)
+            return self.__interval
     
     def set_device(self, device):
         self._device = device

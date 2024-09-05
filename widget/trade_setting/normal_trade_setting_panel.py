@@ -97,5 +97,5 @@ class NormalTradeSettingPanel(QFrame, TradeSettingInterface):
     def unlock_all_input(self):
         pass
     
-    def get_setting_data(self):
+    def get_setting(self):
         pass

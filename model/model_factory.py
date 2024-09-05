@@ -60,6 +60,10 @@ class ModelFactory:
     def get_model_symbol(self, model_id):
         model = self._instance_models.get(model_id)
         return f"{model.base_currency.upper()}{model.quote_currency.upper()}"
+    
+    def get_model_interval(self, model_id):
+        model = self._instance_models.get(model_id)
+        return self._instance_models.get(model_id).interval
 
     def get_model_curreny(self, model_id):
         model = self._instance_models.get(model_id)

@@ -21,3 +21,4 @@ class ModelConfig:
     sample_size = 0
     features = ['close', 'volume', 'trades'] # what columns to use 
     target = 'close' # what column to predict
+    

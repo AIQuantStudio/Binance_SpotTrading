@@ -11,5 +11,9 @@ class TradeSettingInterface:
     def unlock_all(self):
         pass
     
-    def get_setting_data(self) -> Any:
+    def get_setting(self) -> Any:
         pass
+    
+    # @property
+    # def strategy_name(self):
+    #     return 

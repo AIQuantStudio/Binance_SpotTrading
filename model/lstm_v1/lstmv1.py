@@ -77,10 +77,15 @@ class LstmV1(BaseModel):
     def load_data(self, filename_data):
         try:
             checkpoint = torch.load(filename_data, map_location='cpu')
+            
             # self.symbol = checkpoint["symbol"]
             self.symbol = "ADA_USDT"
             self._base_currency = self.symbol.split("_")[0]
             self._quote_currency = self.symbol.split("_")[1]
+            
+            # self.symbol = checkpoint["interval"]
+            self._interval = "15m"
+            
             self.config = ModelConfig(**checkpoint["model_config"])
             self.scaler = checkpoint["model_scaler"]
             print(self.scaler)

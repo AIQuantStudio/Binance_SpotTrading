@@ -206,14 +206,9 @@ class AppWin(QFrame):
         # 交易设置
         trade_setting: TradeSettingInterface = self.stacked_setting_panel.currentWidget()
         trade_setting.lock_all()
-        setting_data: TradeSettingStruct = trade_setting.get_setting_data()
-
-        # 模型参数
-        symbol = ModelFactory().get_model_symbol(self.app_id)
-        model_config = ModelFactory().get_config_dict(self.app_id)
-        strategy = StrategyFactory().create_strategy(self.app_id, setting_data.strategy_name, symbol, Interval.M15)
-
-        daemon = TradingFactory().create_daemon(self.app_id, self.mode, strategy, setting_data)
+        trade_setting_data: TradeSettingStruct = trade_setting.get_setting()
+        
+        daemon = TradingFactory().create_daemon(self.app_id, self.mode, trade_setting_data)
         daemon.start()
 
     def on_click_stop_trade(self):

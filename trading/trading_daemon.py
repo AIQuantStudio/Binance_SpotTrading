@@ -2,7 +2,7 @@ from threading import Thread
 
 from trading.backtester import Backtester
 from event import EVENT_MAKE_ORDER, EVENT_DEAL_ORDER
-from structure import TradeMode
+from structure import TradeMode, TradeSettingStruct
 from main_engine import MainEngine
 
 
@@ -14,7 +14,7 @@ class TradingDaemon:
         self.model_id = model_id
         self.strategy = strategy
         self.trade_mode = trade_mode
-        self.setting_data = setting_data
+        self.setting_data:TradeSettingStruct = setting_data
         
         self.backtester = None
         self.thread = None

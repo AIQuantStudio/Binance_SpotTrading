@@ -35,6 +35,8 @@ class BaseStrategy(ABC):
     @abstractmethod
     def on_bar(self, bar: BarStruct):
         pass
+    
+    def buy(self, price, amount, )
 
     def write_log(self, msg):
         MainEngine.write_log(msg)

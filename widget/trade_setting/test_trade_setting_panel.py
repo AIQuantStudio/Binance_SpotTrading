@@ -79,7 +79,7 @@ class TestTradeSettingPanel(QFrame, TradeSettingInterface):
         self.trade_amount_edit.setEnabled(True)
         self.strategy_name_combobox.setEnabled(True)
 
-    def get_setting_data(self) -> Any:
+    def get_setting(self) -> Any:
         predict_at_first_time = self.predict_at_first_time_checkbox.checkState() == Qt.CheckState.Unchecked
         begin_datetime = self.begin_datetime_edit.dateTime().toPyDateTime()
         end_datetime = self.end_datetime_edit.dateTime().toPyDateTime()
