@@ -36,7 +36,8 @@ class BaseStrategy(ABC):
     def on_bar(self, bar: BarStruct):
         pass
     
-    def buy(self, price, amount, )
+    def buy(self, price, amount):
+        pass
 
     def write_log(self, msg):
         MainEngine.write_log(msg)
