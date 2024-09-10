@@ -4,7 +4,7 @@ from main_window import MainWindow
 from config import Version
 
 
-app_title = f"Binance现货交易系统 {Version}"
+app_title = f"Binance现货交易系统_new {Version}"
 
 if __name__ == "__main__":
     app = create_application(app_title)
