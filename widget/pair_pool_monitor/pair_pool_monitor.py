@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from typing import List
-from datetime import datetime
+from datetime import date, datetime, timedelta
 import numpy as np
 
 from widget.pair_pool_monitor.extended_combobox import ExtendedComboBox
@@ -20,45 +20,45 @@ class PairPoolMonitor(QDialog):
         self.setMinimumHeight(900)
 
         self.all_symbol_list = []
+        self.history_data: dict[str, list] = {}
 
-        self.init_ui()
+        self.setup_ui()
         self.load_all_symbol()
 
-    def init_ui(self):
+    def setup_ui(self):
         vbox_layout = QVBoxLayout()
         self.setLayout(vbox_layout)
 
-        #上半部分
+        # 上半部分
         upper_hbox_layout = QHBoxLayout()
 
         self.setup_left_ui(upper_hbox_layout)
         self.setup_middle_ui(upper_hbox_layout)
         self.setup_right_ui(upper_hbox_layout)
 
-        #下半部分
+        # 下半部分
         lower_hbox_layout = QHBoxLayout()
-        
+
         widget = QFrame()
         # widget.setMinimumHeight(200)
-        
+
         lower_hbox_layout.addWidget(widget)
 
-        
         vbox_layout.addLayout(upper_hbox_layout, stretch=2)
         vbox_layout.addLayout(lower_hbox_layout, stretch=3)
-        
+
     def setup_left_ui(self, layout: QBoxLayout):
         self.all_symbol_combox = ExtendedComboBox()
         self.all_symbol_combox.addItems(self.all_symbol_list)
         self.all_symbol_combox.currentTextChanged.connect(self.combox_currentTextChanged)
 
-        self.left_list_widget = QListWidget()
-        self.left_list_widget.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
-        self.left_list_widget.addItems(self.all_symbol_list)
+        self.all_symbol_list_widget = QListWidget()
+        self.all_symbol_list_widget.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.all_symbol_list_widget.addItems(self.all_symbol_list)
 
-        layout_1 = QVBoxLayout()
-        layout_1.addWidget(self.all_symbol_combox)
-        layout_1.addWidget(self.left_list_widget)
+        vbox_layout_left = QVBoxLayout()
+        vbox_layout_left.addWidget(self.all_symbol_combox)
+        vbox_layout_left.addWidget(self.all_symbol_list_widget)
 
         add_btn = QPushButton("添加>>")
         add_btn.clicked.connect(self.add_btn_clicked)
@@ -67,24 +67,33 @@ class PairPoolMonitor(QDialog):
         clear_btn = QPushButton("清空")
         clear_btn.clicked.connect(self.clear_btn_clicked)
 
-        layout_2 = QVBoxLayout()
-        layout_2.addStretch(1)
-        layout_2.addWidget(add_btn)
-        layout_2.addWidget(del_btn)
-        layout_2.addWidget(clear_btn)
-        layout_2.addStretch(1)
+        vbox_layout_middle = QVBoxLayout()
+        vbox_layout_middle.addStretch(1)
+        vbox_layout_middle.addWidget(add_btn)
+        vbox_layout_middle.addWidget(del_btn)
+        vbox_layout_middle.addWidget(clear_btn)
+        vbox_layout_middle.addStretch(1)
 
         self.right_list_widget = QListWidget()
-        self.right_list_widget.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
+        self.right_list_widget.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        # save_btn = QPushButton("保存")
+        # save_btn.clicked.connect(self.save_btn_clicked)
+        # load_btn = QPushButton("读取")
+        # load_btn.clicked.connect(self.load_btn_clicked)
+        
+        vbox_layout_right = QVBoxLayout()
+        vbox_layout_right.addWidget(self.right_list_widget)
+        # vbox_layout_right.addWidget(save_btn)
+        # vbox_layout_right.addWidget(load_btn)
 
-        layout_3 = QHBoxLayout()
-        layout_3.addLayout(layout_1)
-        layout_3.addLayout(layout_2)
-        layout_3.addWidget(self.right_list_widget)
+        hbox_layout = QHBoxLayout()
+        hbox_layout.addLayout(vbox_layout_left)
+        hbox_layout.addLayout(vbox_layout_middle)
+        hbox_layout.addLayout(vbox_layout_right)
 
-        layout.addLayout(layout_3)
+        layout.addLayout(hbox_layout)
 
-    def setup_middle_ui(self, layout:QBoxLayout):
+    def setup_middle_ui(self, layout: QBoxLayout):
         self.predict_at_first_time_checkbox = QCheckBox()
         self.predict_at_first_time_checkbox.setToolTip("从启动时间开始预测")
 
@@ -98,38 +107,34 @@ class PairPoolMonitor(QDialog):
         self.refer_currency_combobox.setItemDelegate(QStyledItemDelegate())
 
         self.start_btn = QPushButton("启动")
-        # self.start_btn.clicked.connect(self.add_btn_clicked)
+        self.start_btn.clicked.connect(self.start_btn_clicked)
 
         grid = QGridLayout()
-        grid.addWidget(QLabel("从启动时间开始预测"), 0, 0)
-        grid.addWidget(QLabel("起始时间"), 1, 0)
-        grid.addWidget(QLabel("终止时间"), 2, 0)
-        grid.addWidget(QLabel("交易对象"), 3, 0)
-        grid.addWidget(QLabel("交易数量"), 4, 0)
-        grid.addWidget(self.predict_at_first_time_checkbox, 0, 1, 1, 2)
-        grid.addWidget(self.begin_datetime_edit, 1, 1, 1, 2)
-        grid.addWidget(self.end_datetime_edit, 2, 1, 1, 2)
-        grid.addWidget(self.refer_currency_combobox, 3, 1, 1, 2)
-        grid.addWidget(self.start_btn, 4, 1, 1, 2)
+        grid.addWidget(QLabel("起始时间"), 0, 0)
+        grid.addWidget(QLabel("终止时间"), 1, 0)
+        grid.addWidget(QLabel("交易对象"), 2, 0)
+        grid.addWidget(self.begin_datetime_edit, 0, 1, 1, 2)
+        grid.addWidget(self.end_datetime_edit, 1, 1, 1, 2)
+        grid.addWidget(self.refer_currency_combobox, 2, 1, 1, 2)
+        grid.addWidget(self.start_btn, 3, 0, 1, 3)
 
         layout.addLayout(grid)
 
     def setup_right_ui(self, layout: QBoxLayout):
-        self.config_info_textbrowser = QTextBrowser()
-        self.config_info_textbrowser.setFont(QFont("Courier New", 11))
-        self.config_info_textbrowser.setMaximumHeight(200)
-        layout.addWidget(self.config_info_textbrowser)
+        self.log_info_textbrowser = QTextBrowser()
+        self.log_info_textbrowser.setFont(QFont("Courier New", 11))
+        self.log_info_textbrowser.setMaximumHeight(200)
+        layout.addWidget(self.log_info_textbrowser)
 
     def combox_currentTextChanged(self, cur_text: str):
         """下拉框选中"""
-        total_count = self.left_list_widget.count()
+        total_count = self.all_symbol_list_widget.count()
         for i in range(total_count):
-            item = self.left_list_widget.item(i)
+            item = self.all_symbol_list_widget.item(i)
             if item.text() == cur_text:
                 item.setSelected(True)
-                self.left_list_widget.setCurrentRow(i)
+                self.all_symbol_list_widget.setCurrentRow(i)
                 break
-        pass
 
     def check_submit_btn_clicked(self):
         """确认提交"""
@@ -138,11 +143,11 @@ class PairPoolMonitor(QDialog):
             QMessageBox.information(self, "提示", "您没有选择任何项", QMessageBox.StandardButton.Ok)
             return
         print(text_list)
-        pass
+
 
     def add_btn_clicked(self):
         """从左侧添加项到右侧"""
-        selected_items = self.left_list_widget.selectedItems()
+        selected_items = self.all_symbol_list_widget.selectedItems()
         if len(selected_items) <= 0:
             QMessageBox.information(self, "提示", "请选择要添加的项", QMessageBox.StandardButton.Ok)
             return
@@ -176,9 +181,9 @@ class PairPoolMonitor(QDialog):
 
     def all_selected_btn_clicked(self):
         """将左侧的项全部选中"""
-        total_count = self.left_list_widget.count()
+        total_count = self.all_symbol_list_widget.count()
         for i in range(total_count):
-            item = self.left_list_widget.item(i)
+            item = self.all_symbol_list_widget.item(i)
             item.setSelected(True)
         pass
 
@@ -189,7 +194,7 @@ class PairPoolMonitor(QDialog):
         pass
 
     def cancel_left_list_selected(self):
-        selected_items = self.left_list_widget.selectedItems()
+        selected_items = self.all_symbol_list_widget.selectedItems()
         if len(selected_items) <= 0:
             return
         for item in selected_items:
@@ -212,8 +217,58 @@ class PairPoolMonitor(QDialog):
     def load_all_symbol(self):
         with BinanceMarket() as market:
             self.all_symbol_list = market.get_all_symbol()
-            
-        self.all_symbol_combox.addItems(self.all_symbol_list)
-        self.left_list_widget.addItems(self.all_symbol_list)
 
-        
+        self.all_symbol_combox.addItems(self.all_symbol_list)
+        self.all_symbol_list_widget.addItems(self.all_symbol_list)
+
+    def write_log(self, msg):
+        self.log_info_textbrowser.append(msg)
+
+    def start_btn_clicked(self):
+        self.load_data()
+        self.norm_data()
+        self.plot_data()
+
+    def load_data(self):
+        self.write_log("开始加载历史数据")
+
+        begin_datetime = self.begin_datetime_edit.dateTime().toPyDateTime()
+        end_datetime = self.end_datetime_edit.dateTime().toPyDateTime()
+
+        if not end_datetime:
+            end_datetime = datetime.now()
+
+        if begin_datetime >= end_datetime:
+            self.write_log("起始日期必须小于结束日期")
+            return
+
+        self._history_data.clear()
+
+        progress_delta = timedelta(hours=4)
+        interval_delta = timedelta(minutes=15)
+
+        total_delta = end_datetime - begin_datetime
+        start = begin_datetime
+        end = begin_datetime + progress_delta
+        progress = 0
+
+        with BinanceMarket() as market:
+            while start < end_datetime:
+                end = min(end, end_datetime)
+
+                data, data_end_time = load_bar_data(ModelFactory().get_model_symbol(self.model_id), start, end, interval_delta)
+
+                data = market.load_klines(symbol, start, end, interval_delta)
+                data_end_time = data[-1][0]
+
+                self._history_data.extend(data)
+
+                progress += progress_delta / total_delta
+                progress = min(progress, 1)
+                progress_bar = "#" * int(progress * 10)
+                self.write_log(f"加载进度：{progress_bar} [{progress:.0%}]")
+
+                start = datetime.fromtimestamp(data_end_time / 1000.0) + interval_delta
+                end += progress_delta + interval_delta
+
+            self.write_log(f"历史数据加载完成，数据量：{len(self._history_data)}")
