@@ -31,6 +31,6 @@ class BinanceFactory:
         account = self._map_model_to_account.get(model_id)
         return account.get_all_asset_balance()
     
-
+        
 
 

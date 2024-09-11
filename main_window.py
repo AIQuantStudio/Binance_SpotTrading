@@ -4,7 +4,7 @@ from PyQt6.QtGui import *
 
 from main_engine import MainEngine
 from config import Config
-from widget import AppDock, SelectModelDialog, AboutDialog
+from widget import AppDock, SelectModelDialog, AboutDialog, PairPoolMonitor
 from model import ModelFactory
 
 
@@ -46,7 +46,11 @@ class MainWindow(QMainWindow):
         self.app_toolbar.addAction(load_model_action)
         self.app_toolbar.addSeparator()
 
-        about_action = QAction(QIcon(QPixmap("./ico/about.ico")), "加载模型", self)
+        about_action = QAction(QIcon(QPixmap("./ico/about.ico")), "关于", self)
+        about_action.triggered.connect(self.on_click_about)
+        self.app_toolbar.addAction(about_action)
+        
+        about_action = QAction(QIcon(QPixmap("./ico/pool.ico")), "数据监测", self)
         about_action.triggered.connect(self.on_click_about)
         self.app_toolbar.addAction(about_action)
 
@@ -64,6 +68,10 @@ class MainWindow(QMainWindow):
 
     def on_click_about(self):
         dlg = AboutDialog(self)
+        dlg.exec()
+        
+    def on_click_about(self):
+        dlg = PairPoolMonitor(self)
         dlg.exec()
 
     def process_close_app(self, app: AppDock):

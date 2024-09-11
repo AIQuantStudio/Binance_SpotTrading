@@ -72,3 +72,11 @@ class BinanceMarket:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.binance_client.close_connection()
+        
+    def get_all_symbol(self):
+        symbols = []
+        tickers = self.binance_client.get_all_tickers()
+        for ticker in tickers:
+            symbols.append(ticker["symbol"])
+        return symbols
+        
