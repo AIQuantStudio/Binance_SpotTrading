@@ -1,2 +1,2 @@
-from structure.enumeration import TradeMode, TradingDecision, Interval
+from structure.enumeration import TradeMode, TradingDecision, Interval, Scaler
 from structure.structure import LogStruct, BianceAccountData, AssetBalanceData, BianceTestAccountData, TradeSettingStruct, BarStruct

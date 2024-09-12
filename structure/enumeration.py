@@ -24,7 +24,9 @@ class Interval(Enum):
     DAILY = "1d"
     WEEKLY = "1w"
     
-    
+class Scaler(Enum):
+    NORMALIZATION = "归一化"
+    STANDARDIZATION = "标准化"
     
 class Trend(Enum):
     """"""
