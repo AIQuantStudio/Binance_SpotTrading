@@ -5,9 +5,12 @@ from PyQt6.QtGui import *
 from typing import List
 from datetime import date, datetime, timedelta
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from widget.pair_pool_monitor.extended_combobox import ExtendedComboBox
 from exchange import BinanceMarket
+from structure import Interval
+from common import Utils
 
 
 class PairPoolMonitor(QDialog):
@@ -21,6 +24,7 @@ class PairPoolMonitor(QDialog):
 
         self.all_symbol_list = []
         self.history_data: dict[str, list] = {}
+        # self.interval_names = [i.value for i in Interval]
 
         self.setup_ui()
         self.load_all_symbol()
@@ -50,11 +54,12 @@ class PairPoolMonitor(QDialog):
     def setup_left_ui(self, layout: QBoxLayout):
         self.all_symbol_combox = ExtendedComboBox()
         self.all_symbol_combox.addItems(self.all_symbol_list)
-        self.all_symbol_combox.currentTextChanged.connect(self.combox_currentTextChanged)
+        self.all_symbol_combox.currentTextChanged.connect(self.all_symbol_combox_currentTextChanged)
 
         self.all_symbol_list_widget = QListWidget()
         self.all_symbol_list_widget.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.all_symbol_list_widget.addItems(self.all_symbol_list)
+        self.all_symbol_list_widget.doubleClicked.connect(self.all_symbol_list_doubleClicked)
 
         vbox_layout_left = QVBoxLayout()
         vbox_layout_left.addWidget(self.all_symbol_combox)
@@ -102,9 +107,10 @@ class PairPoolMonitor(QDialog):
         self.end_datetime_edit = QDateTimeEdit()
         self.end_datetime_edit.setDateTime(QDateTime(datetime(2024, 1, 2)))
 
-        self.refer_currency_combobox = QComboBox()
+        self.interval_combobox = QComboBox()
+        self.interval_combobox.addItems([i.value for i in Interval])
         # self.refer_currency_combobox.addItems([currency for currency in ModelFactory().get_model_curreny(self.app_id)])
-        self.refer_currency_combobox.setItemDelegate(QStyledItemDelegate())
+        self.interval_combobox.setItemDelegate(QStyledItemDelegate())
 
         self.start_btn = QPushButton("启动")
         self.start_btn.clicked.connect(self.start_btn_clicked)
@@ -112,10 +118,10 @@ class PairPoolMonitor(QDialog):
         grid = QGridLayout()
         grid.addWidget(QLabel("起始时间"), 0, 0)
         grid.addWidget(QLabel("终止时间"), 1, 0)
-        grid.addWidget(QLabel("交易对象"), 2, 0)
+        grid.addWidget(QLabel("间隔时间"), 2, 0)
         grid.addWidget(self.begin_datetime_edit, 0, 1, 1, 2)
         grid.addWidget(self.end_datetime_edit, 1, 1, 1, 2)
-        grid.addWidget(self.refer_currency_combobox, 2, 1, 1, 2)
+        grid.addWidget(self.interval_combobox, 2, 1, 1, 2)
         grid.addWidget(self.start_btn, 3, 0, 1, 3)
 
         layout.addLayout(grid)
@@ -126,7 +132,7 @@ class PairPoolMonitor(QDialog):
         self.log_info_textbrowser.setMaximumHeight(200)
         layout.addWidget(self.log_info_textbrowser)
 
-    def combox_currentTextChanged(self, cur_text: str):
+    def all_symbol_combox_currentTextChanged(self, cur_text: str):
         """下拉框选中"""
         total_count = self.all_symbol_list_widget.count()
         for i in range(total_count):
@@ -144,6 +150,14 @@ class PairPoolMonitor(QDialog):
             return
         print(text_list)
 
+    def all_symbol_list_doubleClicked(self, modelindex: QModelIndex):
+        # self.close_edit()
+        item = self.all_symbol_list_widget.item(modelindex.row())
+        right_text_list = self.gain_right_all_list_text()
+        if item.text() not in right_text_list:
+            self.right_list_widget.addItem(item.text())
+            
+        self.cancel_left_list_selected()
 
     def add_btn_clicked(self):
         """从左侧添加项到右侧"""
@@ -158,7 +172,6 @@ class PairPoolMonitor(QDialog):
                 continue
             self.right_list_widget.addItem(item)
         self.cancel_left_list_selected()
-        pass
 
     def gain_right_all_list_text(self) -> List[str]:
         """获取右侧列表中所有相的文本"""
@@ -199,7 +212,6 @@ class PairPoolMonitor(QDialog):
             return
         for item in selected_items:
             item.setSelected(False)
-        pass
 
     def cancel_right_list_selected(self):
         selected_items = self.right_list_widget.selectedItems()
@@ -207,12 +219,10 @@ class PairPoolMonitor(QDialog):
             return
         for item in selected_items:
             item.setSelected(False)
-        pass
 
     def clear_btn_clicked(self):
         """清空右侧"""
         self.right_list_widget.clear()
-        pass
 
     def load_all_symbol(self):
         with BinanceMarket() as market:
@@ -225,9 +235,14 @@ class PairPoolMonitor(QDialog):
         self.log_info_textbrowser.append(msg)
 
     def start_btn_clicked(self):
-        self.load_data()
-        self.norm_data()
-        self.plot_data()
+        self.thread_a = QThread()
+        self.thread_a.run = self.load_data
+        self.thread_a.start()
+
+        
+        # self.load_data()
+        # self.norm_data()
+        # self.plot_data()
 
     def load_data(self):
         self.write_log("开始加载历史数据")
@@ -242,26 +257,38 @@ class PairPoolMonitor(QDialog):
             self.write_log("起始日期必须小于结束日期")
             return
 
-        self._history_data.clear()
+        self.history_data.clear()
 
-        progress_delta = timedelta(hours=4)
-        interval_delta = timedelta(minutes=15)
+        # progress_delta = timedelta(hours=4)
+        # interval_delta = timedelta(minutes=15)
+        interval = Utils.convert_interval(self.interval_combobox.currentText())
+        interval_delta = Utils.interval_to_timedelta(interval)
+        progress_delta = 30 * interval_delta
 
         total_delta = end_datetime - begin_datetime
         start = begin_datetime
         end = begin_datetime + progress_delta
         progress = 0
 
+        monitor_symbols = self.gain_right_all_list_text()
+        
         with BinanceMarket() as market:
             while start < end_datetime:
                 end = min(end, end_datetime)
 
-                data, data_end_time = load_bar_data(ModelFactory().get_model_symbol(self.model_id), start, end, interval_delta)
+                # data, data_end_time = load_bar_data(ModelFactory().get_model_symbol(self.model_id), start, end, interval_delta)
+                data_end_time = 0
+                for symbol in monitor_symbols:
+                    data = market.load_klines(symbol, start, end, interval_delta)
+                    if data_end_time < data[-1][0]:
+                        data_end_time = data[-1][0]
+                        
+                    if symbol not in self.history_data:
+                        self.history_data[symbol] = []
+                        
+                    self.history_data[symbol].extend(data)
 
-                data = market.load_klines(symbol, start, end, interval_delta)
-                data_end_time = data[-1][0]
-
-                self._history_data.extend(data)
+                    # self._history_data.extend(data)
 
                 progress += progress_delta / total_delta
                 progress = min(progress, 1)
@@ -271,4 +298,16 @@ class PairPoolMonitor(QDialog):
                 start = datetime.fromtimestamp(data_end_time / 1000.0) + interval_delta
                 end += progress_delta + interval_delta
 
-            self.write_log(f"历史数据加载完成，数据量：{len(self._history_data)}")
+            self.write_log(f"历史数据加载完成，数据量：{len(self.history_data)}")
+
+        self.norm_data()
+        
+    def norm_data(self):
+        scaler = MinMaxScaler()
+        for symbol, data in self.history_data.items():
+            # print(data)
+            np_data = np.array(data)
+            # scaler.fit_transform(data)
+            zz = np_data[:,[4]].ravel()
+            print(zz)
+            print(zz.shape)
