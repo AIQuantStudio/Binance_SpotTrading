@@ -305,9 +305,7 @@ class PairPoolMonitor(QDialog):
     def norm_data(self):
         scaler = MinMaxScaler()
         for symbol, data in self.history_data.items():
-            # print(data)
             np_data = np.array(data)
-            # scaler.fit_transform(data)
             zz = np_data[:,[4]].ravel()
             print(zz)
             print(zz.shape)
