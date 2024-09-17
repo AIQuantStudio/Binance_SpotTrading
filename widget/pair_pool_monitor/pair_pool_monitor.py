@@ -8,6 +8,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from widget.pair_pool_monitor.extended_combobox import ExtendedComboBox
+from widget.pair_pool_monitor.relative_price_figure import RelativePriceFigure
 from exchange import BinanceMarket
 from common import Interval
 from common import Utils
@@ -43,10 +44,10 @@ class PairPoolMonitor(QDialog):
         # 下半部分
         lower_hbox_layout = QHBoxLayout()
 
-        widget = QFrame()
+        self.figure = RelativePriceFigure()
         # widget.setMinimumHeight(200)
 
-        lower_hbox_layout.addWidget(widget)
+        lower_hbox_layout.addWidget(self.figure)
 
         vbox_layout.addLayout(upper_hbox_layout, stretch=2)
         vbox_layout.addLayout(lower_hbox_layout, stretch=3)
@@ -111,6 +112,11 @@ class PairPoolMonitor(QDialog):
         self.interval_combobox.addItems([i.value for i in Interval])
         # self.refer_currency_combobox.addItems([currency for currency in ModelFactory().get_model_curreny(self.app_id)])
         self.interval_combobox.setItemDelegate(QStyledItemDelegate())
+        
+        self.scaler_combobox = QComboBox()
+        self.scaler_combobox.addItems([i.value for i in Scaler])
+        # self.refer_currency_combobox.addItems([currency for currency in ModelFactory().get_model_curreny(self.app_id)])
+        self.scaler_combobox.setItemDelegate(QStyledItemDelegate())
 
         self.start_btn = QPushButton("启动")
         self.start_btn.clicked.connect(self.start_btn_clicked)
@@ -119,17 +125,19 @@ class PairPoolMonitor(QDialog):
         grid.addWidget(QLabel("起始时间"), 0, 0)
         grid.addWidget(QLabel("终止时间"), 1, 0)
         grid.addWidget(QLabel("间隔时间"), 2, 0)
+        grid.addWidget(QLabel("规格模式"), 3, 0)
         grid.addWidget(self.begin_datetime_edit, 0, 1, 1, 2)
         grid.addWidget(self.end_datetime_edit, 1, 1, 1, 2)
         grid.addWidget(self.interval_combobox, 2, 1, 1, 2)
-        grid.addWidget(self.start_btn, 3, 0, 1, 3)
+        grid.addWidget(self.scaler_combobox, 3, 1, 1, 2)
+        grid.addWidget(self.start_btn, 4, 0, 1, 3)
 
         layout.addLayout(grid)
 
     def setup_right_ui(self, layout: QBoxLayout):
         self.log_info_textbrowser = QTextBrowser()
         self.log_info_textbrowser.setFont(QFont("Courier New", 11))
-        self.log_info_textbrowser.setMaximumHeight(200)
+        # self.log_info_textbrowser.setMaximumHeight(200)
         layout.addWidget(self.log_info_textbrowser)
 
     def all_symbol_combox_currentTextChanged(self, cur_text: str):
@@ -303,9 +311,38 @@ class PairPoolMonitor(QDialog):
         self.norm_data()
         
     def norm_data(self):
-        scaler = MinMaxScaler()
+        self.plot_data = []
+        
+        if Scaler.NORMALIZATION == Scaler(self.scaler_combobox.currentText()):
+            scaler = MinMaxScaler()
+        elif Scaler.STANDARDIZATION == Scaler(self.scaler_combobox.currentText()):
+            scaler = StandardScaler()
+        
         for symbol, data in self.history_data.items():
+            
+            # np_data = np.array(data)
+            # norm_data = scaler.fit_transform(np_data)
+            # price_data = norm_data[:,[4]].ravel()
+            # print(price_data)
+            
             np_data = np.array(data)
-            zz = np_data[:,[4]].ravel()
-            print(zz)
-            print(zz.shape)
+            
+            timestamp_data = np_data[:,[0]]
+            timestamp_data = timestamp_data.ravel()
+            datetime_array = Utils.timestamp_array_to_datetime_array(timestamp_data.tolist())
+            x = np.array(datetime_array)
+            
+            
+            price_data = np_data[:,[4]]
+            norm_data = scaler.fit_transform(price_data)
+            y = norm_data.ravel()
+            
+            plot = {
+                "name":symbol,
+                "x": x,
+                "y": y
+            }
+            self.plot_data.append(plot)
+        
+        self.figure.plot_multi_line(self.plot_data)
+            

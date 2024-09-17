@@ -48,10 +48,20 @@ def _data_to_bar(symbol, interval, data: list) -> BarStruct:
 
     return BarStruct(symbol=symbol, interval=interval, datetime=dt, open_price=open, high_price=high, low_price=low, close_price=close, volume=volume, trades=trades)
 
+def _timestamp_array_to_datetime_array(timestamp_array:list, unix = False):
+    datetime_array = []
+    div = 1 if unix else 1000.0
+    for timestamp in timestamp_array:
+        timestamp = float(timestamp)
+        d = datetime.fromtimestamp(timestamp/div)
+        datetime_array.append(d)
+    return datetime_array
+
 
 # 导出 Utils
 class Utils:
     data_to_bar = _data_to_bar
     convert_interval = _convert_interval
     interval_to_timedelta = _interval_to_timedelta
+    timestamp_array_to_datetime_array = _timestamp_array_to_datetime_array
 
