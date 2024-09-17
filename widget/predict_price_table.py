@@ -7,7 +7,7 @@ from widget.predict_price_cells.predict_price_time_cell import PrdictPriceTimeCe
 from widget.predict_price_cells.predict_price_float_cell import PredictPriceFloatCell
 from widget.predict_price_cells.predict_price_trend_cell import PredictPriceTrendCell
 from event import Event, EVENT_ASSET_BALANCE
-from structure import AssetBalanceData
+from common import AssetBalanceData
 
 
 class PredictPriceTable(QTableWidget):

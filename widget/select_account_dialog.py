@@ -6,7 +6,7 @@ from PyQt6.QtGui import *
 from functools import partial
 
 from account import AccountFactory
-from structure import BianceAccountData, BianceTestAccountData
+from common import BianceAccountData, BianceTestAccountData
 from setting import AccountSetting
 
 

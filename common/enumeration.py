@@ -24,10 +24,7 @@ class Interval(Enum):
     DAILY = "1d"
     WEEKLY = "1w"
     
-    
-    
 class Trend(Enum):
-    """"""
     RISE = "涨"
     FALL = "跌"
     
@@ -42,8 +39,6 @@ class Offset(Enum):
     NONE = ""
     OPEN = "开"
     CLOSE = "平"
-    CLOSETODAY = "平今"
-    CLOSEYESTERDAY = "平昨"
 
 
 class Status(Enum):
@@ -55,20 +50,6 @@ class Status(Enum):
     CANCELLED = "已撤销"
     REJECTED = "拒单"
 
-
-class Product(Enum):
-    """"""
-    EQUITY = "股票"
-    FUTURES = "期货"
-    OPTION = "期权"
-    INDEX = "指数"
-    FOREX = "外汇"
-    SPOT = "现货"
-    ETF = "ETF"
-    BOND = "债券"
-    WARRANT = "权证"
-    SPREAD = "价差"
-    FUND = "基金"
 
 
 class OrderType(Enum):
@@ -90,20 +71,6 @@ class Exchange(Enum):
     HUOBI = "HUOBI"
     OKEX = "OKEX"
 
-
-
-
-
-class AppEngineMode(Enum):
-    """"""
-    BACKTESTING = "backtesting"
-    SIMULATING = "simulating"
-    TRADER = "trader"
-
-
-class BacktestingMode(Enum):
-    BAR = 1
-    TICK = 2
 
 
 class StopOrderStatus(Enum):

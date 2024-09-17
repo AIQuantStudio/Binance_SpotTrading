@@ -6,7 +6,7 @@ from typing import Any, Callable
 
 from main_engine import MainEngine
 from event import Event, EVENT_LOG
-from structure import LogStruct, BarStruct, Interval
+from common import LogStruct, BarStruct, Interval
 
 
 class BaseStrategy(ABC): 

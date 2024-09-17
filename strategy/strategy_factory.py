@@ -2,7 +2,7 @@ from common import singleton
 
 from setting import StrategySetting
 from strategy.simple_strategy import SimpleStrategy
-from structure import Interval, TradeSettingStruct
+from common import Interval, TradeSettingStruct
 
 
 @singleton

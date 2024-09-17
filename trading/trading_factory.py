@@ -1,6 +1,6 @@
 from common import singleton
 
-# from structure import TradeMode
+# from common import TradeMode
 from trading.trading_daemon import TradingDaemon
 from model import ModelFactory
 from strategy import StrategyFactory

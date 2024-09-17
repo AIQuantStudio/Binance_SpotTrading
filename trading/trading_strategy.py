@@ -1,4 +1,4 @@
-from structure import TradingDecision
+from common import TradingDecision
 
 
 class TradingStrategy:

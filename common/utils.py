@@ -3,7 +3,7 @@ from decimal import Decimal
 from math import floor, ceil
 from datetime import datetime, timedelta
 
-from structure import BarStruct, Interval
+from common import BarStruct, Interval
 
 def _convert_interval(str_interval:str):
     if str_interval == "1m" or str_interval == "1M":

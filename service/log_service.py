@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import datetime
 
 from config import Config
-from structure import LogStruct
+from common import LogStruct
 from event import EventEngine, Event, EVENT_LOG
 
 from service.base_service import BaseService

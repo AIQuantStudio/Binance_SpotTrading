@@ -2,7 +2,7 @@ from threading import Thread
 
 from trading.backtester import Backtester
 from event import EVENT_MAKE_ORDER, EVENT_DEAL_ORDER
-from structure import TradeMode, TradeSettingStruct
+from common import TradeMode, TradeSettingStruct
 from main_engine import MainEngine
 
 

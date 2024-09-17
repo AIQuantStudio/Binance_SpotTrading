@@ -4,7 +4,7 @@ from PyQt6.QtGui import *
 
 from main_engine import MainEngine
 from event import Event, EVENT_LOG
-from structure import LogStruct
+from common import LogStruct
 from widget.log_monitor_cells.log_msg_cell import LogMsgCell
 from widget.log_monitor_cells.log_time_cell import LogTimeCell
 

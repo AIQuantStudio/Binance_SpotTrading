@@ -9,7 +9,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from widget.pair_pool_monitor.extended_combobox import ExtendedComboBox
 from exchange import BinanceMarket
-from structure import Interval
+from common import Interval
 from common import Utils
 
 

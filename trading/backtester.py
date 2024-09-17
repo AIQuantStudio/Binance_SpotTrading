@@ -5,7 +5,7 @@ import time
 
 from main_engine import MainEngine
 from model import ModelFactory
-from structure import TradeSettingStruct, LogStruct, BarStruct
+from common import TradeSettingStruct, LogStruct, BarStruct
 from event import Event, EVENT_LOG
 from exchange import BinanceMarket
 from strategy import BaseStrategy

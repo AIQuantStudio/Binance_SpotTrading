@@ -6,7 +6,7 @@ from datetime import datetime
 
 from widget.trade_setting.trade_setting_interface import TradeSettingInterface
 from model import ModelFactory
-from structure import TradeSettingStruct, TradeMode
+from common import TradeSettingStruct, TradeMode
 from setting import StrategySetting
 
 

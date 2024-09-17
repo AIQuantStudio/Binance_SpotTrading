@@ -16,7 +16,7 @@ from widget.trade_setting.trade_setting_interface import TradeSettingInterface
 from widget.trade_setting.empty_trade_setting_panel import EmptyTradeSettingPanel
 from widget.trade_setting.normal_trade_setting_panel import NormalTradeSettingPanel
 from widget.trade_setting.test_trade_setting_panel import TestTradeSettingPanel
-from structure import TradeMode, AssetBalanceData, LogStruct, TradeSettingStruct, Interval
+from common import TradeMode, AssetBalanceData, LogStruct, TradeSettingStruct, Interval
 from event import Event, EVENT_ASSET_BALANCE, EVENT_LOG
 
 

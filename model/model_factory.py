@@ -8,7 +8,7 @@ from model.base_model import BaseModel
 from model.lstm_v1.lstmv1 import LstmV1
 from exchange.binance_canvas import BinanceCanvas
 from exchange.binance_market import BinanceMarket
-from structure import BarStruct
+from common import BarStruct
 
 
 @singleton

@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from typing import Dict
 
-from structure import AssetBalanceData
+from common import AssetBalanceData
 from event import Event, EVENT_ASSET_BALANCE
 from main_engine import MainEngine
 

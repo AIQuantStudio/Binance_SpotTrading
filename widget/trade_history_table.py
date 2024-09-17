@@ -6,7 +6,7 @@ from typing import Dict
 from event import Event
 from event import EVENT_TRADE
 from main_engine import MainEngine
-# from structure import TradeData
+# from common import TradeData
 
 from widget.trade_history_cells.trade_history_str_cell import TradeHistoryStrCell
 from widget.trade_history_cells.trade_history_float_cell import TradeHistoryFloatCell

@@ -5,7 +5,7 @@ from typing import Any, Dict
 from strategy.base_strategy import BaseStrategy
 from model import ModelFactory
 
-from structure import BarStruct
+from common import BarStruct
 
 
 class SimpleStrategy(BaseStrategy):
